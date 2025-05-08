@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import Header from '../components/common/Header';
 import Footer from '../Components/common/Footer';
 import FloatingActionButton from '../Components/common/FloatingActionButton';
-import ParticlesBackground from '../Components/common/ParticlesBackground';
+// import ParticlesBackground from '../Components/common/ParticlesBackground';
 
 // Hide AppBar on scroll down
 function HideOnScroll({ children }) {
@@ -54,7 +54,7 @@ const MainLayout = () => {
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       {/* Particles background (only on homepage) */}
       {showParticles && ''} 
-      <ParticlesBackground />
+      {/* <ParticlesBackground /> */}
       
       {/* Header */}
       <HideOnScroll>

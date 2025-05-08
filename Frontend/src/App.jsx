@@ -41,6 +41,8 @@ import WatermarkPDFPage from './Pages/WaterMarkPDFPage';
 import UnlockPDFPage from './Pages/UnlockPDFPage';
 import CropPDFPage from './Pages/CropPDFPage';
 import EditPDFPage from './Pages/EditPDFPage';
+import SignupPage from './Pages/SignUpPage';
+import LoginPage from './Pages/LoginPage';
 // import JPGToPDFPage from './Pages/JPGToPDF.JSX';
 
 // Global styles
@@ -146,6 +148,8 @@ function App() {
               <Route path="about" element={<AboutPage />} />
               <Route path="contact" element={<ContactPage />} />
               <Route path="pricing" element={<PricingPage />} />
+              <Route path="signup" element={<SignupPage />} />
+              <Route path="login" element={<LoginPage />} />
             </Route>
             <Route path="/tools" element={<DashboardLayout />}>
               <Route path="merge-pdf" element={<MergePDFPage />} />

@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
+  AppBar,
   Container,
   Toolbar,
   Box,
@@ -9,39 +10,72 @@ import {
   Menu,
   MenuItem,
   ListItemIcon,
-  ListItemText,
+  Avatar,
+  Tooltip,
+  Badge,
   Drawer,
   List,
   ListItem,
   ListItemButton,
+  ListItemText,
   Divider,
   Collapse,
   useMediaQuery,
   useTheme,
-  Badge,
   alpha,
-  Grid,
 } from '@mui/material';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 import {
   Menu as MenuIcon,
   Close as CloseIcon,
-  ArrowForward as ArrowIcon,
   ExpandMore as ExpandMoreIcon,
   ChevronRight as ChevronRightIcon,
   Article as ArticleIcon,
   Image as ImageIcon,
   Layers as LayersIcon,
   Security as SecurityIcon,
-  LockOpen as UnlockIcon,
+  DateRange as DateIcon,
+  AccessTime as TimeIcon,
+  Person as PersonIcon,
+  NotificationsNone as NotificationsIcon,
 } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
-import PdfLogo from './PdfLogo';
+import { Grid } from 'react-feather';
 
-const UltraModernHeader = () => {
+// Logo component
+const PdfLogo = ({ size = 40, light = false }) => (
+  <Box
+    component={motion.div}
+    whileHover={{ rotate: [0, -10, 10, -10, 0] }}
+    transition={{ duration: 0.5 }}
+    sx={{
+      width: size,
+      height: size,
+      borderRadius: '12px',
+      background: light ? 'white' : 'linear-gradient(135deg, #6366f1 0%, #4839eb 100%)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      boxShadow: '0 8px 16px rgba(99, 102, 241, 0.2)',
+    }}
+  >
+    <Typography
+      variant="h6"
+      sx={{
+        fontWeight: 800,
+        color: light ? '#4839eb' : 'white',
+        fontSize: size / 2,
+      }}
+    >
+      PDF
+    </Typography>
+  </Box>
+);
+
+const Header = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [hoverIndex, setHoverIndex] = useState(null);
+  const [dateTime, setDateTime] = useState(new Date());
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
@@ -51,60 +85,56 @@ const UltraModernHeader = () => {
   const [toolsAnchorEl, setToolsAnchorEl] = useState(null);
   const isToolsMenuOpen = Boolean(toolsAnchorEl);
   const [openMobileSubmenu, setOpenMobileSubmenu] = useState(false);
-  const menuTimeoutRef = useRef(null);
+  
+  // User menu
+  const [userMenuAnchor, setUserMenuAnchor] = useState(null);
+  const isUserMenuOpen = Boolean(userMenuAnchor);
+  
+  // Update the date/time every second
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setDateTime(new Date());
+    }, 1000);
+    
+    return () => clearInterval(timer);
+  }, []);
+  
+  // Format date and time (UTC)
+  const formattedDateTime = dateTime.toISOString().replace('T', ' ').slice(0, 19);
 
   const toolsMenuItems = [
     { 
       name: 'Merge PDF', 
       path: '/tools/merge-pdf',
-      icon: <LayersIcon fontSize="small" sx={{ color: '#6C63FF' }} />,
-      description: 'Combine multiple PDFs into one document',
-      bgColor: '#6C63FF10',
-      borderColor: '#6C63FF40'
+      icon: <LayersIcon fontSize="small" sx={{ color: '#6366f1' }} />,
+      description: 'Combine multiple PDFs into one document' 
     },
     { 
       name: 'Split PDF', 
       path: '/tools/split-pdf',
-      icon: <ArticleIcon fontSize="small" sx={{ color: '#FF9966' }} />,
-      description: 'Extract pages from PDF files with precision',
-      bgColor: '#FF996610',
-      borderColor: '#FF996640'
+      icon: <ArticleIcon fontSize="small" sx={{ color: '#f97316' }} />,
+      description: 'Extract pages from PDF files with precision' 
     },
     { 
       name: 'Convert PDF', 
       path: '/tools/convert-pdf',
-      icon: <ImageIcon fontSize="small" sx={{ color: '#2AC770' }} />,
-      description: 'Convert to and from PDF format seamlessly',
-      bgColor: '#2AC77010',
-      borderColor: '#2AC77040'
+      icon: <ImageIcon fontSize="small" sx={{ color: '#10b981' }} />,
+      description: 'Convert to and from PDF format seamlessly' 
     },
     {  
       name: 'Protect PDF', 
       path: '/tools/protect-pdf',
-      icon: <SecurityIcon fontSize="small" sx={{ color: '#FF6B6B' }} />,
-      description: 'Add password security to your sensitive PDFs',
-      bgColor: '#FF6B6B10',
-      borderColor: '#FF6B6B40'
-    },
-    { 
-      name: 'Create PDF', 
-      path: '/tools/create-pdf',
-      icon: <ArticleIcon fontSize="small" sx={{ color: '#A66CFF' }} />,
-      description: 'Create professional PDFs from scratch',
-      bgColor: '#A66CFF10',
-      borderColor: '#A66CFF40'
+      icon: <SecurityIcon fontSize="small" sx={{ color: '#ef4444' }} />,
+      description: 'Add password security to your sensitive PDFs' 
     },
   ];
 
   const handleToolsMenuOpen = (event) => {
-    clearTimeout(menuTimeoutRef.current);
     setToolsAnchorEl(event.currentTarget);
   };
 
   const handleToolsMenuClose = () => {
-    menuTimeoutRef.current = setTimeout(() => {
-      setToolsAnchorEl(null);
-    }, 100);
+    setToolsAnchorEl(null);
   };
 
   const toggleMobileDrawer = () => {
@@ -113,6 +143,14 @@ const UltraModernHeader = () => {
   
   const handleMobileSubmenuToggle = () => {
     setOpenMobileSubmenu(!openMobileSubmenu);
+  };
+  
+  const handleUserMenuOpen = (event) => {
+    setUserMenuAnchor(event.currentTarget);
+  };
+  
+  const handleUserMenuClose = () => {
+    setUserMenuAnchor(null);
   };
 
   // Check if the page is scrolled
@@ -128,7 +166,6 @@ const UltraModernHeader = () => {
     window.addEventListener('scroll', handleScroll);
     return () => {
       window.removeEventListener('scroll', handleScroll);
-      clearTimeout(menuTimeoutRef.current);
     };
   }, []);
 
@@ -139,46 +176,41 @@ const UltraModernHeader = () => {
     { title: 'Pricing', path: '/pricing' },
     { title: 'Contact', path: '/contact' },
   ];
+  
+  // Get current user's initials for avatar
+  const getUserInitials = (name) => {
+    return name.split('-')
+      .map(part => part[0])
+      .join('')
+      .substring(0, 2)
+      .toUpperCase();
+  };
 
   return (
-    <Box 
-      component={motion.div}
-      initial={{ y: -20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.5 }}
+    <AppBar 
+      position="fixed" 
+      color="transparent"
+      elevation={0}
       sx={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 1100,
+        background: scrolled 
+          ? 'rgba(255, 255, 255, 0.8)'
+          : 'transparent',
+        backdropFilter: scrolled ? 'blur(10px)' : 'none',
+        boxShadow: scrolled 
+          ? '0 4px 20px rgba(0, 0, 0, 0.08)'
+          : 'none',
+        borderBottom: scrolled 
+          ? '1px solid rgba(0, 0, 0, 0.05)'
+          : 'none',
         transition: 'all 0.3s ease',
       }}
     >
-      {/* Glass background that appears on scroll */}
-      <Box
-        component={motion.div}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: scrolled ? 1 : 0 }}
-        sx={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backdropFilter: 'blur(10px)',
-          backgroundColor: 'rgba(255, 255, 255, 0.7)',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.3)',
-          boxShadow: scrolled ? '0 10px 30px -10px rgba(0, 0, 0, 0.1)' : 'none',
-          zIndex: -1,
-        }}
-      />
-
       <Container maxWidth="xl">
         <Toolbar 
           disableGutters 
           sx={{ 
-            height: { xs: 70, md: 90 },
+            height: { xs: 70, md: 80 },
+            py: 0.5,
             transition: 'height 0.3s ease',
           }}
         >
@@ -187,50 +219,49 @@ const UltraModernHeader = () => {
             display: 'flex', 
             alignItems: 'center', 
             textDecoration: 'none',
-            position: 'relative',
-            zIndex: 2,
+            marginRight: 'auto',
           }}>
-            <Box
+            <Box 
               component={motion.div}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               sx={{ 
                 display: 'flex', 
                 alignItems: 'center',
+                mr: 1.5,
               }}
             >
-              <Box sx={{ display: 'flex', alignItems: 'center', mr: 1.5 }}>
-                <PdfLogo size={isSmall ? 32 : 42} />
-              </Box>
+              <PdfLogo size={isSmall ? 36 : 40} />
               <Typography
                 variant="h5"
                 sx={{
-                  color: scrolled ? 'text.primary' : { xs: 'text.primary', md: 'white' },
                   fontWeight: 700,
-                  display: { xs: 'none', sm: 'block' },
-                  mr: 3,
-                  fontSize: { xs: '1.2rem', md: '1.5rem' },
-                  letterSpacing: '-0.02em',
+                  ml: 1.5,
+                  fontSize: { xs: '1.25rem', md: '1.5rem' },
+                  color: scrolled 
+                    ? 'text.primary' 
+                    : { xs: 'text.primary', md: 'white' },
                   transition: 'color 0.3s ease',
                 }}
               >
                 <Box 
                   component="span" 
                   sx={{ 
-                    background: 'linear-gradient(90deg, #6C63FF, #A66CFF)',
+                    background: 'linear-gradient(to right, #6366f1, #4839eb)',
                     backgroundClip: 'text',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
-                    fontWeight: 800,
                   }}
                 >
                   PDF
-                </Box>{' '}
+                </Box>
                 <Box 
                   component="span" 
                   sx={{ 
-                    color: scrolled ? 'text.primary' : { xs: 'text.primary', md: 'white' },
-                    transition: 'color 0.3s ease',
+                    color: scrolled 
+                      ? 'text.primary' 
+                      : { xs: 'text.primary', md: 'white' },
+                    ml: 0.5,
                   }}
                 >
                   Utility
@@ -242,11 +273,10 @@ const UltraModernHeader = () => {
           {/* Desktop Navigation */}
           <Box
             sx={{
-              flexGrow: 1,
               display: { xs: 'none', md: 'flex' },
               justifyContent: 'center',
-              position: 'relative',
-              zIndex: 1,
+              alignItems: 'center',
+              gap: 1,
             }}
           >
             <Box
@@ -256,11 +286,11 @@ const UltraModernHeader = () => {
             >
               <Button
                 onClick={handleToolsMenuOpen}
-                onMouseEnter={handleToolsMenuOpen}
-                onMouseLeave={handleToolsMenuClose}
+                aria-haspopup="true"
+                aria-expanded={isToolsMenuOpen ? 'true' : undefined}
+                aria-controls={isToolsMenuOpen ? 'tools-menu' : undefined}
                 sx={{
-                  mx: 1,
-                  px: 2.5,
+                  px: 2,
                   py: 1,
                   color: scrolled ? 'text.primary' : 'white',
                   fontWeight: 600,
@@ -269,7 +299,7 @@ const UltraModernHeader = () => {
                   alignItems: 'center',
                   position: 'relative',
                   overflow: 'hidden',
-                  borderRadius: '12px',
+                  borderRadius: '10px',
                   transition: 'all 0.3s ease',
                   '&::before': {
                     content: '""',
@@ -279,9 +309,9 @@ const UltraModernHeader = () => {
                     right: 0,
                     bottom: 0,
                     background: scrolled 
-                      ? 'rgba(108, 99, 255, 0.08)'
+                      ? 'rgba(99, 102, 241, 0.08)'
                       : 'rgba(255, 255, 255, 0.1)',
-                    borderRadius: '12px',
+                    borderRadius: '10px',
                     opacity: 0,
                     transition: 'opacity 0.3s ease',
                     zIndex: -1,
@@ -298,7 +328,7 @@ const UltraModernHeader = () => {
                     animate={{ rotate: isToolsMenuOpen ? 180 : 0 }}
                     transition={{ duration: 0.3 }}
                   >
-                    <ExpandMoreIcon />
+                    <ExpandMoreIcon fontSize="small" />
                   </motion.div>
                 }
               >
@@ -312,22 +342,19 @@ const UltraModernHeader = () => {
                 component={motion.div}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.98 }}
-                onMouseEnter={() => setHoverIndex(index)}
-                onMouseLeave={() => setHoverIndex(null)}
               >
                 <Button
                   component={RouterLink}
                   to={link.path}
                   sx={{
-                    mx: 1,
-                    px: 2.5,
+                    px: 2,
                     py: 1,
                     color: scrolled ? 'text.primary' : 'white',
                     fontWeight: 600,
                     fontSize: '0.95rem',
                     position: 'relative',
                     overflow: 'hidden',
-                    borderRadius: '12px',
+                    borderRadius: '10px',
                     transition: 'all 0.3s ease',
                     '&::before': {
                       content: '""',
@@ -337,9 +364,9 @@ const UltraModernHeader = () => {
                       right: 0,
                       bottom: 0,
                       background: scrolled 
-                        ? 'rgba(108, 99, 255, 0.08)'
+                        ? 'rgba(99, 102, 241, 0.08)'
                         : 'rgba(255, 255, 255, 0.1)',
-                      borderRadius: '12px',
+                      borderRadius: '10px',
                       opacity: 0,
                       transition: 'opacity 0.3s ease',
                       zIndex: -1,
@@ -362,14 +389,14 @@ const UltraModernHeader = () => {
                       initial={false}
                       sx={{
                         position: 'absolute',
-                        bottom: '8px',
+                        bottom: '5px',
                         left: '50%',
-                        width: '6px',
-                        height: '6px',
+                        width: '5px',
+                        height: '5px',
                         borderRadius: '50%',
-                        backgroundColor: '#6C63FF',
+                        backgroundColor: '#6366f1',
                         transform: 'translateX(-50%)',
-                        boxShadow: '0 0 8px rgba(108, 99, 255, 0.6)',
+                        boxShadow: '0 0 8px rgba(99, 102, 241, 0.6)',
                       }}
                     />
                   )}
@@ -378,121 +405,128 @@ const UltraModernHeader = () => {
             ))}
           </Box>
 
-          {/* Right side buttons */}
+          {/* Right side information: time, user */}
           <Box 
             sx={{ 
-              display: 'flex', 
+              ml: { xs: 0, md: 2 },
+              display: 'flex',
               alignItems: 'center',
-              gap: { xs: 1, sm: 2 },
-              position: 'relative',
-              zIndex: 1,
+              gap: { xs: 1, md: 2 },
             }}
           >
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Button
-                variant="outlined"
-                component={RouterLink}
-                to="/login"
-                sx={{
-                  height: { xs: 36, md: 42 },
-                  borderColor: scrolled ? '#6C63FF' : 'rgba(255, 255, 255, 0.5)',
-                  color: scrolled ? '#6C63FF' : 'white',
-                  fontWeight: 600,
-                  borderRadius: '12px',
-                  borderWidth: '1.5px',
-                  px: { xs: 2, md: 2.5 },
-                  display: { xs: 'none', sm: 'inline-flex' },
-                  transition: 'all 0.3s ease',
-                  '&:hover': {
-                    borderColor: scrolled ? '#6C63FF' : 'white',
-                    backgroundColor: scrolled ? 'rgba(108, 99, 255, 0.04)' : 'rgba(255, 255, 255, 0.1)',
-                    transform: 'translateY(-2px)',
-                    boxShadow: '0 5px 15px rgba(108, 99, 255, 0.15)',
-                  },
-                }}
+        
+            {/* User profile button */}
+            <Tooltip title="Account settings">
+              <Box
+                component={motion.div}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.97 }}
               >
-                Login
-              </Button>
-            </motion.div>
-            
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+                <Button
+                  onClick={handleUserMenuOpen}
+                  aria-controls={isUserMenuOpen ? 'user-menu' : undefined}
+                  aria-haspopup="true"
+                  aria-expanded={isUserMenuOpen ? 'true' : undefined}
+                  sx={{
+                    borderRadius: '10px',
+                    textTransform: 'none',
+                    py: 0.5,
+                    px: { xs: 1, sm: 1.5 },
+                    background: scrolled 
+                      ? 'rgba(99, 102, 241, 0.08)'
+                      : 'rgba(255, 255, 255, 0.1)',
+                    border: '1px solid',
+                    borderColor: scrolled 
+                      ? 'rgba(99, 102, 241, 0.2)'
+                      : 'rgba(255, 255, 255, 0.1)',
+                    color: scrolled ? 'text.primary' : 'white',
+                    '&:hover': {
+                      background: scrolled 
+                        ? 'rgba(99, 102, 241, 0.15)'
+                        : 'rgba(255, 255, 255, 0.2)',
+                    },
+                  }}
+                >
+                  <Avatar
+                    sx={{
+                      width: 32,
+                      height: 32,
+                      backgroundColor: '#6366f1',
+                      fontSize: '0.875rem',
+                      fontWeight: 600,
+                    }}
+                  >
+                    {getUserInitials('Anuj-prajapati-SDE')}
+                  </Avatar>
+                  
+                  <Box sx={{ 
+                    ml: 1.5, 
+                    display: { xs: 'none', sm: 'block' },
+                    textAlign: 'left',
+                  }}>
+                    <Typography 
+                      component="span" 
+                      sx={{ 
+                        fontSize: '0.85rem',
+                        fontWeight: 600,
+                        display: 'block',
+                        lineHeight: 1.2,
+                      }}
+                    >
+                      {isSmall ? 'Anuj' : 'Anuj-prajapati'}
+                    </Typography>
+                    <Typography 
+                      component="span" 
+                      sx={{ 
+                        fontSize: '0.7rem',
+                        opacity: 0.8,
+                        display: 'block',
+                        lineHeight: 1.2,
+                      }}
+                    >
+                      SDE
+                    </Typography>
+                  </Box>
+                </Button>
+              </Box>
+            </Tooltip>
+
+            {/* Mobile menu toggle */}
+            <IconButton
+              edge="start"
+              color="inherit"
+              aria-label="menu"
+              onClick={toggleMobileDrawer}
+              sx={{
+                ml: { xs: 0, sm: 1 },
+                display: { md: 'none' },
+                color: scrolled ? '#6366f1' : 'white',
+                backgroundColor: scrolled 
+                  ? 'rgba(99, 102, 241, 0.08)'
+                  : 'rgba(255, 255, 255, 0.1)',
+                borderRadius: '10px',
+                p: 1,
+                '&:hover': {
+                  backgroundColor: scrolled 
+                    ? 'rgba(99, 102, 241, 0.15)'
+                    : 'rgba(255, 255, 255, 0.2)',
+                },
+              }}
             >
-              <Button
-                variant="contained"
-                component={RouterLink}
-                to="/signup"
-                sx={{
-                  height: { xs: 36, md: 42 },
-                  backgroundColor: scrolled ? '#6C63FF' : 'white',
-                  color: scrolled ? 'white' : '#6C63FF',
-                  fontWeight: 600,
-                  borderRadius: '12px',
-                  px: { xs: 2, md: 2.5 },
-                  display: { xs: 'none', sm: 'inline-flex' },
-                  transition: 'all 0.3s ease',
-                  boxShadow: scrolled 
-                    ? '0 10px 25px -5px rgba(108, 99, 255, 0.4)' 
-                    : '0 10px 25px -5px rgba(0, 0, 0, 0.15)',
-                  '&:hover': {
-                    backgroundColor: scrolled ? '#5A52E3' : 'rgba(255, 255, 255, 0.9)',
-                    transform: 'translateY(-2px)',
-                    boxShadow: scrolled 
-                      ? '0 15px 30px -5px rgba(108, 99, 255, 0.5)' 
-                      : '0 15px 30px -5px rgba(0, 0, 0, 0.2)',
-                  },
-                }}
-              >
-                Sign Up
-              </Button>
-            </motion.div>
-            
-            {/* Mobile menu button with animated icon */}
-            <Box
-              component={motion.div}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              sx={{ display: { md: 'none' } }}
-            >
-              <IconButton
-                edge="end"
-                aria-label="menu"
-                onClick={toggleMobileDrawer}
-                sx={{
-                  color: scrolled ? '#6C63FF' : 'white',
-                  backgroundColor: scrolled ? 'rgba(108, 99, 255, 0.08)' : 'rgba(255, 255, 255, 0.1)',
-                  borderRadius: '12px',
-                  width: 40,
-                  height: 40,
-                  '&:hover': {
-                    backgroundColor: scrolled ? 'rgba(108, 99, 255, 0.15)' : 'rgba(255, 255, 255, 0.2)',
-                  },
-                }}
-              >
-                <MenuIcon />
-              </IconButton>
-            </Box>
+              <MenuIcon />
+            </IconButton>
           </Box>
         </Toolbar>
       </Container>
 
-      {/* Tools dropdown menu with improved design */}
+      {/* Tools dropdown menu */}
       <Menu
         id="tools-menu"
         anchorEl={toolsAnchorEl}
         open={isToolsMenuOpen}
         onClose={handleToolsMenuClose}
         MenuListProps={{
-          onMouseEnter: handleToolsMenuOpen,
-          onMouseLeave: handleToolsMenuClose,
           'aria-labelledby': 'tools-button',
-          sx: {
-            padding: '12px',
-          }
         }}
         anchorOrigin={{
           vertical: 'bottom',
@@ -507,12 +541,13 @@ const UltraModernHeader = () => {
           sx: {
             mt: 1.5,
             overflow: 'visible',
-            borderRadius: '16px',
-            minWidth: 380,
-            backgroundColor: 'rgba(255, 255, 255, 0.7)',
+            borderRadius: '14px',
+            minWidth: 340,
+            backgroundColor: 'rgba(255, 255, 255, 0.9)',
             backdropFilter: 'blur(20px)',
             border: '1px solid rgba(255, 255, 255, 0.8)',
-            boxShadow: '0 15px 40px rgba(0, 0, 0, 0.1)',
+            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)',
+            p: 1.5,
             '&:before': {
               content: '""',
               display: 'block',
@@ -521,7 +556,7 @@ const UltraModernHeader = () => {
               left: '50%',
               width: 12,
               height: 12,
-              bgcolor: 'rgba(255, 255, 255, 0.7)',
+              bgcolor: 'rgba(255, 255, 255, 0.9)',
               backdropFilter: 'blur(20px)',
               transform: 'translateY(-50%) translateX(-50%) rotate(45deg)',
               zIndex: 0,
@@ -530,35 +565,24 @@ const UltraModernHeader = () => {
             },
           },
         }}
-        slotProps={{
-          backdrop: {
-            sx: {
-              backgroundColor: 'transparent',
-            }
-          }
-        }}
-        transitionDuration={{ enter: 400, exit: 300 }}
       >
         <Box 
           component="div" 
           sx={{ 
             display: 'grid', 
             gridTemplateColumns: '1fr',
-            gap: 1,
+            gap: 1.5,
           }}
         >
-          {toolsMenuItems.map((item, index) => (
+          {toolsMenuItems.map((item) => (
             <MenuItem
               key={item.name}
               component={RouterLink}
               to={item.path}
               onClick={handleToolsMenuClose}
               sx={{
-                borderRadius: '12px',
-                py: 1.5,
-                px: 2,
-                backgroundColor: item.bgColor,
-                border: `1px solid ${item.borderColor}`,
+                borderRadius: '10px',
+                p: 1.5,
                 transition: 'all 0.2s ease',
                 overflow: 'hidden',
                 position: 'relative',
@@ -569,15 +593,15 @@ const UltraModernHeader = () => {
                   left: 0,
                   right: 0,
                   bottom: 0,
-                  background: 'rgba(255, 255, 255, 0.3)',
+                  background: 'rgba(255, 255, 255, 0.5)',
                   opacity: 0,
                   transition: 'opacity 0.3s ease',
                   zIndex: 0,
                 },
                 '&:hover': {
-                  backgroundColor: alpha(item.bgColor, 0.8),
+                  backgroundColor: alpha(theme.palette.primary.main, 0.08),
                   transform: 'translateY(-2px)',
-                  boxShadow: `0 10px 20px -5px ${item.borderColor}`,
+                  boxShadow: '0 6px 12px rgba(0,0,0,0.05)',
                 },
                 '&:hover::before': {
                   opacity: 0.5,
@@ -586,11 +610,11 @@ const UltraModernHeader = () => {
             >
               <ListItemIcon 
                 sx={{ 
-                  minWidth: '40px',
-                  width: 40,
-                  height: 40,
+                  minWidth: 42,
+                  width: 42,
+                  height: 42,
                   borderRadius: '10px',
-                  backgroundColor: alpha(item.borderColor, 0.2),
+                  backgroundColor: alpha(theme.palette.primary.main, 0.1),
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -610,47 +634,142 @@ const UltraModernHeader = () => {
           ))}
         </Box>
         
-        <Divider sx={{ my: 1.5, opacity: 0.6 }} />
-        
-        <MenuItem
-          component={RouterLink}
-          to="/tools"
-          onClick={handleToolsMenuClose}
-          sx={{
-            borderRadius: '12px',
-            color: '#6C63FF',
-            fontWeight: 600,
-            py: 1.5,
-            backgroundColor: 'rgba(108, 99, 255, 0.05)',
-            transition: 'all 0.2s ease',
-            '&:hover': {
-              backgroundColor: 'rgba(108, 99, 255, 0.1)',
-              transform: 'translateY(-2px)',
+        <Box sx={{ mt: 1.5, display: 'flex', justifyContent: 'center' }}>
+          <Button
+            component={RouterLink}
+            to="/tools"
+            onClick={handleToolsMenuClose}
+            variant="contained"
+            disableElevation
+            size="small"
+            sx={{
+              borderRadius: '10px',
+              background: 'linear-gradient(to right, #6366f1, #4839eb)',
+              color: 'white',
+              textTransform: 'none',
+              fontWeight: 600,
+              px: 2,
+              py: 0.8,
+              '&:hover': {
+                boxShadow: '0 6px 15px rgba(99, 102, 241, 0.4)',
+              },
+            }}
+            endIcon={<ChevronRightIcon fontSize="small" />}
+          >
+            View All Tools
+          </Button>
+        </Box>
+      </Menu>
+      
+      {/* User menu */}
+      <Menu
+        id="user-menu"
+        anchorEl={userMenuAnchor}
+        open={isUserMenuOpen}
+        onClose={handleUserMenuClose}
+        MenuListProps={{
+          'aria-labelledby': 'user-button',
+        }}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+        PaperProps={{
+          elevation: 0,
+          sx: {
+            mt: 1.5,
+            overflow: 'visible',
+            borderRadius: '14px',
+            minWidth: 220,
+            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255, 255, 255, 0.8)',
+            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)',
+            p: 1,
+            '&:before': {
+              content: '""',
+              display: 'block',
+              position: 'absolute',
+              top: 0,
+              right: 14,
+              width: 12,
+              height: 12,
+              bgcolor: 'rgba(255, 255, 255, 0.9)',
+              backdropFilter: 'blur(20px)',
+              transform: 'translateY(-50%) rotate(45deg)',
+              zIndex: 0,
+              borderTop: '1px solid rgba(255, 255, 255, 0.8)',
+              borderLeft: '1px solid rgba(255, 255, 255, 0.8)',
             },
+          },
+        }}
+      >
+        <Box sx={{ px: 2, py: 1 }}>
+          <Typography variant="subtitle2" fontWeight={600}>
+            Anuj Prajapati
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            SDE Developer
+          </Typography>
+        </Box>
+        
+        <Divider sx={{ my: 1 }} />
+        
+        <MenuItem 
+          onClick={handleUserMenuClose}
+          sx={{ 
+            borderRadius: '8px',
+            my: 0.5,
           }}
         >
-          <Box 
-            sx={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'space-between',
-              width: '100%',
-            }}
-          >
-            <Typography variant="body2">
-              View All Tools
-            </Typography>
-            <motion.div
-              animate={{ x: [0, 5, 0] }}
-              transition={{ repeat: Infinity, duration: 1.5 }}
+          <ListItemIcon>
+            <PersonIcon fontSize="small" color="primary" />
+          </ListItemIcon>
+          <ListItemText>Profile</ListItemText>
+        </MenuItem>
+        
+        <MenuItem 
+          onClick={handleUserMenuClose}
+          sx={{ 
+            borderRadius: '8px',
+            my: 0.5,
+          }}
+        >
+          <ListItemIcon>
+            <NotificationsIcon fontSize="small" color="primary" />
+          </ListItemIcon>
+          <ListItemText>Notifications</ListItemText>
+        </MenuItem>
+        
+        <Divider sx={{ my: 1 }} />
+        
+        <MenuItem 
+          onClick={handleUserMenuClose}
+          sx={{ 
+            borderRadius: '8px',
+            my: 0.5,
+            color: '#ef4444',
+          }}
+        >
+          <ListItemIcon>
+            <Box 
+              sx={{ 
+                color: '#ef4444', 
+                display: 'flex' 
+              }}
             >
-              <ArrowIcon fontSize="small" sx={{ ml: 1 }} />
-            </motion.div>
-          </Box>
+              <CloseIcon fontSize="small" />
+            </Box>
+          </ListItemIcon>
+          <ListItemText>Logout</ListItemText>
         </MenuItem>
       </Menu>
 
-      {/* Mobile drawer with improved animations and design */}
+      {/* Mobile drawer */}
       <Drawer
         anchor="right"
         open={mobileOpen}
@@ -658,39 +777,34 @@ const UltraModernHeader = () => {
         PaperProps={{
           sx: {
             width: '100%',
-            maxWidth: 350,
-            background: 'rgba(30, 25, 80, 0.85)',
-            backdropFilter: 'blur(20px)',
+            maxWidth: 320,
+            background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.95) 0%, rgba(72, 57, 235, 0.95) 100%)',
+            backdropFilter: 'blur(10px)',
             color: 'white',
             px: 2,
-            borderTopLeftRadius: '24px',
-            borderBottomLeftRadius: '24px',
-            borderLeft: '1px solid rgba(255, 255, 255, 0.1)',
+            borderTopLeftRadius: '20px',
+            borderBottomLeftRadius: '20px',
           },
         }}
-        transitionDuration={{ enter: 400, exit: 300 }}
-        sx={{
-          '& .MuiBackdrop-root': {
-            backgroundColor: 'rgba(0, 0, 0, 0.3)',
-            backdropFilter: 'blur(3px)',
-          },
+        SlideProps={{
+          direction: "left"
         }}
       >
         <Box
           component={motion.div}
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
+          transition={{ duration: 0.5 }}
           sx={{ 
             display: 'flex', 
             alignItems: 'center', 
             justifyContent: 'space-between', 
-            py: 2 
+            py: 2.5
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <PdfLogo size={32} light />
-            <Typography variant="h6" sx={{ ml: 1, fontWeight: 700 }}>
+            <PdfLogo size={36} light />
+            <Typography variant="h6" sx={{ ml: 1.5, fontWeight: 700 }}>
               PDF Utility
             </Typography>
           </Box>
@@ -698,31 +812,77 @@ const UltraModernHeader = () => {
             onClick={toggleMobileDrawer} 
             sx={{ 
               color: 'white',
-              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              backgroundColor: 'rgba(255, 255, 255, 0.2)',
               '&:hover': {
-                backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                backgroundColor: 'rgba(255, 255, 255, 0.3)',
               },
             }}
           >
             <CloseIcon />
           </IconButton>
         </Box>
+        
+        {/* User info in drawer */}
+        <Box
+          component={motion.div}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          sx={{
+            py: 2,
+            px: 2,
+            mt: 1,
+            mb: 2,
+            borderRadius: '16px',
+            backdropFilter: 'blur(8px)',
+            backgroundColor: 'rgba(255, 255, 255, 0.15)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+          }}
+        >
+          <Avatar
+            sx={{
+              width: 48,
+              height: 48,
+              backgroundColor: 'white',
+              color: '#6366f1',
+              fontWeight: 600,
+              fontSize: '1rem',
+              boxShadow: '0 0 0 2px rgba(255, 255, 255, 0.3)',
+            }}
+          >
+            {getUserInitials('Anuj-prajapati-SDE')}
+          </Avatar>
+          <Box>
+            <Typography variant="subtitle2" fontWeight={600}>
+              Anuj-prajapati-SDE
+            </Typography>
+            <Typography 
+              variant="caption" 
+              sx={{ opacity: 0.8, fontSize: '0.75rem' }}
+            >
+              {formattedDateTime}
+            </Typography>
+          </Box>
+        </Box>
 
-        <Divider sx={{ borderColor: 'rgba(255,255,255,0.15)', my: 1.5 }} />
+        <Divider sx={{ borderColor: 'rgba(255,255,255,0.15)', my: 1 }} />
 
         <List disablePadding>
           {/* Tools submenu */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
           >
             <ListItem disablePadding>
               <ListItemButton 
                 onClick={handleMobileSubmenuToggle}
                 sx={{ 
-                  borderRadius: '12px', 
+                  borderRadius: '10px', 
                   px: 2,
+                  py: 1.5,
                   my: 0.5,
                   '&:hover': {
                     backgroundColor: 'rgba(255, 255, 255, 0.1)',
@@ -732,8 +892,8 @@ const UltraModernHeader = () => {
                 <ListItemText 
                   primary="Tools" 
                   primaryTypographyProps={{ 
-                    fontWeight: 600,
-                    fontSize: '1.1rem',
+                    fontWeight: 700,
+                    fontSize: '1rem',
                   }} 
                 />
                 <motion.div
@@ -759,8 +919,8 @@ const UltraModernHeader = () => {
                     component="div" 
                     disablePadding
                     sx={{ 
-                      backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                      borderRadius: '12px',
+                      backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                      borderRadius: '10px',
                       mt: 0.5,
                       mb: 1.5,
                       py: 1,
@@ -779,7 +939,6 @@ const UltraModernHeader = () => {
                             to={item.path}
                             onClick={toggleMobileDrawer}
                             sx={{ 
-                              pl: 4,
                               borderRadius: '8px',
                               mx: 1,
                               my: 0.5,
@@ -788,30 +947,12 @@ const UltraModernHeader = () => {
                               },
                             }}
                           >
-                            <ListItemIcon sx={{ 
-                              color: 'white', 
-                              minWidth: 36,
-                              width: 32,
-                              height: 32,
-                              borderRadius: '8px',
-                              backgroundColor: alpha(item.borderColor, 0.3),
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                            }}>
+                            <ListItemIcon sx={{ minWidth: 40, color: 'white' }}>
                               {item.icon}
                             </ListItemIcon>
                             <ListItemText 
                               primary={item.name} 
-                              primaryTypographyProps={{ fontSize: '0.95rem', fontWeight: 500 }} 
-                              secondary={item.description}
-                              secondaryTypographyProps={{ 
-                                fontSize: '0.75rem', 
-                                sx: { 
-                                  color: 'rgba(255, 255, 255, 0.6)',
-                                  display: { xs: 'none', sm: 'block' }
-                                } 
-                              }}
+                              primaryTypographyProps={{ fontSize: '0.95rem' }}  
                             />
                           </ListItemButton>
                         </ListItem>
@@ -829,7 +970,7 @@ const UltraModernHeader = () => {
               key={link.title}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
+              transition={{ duration: 0.5, delay: 0.4 + index * 0.1 }}
             >
               <ListItem disablePadding>
                 <ListItemButton
@@ -837,8 +978,9 @@ const UltraModernHeader = () => {
                   to={link.path}
                   onClick={toggleMobileDrawer}
                   sx={{ 
-                    borderRadius: '12px', 
+                    borderRadius: '10px', 
                     px: 2,
+                    py: 1.5,
                     my: 0.5,
                     position: 'relative',
                     overflow: 'hidden',
@@ -850,7 +992,7 @@ const UltraModernHeader = () => {
                       top: 0,
                       bottom: 0,
                       width: '3px',
-                      backgroundColor: '#6C63FF',
+                      backgroundColor: 'white',
                       opacity: location.pathname === link.path ? 1 : 0,
                       borderRadius: '0 3px 3px 0',
                       transition: 'opacity 0.3s ease',
@@ -859,7 +1001,7 @@ const UltraModernHeader = () => {
                       backgroundColor: 'rgba(255, 255, 255, 0.1)',
                     },
                     ...(location.pathname === link.path && {
-                      backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                      backgroundColor: 'rgba(255, 255, 255, 0.1)',
                     }),
                   }}
                 >
@@ -867,176 +1009,82 @@ const UltraModernHeader = () => {
                     primary={link.title} 
                     primaryTypographyProps={{ 
                       fontWeight: location.pathname === link.path ? 700 : 500,
-                      fontSize: '1.1rem',
-                    }} 
+                      fontSize: '1rem',
+                    }}  
                   />
-                  {location.pathname === link.path && (
-                    <Box 
-                      component={motion.div}
-                      layoutId="mobileActiveIndicator"
-                      sx={{
-                        width: 8,
-                        height: 8,
-                        borderRadius: '50%',
-                        backgroundColor: '#6C63FF',
-                        boxShadow: '0 0 8px rgba(108, 99, 255, 0.8)',
-                      }}
-                    />
-                  )}
                 </ListItemButton>
               </ListItem>
             </motion.div>
           ))}
         </List>
 
-        {/* Mobile authentication buttons */}
+        {/* Button group at bottom of drawer */}
         <Box 
           component={motion.div}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.7 }}
+          transition={{ duration: 0.5, delay: 0.8 }}
           sx={{ 
             mt: 'auto', 
             mb: 4, 
-            px: 2, 
             py: 3,
-            backgroundColor: 'rgba(255, 255, 255, 0.05)',
-            backdropFilter: 'blur(10px)',
-            borderRadius: '16px',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            mt: 4,
+            px: 2,
           }}
         >
-          <Typography 
-            variant="subtitle2" 
-            sx={{ 
-              mb: 2, 
-              color: 'rgba(255, 255, 255, 0.7)',
-              textAlign: 'center',
-            }}
-          >
-            Get access to premium features
-          </Typography>
-          
           <Grid container spacing={2}>
-            <Grid item xs={6}>
-              <motion.div
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
+            <Grid item xs={12}>
+              <Button
+                fullWidth
+                variant="contained"
+                component={RouterLink}
+                to="/signup"
+                onClick={toggleMobileDrawer}
+                sx={{
+                  backgroundColor: 'white',
+                  color: '#6366f1',
+                  borderRadius: '10px',
+                  py: 1.2,
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  boxShadow: '0 10px 20px -5px rgba(0, 0, 0, 0.1)',
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                    boxShadow: '0 15px 25px -5px rgba(0, 0, 0, 0.2)',
+                  },
+                }}
               >
-                <Button
-                  fullWidth
-                  variant="outlined"
-                  component={RouterLink}
-                  to="/login"
-                  sx={{
-                    borderColor: 'rgba(255, 255, 255, 0.5)',
-                    color: 'white',
-                    borderRadius: '12px',
-                    py: 1,
-                    '&:hover': {
-                      borderColor: 'white',
-                      backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                    },
-                  }}
-                >
-                  Login
-                </Button>
-              </motion.div>
+                Get Started
+              </Button>
             </Grid>
-            <Grid item xs={6}>
-              <motion.div
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
+            <Grid item xs={12}>
+              <Button
+                fullWidth
+                variant="outlined"
+                component={RouterLink}
+                to="/login"
+                onClick={toggleMobileDrawer}
+                sx={{
+                  borderColor: 'white',
+                  color: 'white',
+                  borderRadius: '10px',
+                  py: 1.2,
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  borderWidth: 2,
+                  '&:hover': {
+                    borderColor: 'white',
+                    backgroundColor: 'rgba(235, 235, 235, 0)',
+                  },
+                }}
               >
-                <Button
-                  fullWidth
-                  variant="contained"
-                  component={RouterLink}
-                  to="/signup"
-                  sx={{
-                    backgroundColor: '#6C63FF',
-                    color: 'white',
-                    borderRadius: '12px',
-                    py: 1,
-                    boxShadow: '0 10px 20px -5px rgba(108, 99, 255, 0.4)',
-                    '&:hover': {
-                      backgroundColor: '#5A52E3',
-                    },
-                  }}
-                >
-                  Sign Up
-                </Button>
-              </motion.div>
+                Sign In
+              </Button>
             </Grid>
           </Grid>
         </Box>
       </Drawer>
-
-      {/* Visual decorative elements in the header */}
-      <Box
-        sx={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          pointerEvents: 'none',
-          zIndex: 0,
-          overflow: 'hidden',
-        }}
-      >
-        {/* Purple glow on the right side */}
-        <Box
-          component={motion.div}
-          animate={{ 
-            opacity: [0.6, 0.8, 0.6],
-            scale: [1, 1.1, 1],
-          }}
-          transition={{ 
-            repeat: Infinity,
-            duration: 5,
-            ease: 'easeInOut',
-          }}
-          sx={{
-            position: 'absolute',
-            top: '-50%',
-            right: '-10%',
-            width: '30%',
-            height: '200%',
-            background: 'radial-gradient(circle, rgba(108, 99, 255, 0.2) 0%, rgba(108, 99, 255, 0) 70%)',
-            borderRadius: '50%',
-            filter: 'blur(60px)',
-          }}
-        />
-
-        {/* Blue glow on the left side */}
-        <Box
-          component={motion.div}
-          animate={{ 
-            opacity: [0.5, 0.7, 0.5],
-            scale: [1, 1.1, 1],
-          }}
-          transition={{ 
-            repeat: Infinity,
-            duration: 6,
-            ease: 'easeInOut',
-            delay: 1,
-          }}
-          sx={{
-            position: 'absolute',
-            top: '-30%',
-            left: '10%',
-            width: '25%',
-            height: '180%',
-            background: 'radial-gradient(circle, rgba(125, 249, 255, 0.15) 0%, rgba(125, 249, 255, 0) 70%)',
-            borderRadius: '50%',
-            filter: 'blur(60px)',
-          }}
-        />
-      </Box>
-    </Box>
+    </AppBar>
   );
 };
 
-export default UltraModernHeader;
+export default Header;

@@ -1,801 +1,1420 @@
 import React, { useState } from 'react';
-import { 
-  Box, 
-  Container, 
-  Grid, 
-  Typography, 
-  Card, 
-  CardContent, 
-  Button, 
+import { useNavigate } from 'react-router-dom';
+import {
+  Box,
+  Typography,
+  Button,
+  Paper,
+  Grid,
+  Container,
+  Card,
+  CardContent,
+  CardActions,
+  Stack,
+  Avatar,
+  Chip,
   Divider,
   Switch,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Chip,
-  styled,
-  alpha,
+  FormControlLabel,
+  IconButton,
+  Tooltip,
   useTheme,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
+  alpha,
+  useMediaQuery,
 } from '@mui/material';
-import { 
+import {
   Check as CheckIcon,
-  X as XIcon,
+  X as CloseIcon,
+  Info as InfoIcon,
+  AlertCircle as AlertCircleIcon,
   Award as AwardIcon,
   Zap as ZapIcon,
   Shield as ShieldIcon,
-  HelpCircle as HelpCircleIcon,
-  MessageCircle as MessageCircleIcon,
-  Clock as ClockIcon,
+  Star as StarIcon,
   Download as DownloadIcon,
-  ChevronDown as ChevronDownIcon,
+  Users as UsersIcon,
+  Mail as MailIcon,
+  Edit as EditIcon,
+  FileText as FileTextIcon,
+  Unlock as UnlockIcon,
+  MessageCircle as MessageCircleIcon,
+  Gift as GiftIcon,
+  Briefcase as BriefcaseIcon,
+  Settings as SettingsIcon,
 } from 'react-feather';
 import { motion } from 'framer-motion';
-import { Link as RouterLink } from 'react-router-dom';
+import { Image } from '@mui/icons-material';
 
-// Styled switch for billing period toggle
-const BillingSwitch = styled(Switch)(({ theme }) => ({
-  width: 58,
-  height: 32,
-  padding: 0,
-  '& .MuiSwitch-switchBase': {
-    padding: 2,
-    margin: 2,
-    transitionDuration: '300ms',
-    '&.Mui-checked': {
-      transform: 'translateX(26px)',
-      color: '#fff',
-      '& + .MuiSwitch-track': {
-        backgroundColor: theme.palette.primary.main,
-        opacity: 1,
-        border: 0,
-      },
-    },
+// Custom theme colors
+const customColors = {
+  darkBlue: '#0B1340',
+  deepPurple: '#5B0E8B',
+  aqua: '#00D4FF',
+  lightAqua: '#88E1FF',
+  brightPurple: '#A239FF',
+  nightPurple: '#2C1344',
+  glassOverlay: 'rgba(12, 24, 61, 0.3)',
+};
+
+// Pricing plan data
+const pricingPlans = [
+  {
+    id: 'free',
+    name: 'Free',
+    description: 'Basic tools for occasional use',
+    monthlyPrice: 0,
+    annualPrice: 0,
+    features: [
+      { text: 'PDF to JPG conversion', included: true },
+      { text: 'JPG to PDF conversion', included: true },
+      { text: 'Basic watermarking', included: true },
+      { text: 'Up to 5 files per day', included: true },
+      { text: 'Max file size: 15MB', included: true },
+      { text: 'Basic signatures', included: true },
+      { text: 'Ad-supported', included: true },
+      { text: 'Advanced editing tools', included: false },
+      { text: 'PDF encryption', included: false },
+      { text: 'Priority support', included: false },
+    ],
+    popular: false,
+    color: customColors.aqua,
+    gradient: `linear-gradient(135deg, ${alpha(customColors.aqua, 0.4)} 0%, ${alpha(customColors.aqua, 0.1)} 100%)`,
+    icon: <DownloadIcon size={24} />,
   },
-  '& .MuiSwitch-thumb': {
-    width: 24,
-    height: 24,
-    borderRadius: '50%',
-    boxShadow: '0 2px 4px 0 rgba(0, 35, 11, 0.2)',
+  {
+    id: 'pro',
+    name: 'Pro',
+    description: 'For professionals and small teams',
+    monthlyPrice: 9.99,
+    annualPrice: 99.99,
+    features: [
+      { text: 'All Free features', included: true },
+      { text: 'Unlimited conversions', included: true },
+      { text: 'Advanced editing tools', included: true },
+      { text: 'Max file size: 100MB', included: true },
+      { text: 'PDF encryption', included: true },
+      { text: 'Advanced signatures', included: true },
+      { text: 'No ads', included: true },
+      { text: 'Email support', included: true },
+      { text: 'API access', included: false },
+      { text: 'Enterprise integrations', included: false },
+    ],
+    popular: true,
+    color: customColors.brightPurple,
+    gradient: `linear-gradient(135deg, ${alpha(customColors.brightPurple, 0.4)} 0%, ${alpha(customColors.brightPurple, 0.1)} 100%)`,
+    icon: <AwardIcon size={24} />,
   },
-  '& .MuiSwitch-track': {
-    borderRadius: 32,
-    opacity: 1,
-    backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[600] : theme.palette.grey[400],
-    transition: theme.transitions.create(['background-color'], {
-      duration: 500,
-    }),
+  {
+    id: 'business',
+    name: 'Business',
+    description: 'For teams and organizations',
+    monthlyPrice: 29.99,
+    annualPrice: 299.99,
+    features: [
+      { text: 'All Pro features', included: true },
+      { text: 'Unlimited everything', included: true },
+      { text: 'API access', included: true },
+      { text: 'Enterprise integrations', included: true },
+      { text: 'Max file size: 500MB', included: true },
+      { text: 'Team management', included: true },
+      { text: 'Advanced analytics', included: true },
+      { text: 'Priority support', included: true },
+      { text: 'Dedicated account manager', included: true },
+      { text: 'Custom onboarding', included: true },
+    ],
+    popular: false,
+    color: customColors.deepPurple,
+    gradient: `linear-gradient(135deg, ${alpha(customColors.deepPurple, 0.4)} 0%, ${alpha(customColors.deepPurple, 0.1)} 100%)`,
+    icon: <BriefcaseIcon size={24} />,
+  }
+];
+
+// FAQ data
+const faqItems = [
+  {
+    question: 'What payment methods do you accept?',
+    answer: 'We accept all major credit cards (Visa, MasterCard, American Express) as well as PayPal. For Business plans, we can also accommodate invoicing and purchase orders.'
   },
-}));
+  {
+    question: 'Can I upgrade or downgrade my plan later?',
+    answer: 'Yes, you can upgrade your plan at any time. The price difference will be prorated. You can downgrade your plan at the end of your current billing cycle.'
+  },
+  {
+    question: 'Is there a free trial for paid plans?',
+    answer: 'Yes, we offer a 7-day free trial for all paid plans. No credit card is required to start your trial.'
+  },
+  {
+    question: 'How do I cancel my subscription?',
+    answer: 'You can cancel your subscription at any time from your account settings. Your access will continue until the end of the current billing period.'
+  },
+  {
+    question: 'Is my data secure?',
+    answer: 'Yes, all files are processed securely with end-to-end encryption. We don\'t store your files beyond the processing period, and your documents are automatically deleted from our servers.'
+  }
+];
 
 const PricingPage = () => {
   const theme = useTheme();
-  const [isYearly, setIsYearly] = useState(true);
-  const [expandedFaq, setExpandedFaq] = useState(false);
+  const navigate = useNavigate();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMedium = useMediaQuery(theme.breakpoints.down('md'));
   
-  const handleAccordionChange = (panel) => (event, isExpanded) => {
-    setExpandedFaq(isExpanded ? panel : false);
+  // Current date and time
+  const currentDateTime = "2025-05-09 10:47:51";
+  const username = "Anuj-prajapati-SDE";
+
+  // Annual billing state
+  const [isAnnual, setIsAnnual] = useState(true);
+  
+  // Split date and time for display
+  const [date, time] = currentDateTime.split(' ');
+
+  // Animation variants
+  const fadeIn = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { duration: 0.6 }
+    }
   };
   
-  // Animation variants
-  const containerVariants = {
+  const staggerContainer = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        delayChildren: 0.3,
         staggerChildren: 0.2
       }
     }
   };
   
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
+  const itemAnimation = {
+    hidden: { opacity: 0, y: 20 },
     visible: {
-      y: 0,
       opacity: 1,
-      transition: { duration: 0.6 }
+      y: 0,
+      transition: { duration: 0.5 }
     }
   };
 
-  // Pricing plans data
-  const pricingPlans = [
-    {
-      name: 'Free',
-      description: 'Basic PDF tools for personal use',
-      price: {
-        monthly: 0,
-        yearly: 0,
-      },
-      features: [
-        { text: 'Basic PDF tools', included: true },
-        { text: 'Process up to 3 files daily', included: true },
-        { text: 'File size up to 10MB', included: true },
-        { text: 'Standard processing speed', included: true },
-        { text: 'Community support', included: true },
-        { text: 'Advanced security options', included: false },
-        { text: 'API access', included: false },
-        { text: 'Priority support', included: false },
-      ],
-      highlight: false,
-      buttonText: 'Get Started',
-      color: theme.palette.grey[700],
-      bgColor: 'transparent',
-    },
-    {
-      name: 'Pro',
-      description: 'Advanced features for professionals',
-      price: {
-        monthly: 9.99,
-        yearly: 7.99,
-      },
-      features: [
-        { text: 'All Free features', included: true },
-        { text: 'Unlimited files', included: true },
-        { text: 'File size up to 100MB', included: true },
-        { text: '2x faster processing', included: true },
-        { text: 'Advanced security options', included: true },
-        { text: 'Email support', included: true },
-        { text: 'API access (1000 calls/month)', included: true },
-        { text: 'Priority support', included: false },
-      ],
-      highlight: true,
-      popular: true,
-      buttonText: 'Get Pro',
-      color: theme.palette.primary.main,
-      bgColor: alpha(theme.palette.primary.main, 0.03),
-    },
-    {
-      name: 'Business',
-      description: 'Enterprise-grade PDF solution',
-      price: {
-        monthly: 24.99,
-        yearly: 19.99,
-      },
-      features: [
-        { text: 'All Pro features', included: true },
-        { text: 'Unlimited files', included: true },
-        { text: 'File size up to 1GB', included: true },
-        { text: '5x faster processing', included: true },
-        { text: 'Enterprise-grade security', included: true },
-        { text: 'Dedicated account manager', included: true },
-        { text: 'API access (10,000 calls/month)', included: true },
-        { text: 'Priority support 24/7', included: true },
-      ],
-      highlight: false,
-      buttonText: 'Contact Sales',
-      color: theme.palette.success.main,
-      bgColor: 'transparent',
-    },
-  ];
-  
-  // Feature comparison table data
-  const featureComparisonData = {
-    categories: [
-      {
-        name: 'Core PDF Tools',
-        features: [
-          { name: 'Merge PDFs', free: true, pro: true, business: true },
-          { name: 'Split PDFs', free: true, pro: true, business: true },
-          { name: 'Basic PDF to Image', free: true, pro: true, business: true },
-          { name: 'PDF to Word (Basic)', free: true, pro: true, business: true },
-          { name: 'Advanced PDF to Word', free: false, pro: true, business: true },
-          { name: 'Advanced PDF to Image', free: false, pro: true, business: true },
-          { name: 'OCR Technology', free: false, pro: true, business: true },
-          { name: 'Digital Signatures', free: false, pro: false, business: true },
-        ]
-      },
-      {
-        name: 'Security & Privacy',
-        features: [
-          { name: 'Basic PDF Encryption', free: true, pro: true, business: true },
-          { name: 'Advanced Encryption', free: false, pro: true, business: true },
-          { name: 'Password Protection', free: true, pro: true, business: true },
-          { name: 'Permission Controls', free: false, pro: true, business: true },
-          { name: 'HIPAA Compliance', free: false, pro: false, business: true },
-          { name: 'Data Retention Controls', free: false, pro: false, business: true },
-        ]
-      },
-      {
-        name: 'Support & Resources',
-        features: [
-          { name: 'Community Support', free: true, pro: true, business: true },
-          { name: 'Email Support', free: false, pro: true, business: true },
-          { name: 'Live Chat Support', free: false, pro: true, business: true },
-          { name: 'Phone Support', free: false, pro: false, business: true },
-          { name: 'Dedicated Account Manager', free: false, pro: false, business: true },
-          { name: 'Training Sessions', free: false, pro: false, business: true },
-        ]
-      },
-    ]
+  const handleBillingToggle = () => {
+    setIsAnnual(!isAnnual);
   };
-  
-  // FAQ items
-  const faqItems = [
-    {
-      question: "Can I upgrade or downgrade my plan?",
-      answer: "Yes, you can upgrade or downgrade your plan at any time. When upgrading, you'll immediately get access to all the new features. If you downgrade, your current plan will continue until the end of the billing cycle."
-    },
-    {
-      question: "Do you offer refunds?",
-      answer: "We offer a 30-day money-back guarantee on all paid plans. If you're not satisfied with our service within the first 30 days, contact support for a full refund."
-    },
-    {
-      question: "What payment methods do you accept?",
-      answer: "We accept all major credit cards including Visa, MasterCard, American Express, and Discover. We also support PayPal payments."
-    },
-    {
-      question: "Is my data secure?",
-      answer: "Absolutely. We use bank-level encryption to protect your data and documents. Our security practices include secure data transmission, regular security audits, and strict access controls."
-    },
-    {
-      question: "Do I need to install anything?",
-      answer: "No, our service is entirely web-based. You don't need to install any software to use PDF Utility."
-    },
-    {
-      question: "Can I use the service on mobile devices?",
-      answer: "Yes, PDF Utility is fully responsive and works on all modern browsers, including those on mobile devices."
-    }
-  ];
 
   return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-    >
-      <Container maxWidth="lg">
-        {/* Page Header */}
-        <Box sx={{ textAlign: 'center', mb: 8 }}>
-          <motion.div variants={itemVariants}>
-            <Typography variant="h3" component="h1" fontWeight={700} gutterBottom>
-              Simple, Transparent Pricing
-            </Typography>
-            <Typography variant="h6" color="text.secondary" sx={{ maxWidth: 700, mx: 'auto', mb: 5, fontWeight: 400 }}>
-              Choose the perfect plan for your PDF needs. All plans include our core features with no hidden fees.
-            </Typography>
-            
-            {/* Billing Period Toggle */}
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Typography variant="body1" color={!isYearly ? 'primary' : 'text.secondary'} fontWeight={!isYearly ? 600 : 400}>
-                Monthly
+    <>
+      {/* Hero Section with Blue/Purple Gradient and Glass Effects */}
+      <Box 
+        sx={{
+          position: 'relative',
+          minHeight: { xs: 'auto', md: '50vh' },
+          overflow: 'hidden',
+          display: 'flex',
+          alignItems: 'center',
+          background: `linear-gradient(135deg, ${customColors.darkBlue} 0%, ${customColors.deepPurple} 70%, ${customColors.nightPurple} 100%)`,
+          pt: { xs: 10, md: 15 },
+          pb: { xs: 8, md: 15 },
+        }}
+      >
+        {/* Decorative blobs & light effects */}
+        <Box 
+          sx={{
+            position: 'absolute',
+            top: '-5%',
+            right: '-5%',
+            width: '30%',
+            height: '50%',
+            borderRadius: '50%',
+            background: `radial-gradient(circle, ${alpha(customColors.aqua, 0.3)} 0%, rgba(0,0,0,0) 70%)`,
+            filter: 'blur(60px)',
+            zIndex: 0,
+          }}
+        />
+        
+        <Box 
+          sx={{
+            position: 'absolute',
+            bottom: '-20%',
+            left: '30%',
+            width: '40%',
+            height: '60%',
+            borderRadius: '50%',
+            background: `radial-gradient(circle, ${alpha(customColors.brightPurple, 0.3)} 0%, rgba(0,0,0,0) 70%)`,
+            filter: 'blur(100px)',
+            zIndex: 0,
+          }}
+        />
+        
+        <Box 
+          sx={{
+            position: 'absolute',
+            top: '30%',
+            left: '-10%',
+            width: '25%',
+            height: '40%',
+            borderRadius: '50%',
+            background: `radial-gradient(circle, ${alpha(customColors.aqua, 0.15)} 0%, rgba(0,0,0,0) 70%)`,
+            filter: 'blur(70px)',
+            zIndex: 0,
+          }}
+        />
+
+        {/* Animated star-like particles */}
+        {[...Array(20)].map((_, index) => (
+          <Box
+            key={index}
+            sx={{
+              position: 'absolute',
+              width: Math.random() * 3 + 1,
+              height: Math.random() * 3 + 1,
+              backgroundColor: customColors.lightAqua,
+              borderRadius: '50%',
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`,
+              opacity: Math.random() * 0.5 + 0.2,
+              animation: `twinkle ${Math.random() * 3 + 2}s infinite ease-in-out ${Math.random() * 2}s`,
+              '@keyframes twinkle': {
+                '0%, 100%': { opacity: 0.1, transform: 'scale(1)' },
+                '50%': { opacity: 0.7, transform: 'scale(1.3)' },
+              }
+            }}
+          />
+        ))}
+
+        {/* User info bar with advanced glassmorphism */}
+        <Box 
+          sx={{ 
+            position: 'absolute',
+            top: 20,
+            right: 20,
+            zIndex: 10,
+          }}
+        >
+          <Paper
+            elevation={0}
+            sx={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              px: 3,
+              py: 1.5,
+              borderRadius: 8,
+              backdropFilter: 'blur(20px)',
+              backgroundColor: 'rgba(18, 18, 50, 0.3)',
+              border: '1px solid',
+              borderColor: 'rgba(122, 184, 255, 0.2)',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
+            }}
+          >
+            <Box mr={3} sx={{ display: { xs: 'none', sm: 'block' } }}>
+              <Typography variant="caption" color="rgba(255, 255, 255, 0.7)" display="block">
+                Date & Time (UTC)
               </Typography>
-              <BillingSwitch
-                checked={isYearly}
-                onChange={() => setIsYearly(!isYearly)}
-                inputProps={{ 'aria-label': 'billing period switch' }}
-              />
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <Typography variant="body1" color={isYearly ? 'primary' : 'text.secondary'} fontWeight={isYearly ? 600 : 400}>
-                  Yearly
+              <Typography variant="body2" fontWeight={500} color="#fff">
+                {date} <Box component="span" sx={{ color: customColors.lightAqua }}>{time}</Box>
+              </Typography>
+            </Box>
+            
+            <Divider orientation="vertical" flexItem sx={{ 
+              mx: 1, 
+              bgcolor: 'rgba(255, 255, 255, 0.2)',
+              display: { xs: 'none', sm: 'block' } 
+            }} />
+            
+            <Box sx={{ display: 'flex', alignItems: 'center', ml: { xs: 0, sm: 2 } }}>
+              <Avatar 
+                sx={{ 
+                  width: 38, 
+                  height: 38,
+                  bgcolor: alpha(customColors.aqua, 0.2),
+                  color: customColors.lightAqua,
+                  fontWeight: 'bold',
+                  fontSize: '0.9rem',
+                  border: '2px solid',
+                  borderColor: alpha(customColors.aqua, 0.3),
+                }}
+              >
+                {username.charAt(0).toUpperCase()}
+              </Avatar>
+              <Box ml={2}>
+                <Typography variant="caption" color="rgba(255, 255, 255, 0.7)" display="block">
+                  Welcome
                 </Typography>
-                <Chip
-                  label="Save 20%"
-                  size="small"
-                  color="secondary"
+                <Typography variant="body2" fontWeight={500} color="#fff">
+                  {username}
+                </Typography>
+              </Box>
+            </Box>
+          </Paper>
+        </Box>
+        
+        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={fadeIn}
+          >
+            <Box sx={{ textAlign: 'center', maxWidth: 850, mx: 'auto' }}>
+              <Typography
+                variant="overline"
+                sx={{
+                  color: customColors.lightAqua,
+                  fontWeight: 600,
+                  letterSpacing: 3,
+                  mb: 1,
+                  display: 'block',
+                }}
+              >
+                TRANSPARENT PRICING
+              </Typography>
+              
+              <Typography 
+                variant="h2" 
+                component="h1" 
+                fontWeight={800}
+                sx={{ 
+                  fontSize: { xs: '2.5rem', sm: '3rem', md: '3.75rem' },
+                  mb: 2,
+                  color: '#fff',
+                  textShadow: '0 5px 15px rgba(0,0,0,0.2)',
+                  background: `linear-gradient(135deg, #FFFFFF 30%, ${customColors.lightAqua} 100%)`,
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  letterSpacing: '-0.02em',
+                }}
+              >
+                Choose Your Perfect Plan
+              </Typography>
+              
+              <Typography 
+                variant="h6" 
+                sx={{ 
+                  mb: 4, 
+                  maxWidth: 700,
+                  mx: 'auto',
+                  color: 'rgba(255, 255, 255, 0.9)',
+                  fontWeight: 'normal',
+                  lineHeight: 1.6,
+                  fontSize: { xs: '1rem', md: '1.125rem' },
+                }}
+              >
+                Simple, transparent pricing that scales with your needs. 
+                All plans come with our core PDF tools to help you work more efficiently.
+              </Typography>
+              
+              {/* Billing toggle */}
+              <Box 
+                sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  mt: 6,
+                  mb: { xs: 4, md: 8 },
+                }}
+              >
+                <Typography 
+                  variant="subtitle1" 
                   sx={{
-                    ml: 1,
-                    fontWeight: 600,
-                    fontSize: '0.7rem',
-                    height: 22,
+                    color: isAnnual ? 'rgba(255, 255, 255, 0.7)' : '#fff',
+                    fontWeight: isAnnual ? 'normal' : 'medium',
                   }}
-                />
+                >
+                  Monthly
+                </Typography>
+                
+                <Box 
+                  onClick={handleBillingToggle}
+                  sx={{
+                    position: 'relative',
+                    cursor: 'pointer',
+                    mx: 2,
+                  }}
+                >
+                  <Switch
+                    checked={isAnnual}
+                    onChange={handleBillingToggle}
+                    sx={{
+                      '& .MuiSwitch-switchBase': {
+                        color: 'white',
+                        '&.Mui-checked': {
+                          color: customColors.aqua,
+                          '& + .MuiSwitch-track': {
+                            backgroundColor: alpha(customColors.aqua, 0.5),
+                            opacity: 1,
+                          },
+                        },
+                      },
+                      '& .MuiSwitch-track': {
+                        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                        opacity: 1,
+                      },
+                      '& .MuiSwitch-thumb': {
+                        boxShadow: '0 0 8px rgba(0, 0, 0, 0.5)',
+                      },
+                    }}
+                  />
+                  
+                  {/* Savings pill */}
+                  {isAnnual && (
+                    <Chip
+                      label="Save 15%"
+                      size="small"
+                      sx={{
+                        position: 'absolute',
+                        top: -22,
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        bgcolor: customColors.brightPurple,
+                        color: '#fff',
+                        fontWeight: 'bold',
+                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+                        '& .MuiChip-label': {
+                          px: 1,
+                        },
+                        fontSize: '0.7rem',
+                      }}
+                    />
+                  )}
+                </Box>
+                
+                <Typography 
+                  variant="subtitle1" 
+                  sx={{
+                    color: isAnnual ? '#fff' : 'rgba(255, 255, 255, 0.7)',
+                    fontWeight: isAnnual ? 'medium' : 'normal',
+                  }}
+                >
+                  Annual
+                </Typography>
               </Box>
             </Box>
           </motion.div>
-        </Box>
-        
-        {/* Pricing Plans */}
-        <Box sx={{ mb: 10 }}>
-          <Grid container spacing={3} alignItems="stretch">
-            {pricingPlans.map((plan, index) => (
-              <Grid item xs={12} md={4} key={plan.name}>
-                <motion.div variants={itemVariants} style={{ height: '100%' }}>
-                  <Card 
-                    elevation={plan.highlight ? 8 : 0}
-                    sx={{ 
-                      borderRadius: 4, 
-                      py: 4,
-                      px: 3,
-                      height: '100%',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      position: 'relative',
-                      overflow: 'visible',
-                      border: !plan.highlight ? '1px solid' : 'none',
-                      borderColor: 'divider',
-                      transform: plan.highlight ? 'scale(1.05)' : 'none',
-                      zIndex: plan.highlight ? 2 : 1,
-                      transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-                      bgcolor: plan.bgColor,
-                      '&:hover': {
-                        boxShadow: plan.highlight ? '0 20px 40px rgba(0, 0, 0, 0.12)' : '0 10px 30px rgba(0, 0, 0, 0.08)',
-                        transform: plan.highlight ? 'scale(1.05)' : 'translateY(-5px)',
-                      },
-                    }}
-                  >
-                    {plan.popular && (
-                      <Chip
-                        label="Most Popular"
-                        color="primary"
-                        size="small"
-                        sx={{
-                          position: 'absolute',
-                          top: -12,
-                          right: 24,
-                          fontWeight: 600,
-                          px: 1,
-                        }}
-                      />
-                    )}
-                    
-                    <Box sx={{ mb: 3 }}>
-                      <Typography 
-                        variant="h5" 
-                        component="h2" 
-                        fontWeight={700}
-                        color={plan.color}
-                        gutterBottom
-                      >
-                        {plan.name}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {plan.description}
-                      </Typography>
-                    </Box>
-                    
-                    <Box sx={{ mb: 3 }}>
-                      <Box sx={{ display: 'flex', alignItems: 'baseline' }}>
-                        <Typography 
-                          variant="h3" 
-                          component="span" 
-                          fontWeight={700}
-                          sx={{ mr: 1 }}
+        </Container>
+      </Box>
+      
+      {/* Pricing Plans Section */}
+      <Box 
+        sx={{ 
+          py: { xs: 6, md: 12 },
+          background: customColors.darkBlue,
+          position: 'relative',
+          mt: { xs: -6, sm: -8, md: -10 },
+        }}
+      >
+        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={staggerContainer}
+          >            
+            <Grid container spacing={3} justifyContent="center">
+              {pricingPlans.map((plan) => (
+                <Grid item xs={12} sm={6} md={4} key={plan.id}>
+                  <motion.div variants={itemAnimation}>
+                    <Card
+                      sx={{
+                        borderRadius: 4,
+                        overflow: 'hidden',
+                        background: 'rgba(20, 24, 60, 0.3)',
+                        backdropFilter: 'blur(20px)',
+                        border: '1px solid',
+                        borderColor: plan.popular 
+                          ? alpha(plan.color, 0.4)
+                          : 'rgba(122, 184, 255, 0.15)',
+                        boxShadow: plan.popular 
+                          ? `0 20px 40px ${alpha(plan.color, 0.3)}`
+                          : '0 15px 35px rgba(0, 0, 0, 0.2)',
+                        transform: plan.popular ? 'scale(1.05)' : 'none',
+                        position: 'relative',
+                        height: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                        '&:hover': {
+                          transform: plan.popular ? 'scale(1.07)' : 'scale(1.02)',
+                          boxShadow: plan.popular 
+                            ? `0 25px 50px ${alpha(plan.color, 0.4)}`
+                            : '0 20px 40px rgba(0, 0, 0, 0.3)',
+                        },
+                        zIndex: plan.popular ? 2 : 1,
+                      }}
+                    >
+                      {/* Popular badge */}
+                      {plan.popular && (
+                        <Box
+                          sx={{
+                            position: 'absolute',
+                            top: 15,
+                            right: -35,
+                            transform: 'rotate(45deg)',
+                            bgcolor: plan.color,
+                            color: '#fff',
+                            py: 0.5,
+                            px: 4,
+                            width: 150,
+                            textAlign: 'center',
+                            boxShadow: '0 3px 10px rgba(0, 0, 0, 0.2)',
+                            fontWeight: 'bold',
+                            fontSize: '0.75rem',
+                            letterSpacing: 1,
+                            zIndex: 3,
+                          }}
                         >
-                          ${isYearly ? plan.price.yearly : plan.price.monthly}
-                        </Typography>
-                        <Typography variant="body1" color="text.secondary">
-                          {plan.price.monthly > 0 ? '/month' : ''}
-                        </Typography>
-                      </Box>
-                      {isYearly && plan.price.yearly > 0 && (
-                        <Typography variant="body2" color="text.secondary">
-                          billed annually (${plan.price.yearly * 12}/year)
-                        </Typography>
+                          MOST POPULAR
+                        </Box>
                       )}
-                    </Box>
-                    
-                    <Divider sx={{ my: 3 }} />
-                    
-                    <Box sx={{ mb: 4, flexGrow: 1 }}>
-                      <List dense disablePadding>
-                        {plan.features.map((feature, featureIndex) => (
-                          <ListItem 
-                            key={featureIndex} 
-                            disablePadding 
-                            sx={{ 
-                              mb: 1.5,
-                              opacity: feature.included ? 1 : 0.5,
+
+                      {/* Top gradient bar */}
+                      <Box 
+                        sx={{ 
+                          height: '5px', 
+                          width: '100%', 
+                          background: `linear-gradient(to right, ${plan.color}, ${alpha(plan.color, 0.5)})`,
+                        }} 
+                      />
+                      
+                      {/* Plan header */}
+                      <CardContent sx={{ p: 3, pb: 1 }}>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 2,
+                            mb: 2,
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              width: 56,
+                              height: 56,
+                              borderRadius: '12px',
+                              background: plan.gradient,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              boxShadow: `0 8px 16px ${alpha(plan.color, 0.2)}`,
+                              color: plan.color,
+                              border: '1px solid',
+                              borderColor: alpha(plan.color, 0.2),
                             }}
                           >
-                            <ListItemIcon sx={{ minWidth: 30 }}>
+                            {React.cloneElement(plan.icon, { size: 28 })}
+                          </Box>
+                          <Typography 
+                            variant="h5" 
+                            component="h2" 
+                            fontWeight={700}
+                            color="#fff"
+                          >
+                            {plan.name}
+                          </Typography>
+                        </Box>
+                        
+                        <Typography 
+                          variant="body2" 
+                          sx={{ 
+                            color: 'rgba(255, 255, 255, 0.8)',
+                            height: 40,
+                            mb: 2,
+                          }}
+                        >
+                          {plan.description}
+                        </Typography>
+                        
+                        <Box sx={{ mt: 2, mb: 3 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'baseline' }}>
+                            <Typography 
+                              variant="h3" 
+                              component="span" 
+                              fontWeight={800}
+                              sx={{ color: '#fff' }}
+                            >
+                              ${isAnnual ? plan.annualPrice / 12 : plan.monthlyPrice}
+                            </Typography>
+                            <Typography 
+                              variant="subtitle1" 
+                              component="span" 
+                              sx={{ ml: 1, color: 'rgba(255, 255, 255, 0.7)' }}
+                            >
+                              /mo
+                            </Typography>
+                          </Box>
+                          
+                          {isAnnual && plan.annualPrice > 0 && (
+                            <Typography variant="caption" color="rgba(255, 255, 255, 0.7)">
+                              ${plan.annualPrice} billed annually
+                            </Typography>
+                          )}
+                        </Box>
+                      </CardContent>
+                      
+                      {/* Feature list */}
+                      <CardContent sx={{ px: 3, py: 1, flexGrow: 1 }}>
+                        <Divider sx={{ mb: 2, borderColor: 'rgba(255, 255, 255, 0.1)' }} />
+                        <Box sx={{ mb: 2 }}>
+                          {plan.features.map((feature, idx) => (
+                            <Box
+                              key={idx}
+                              sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                py: 1.5,
+                                borderBottom: idx !== plan.features.length - 1 ? '1px solid rgba(255, 255, 255, 0.08)' : 'none',
+                              }}
+                            >
                               {feature.included ? (
                                 <CheckIcon 
                                   size={18} 
-                                  color={plan.highlight ? theme.palette.primary.main : theme.palette.success.main} 
+                                  style={{ 
+                                    color: plan.color,
+                                    marginRight: 12,
+                                    flexShrink: 0,
+                                  }} 
                                 />
                               ) : (
-                                <XIcon size={18} color={theme.palette.text.disabled} />
+                                <CloseIcon 
+                                  size={18} 
+                                  style={{ 
+                                    color: 'rgba(255, 255, 255, 0.5)',
+                                    marginRight: 12,
+                                    flexShrink: 0,
+                                  }} 
+                                />
                               )}
-                            </ListItemIcon>
-                            <ListItemText 
-                              primary={feature.text} 
-                              primaryTypographyProps={{ 
-                                variant: 'body2', 
-                                fontWeight: feature.included ? 500 : 400 
-                              }} 
-                            />
-                          </ListItem>
-                        ))}
-                      </List>
-                    </Box>
-                    
-                    <Button
-                      variant={plan.highlight ? "contained" : "outlined"}
-                      color={plan.highlight ? "primary" : "inherit"}
-                      fullWidth
-                      size="large"
-                      component={RouterLink}
-                      to={plan.name === 'Free' ? "/tools/merge-pdf" : "#"}
-                      sx={{ 
-                        py: 1.5,
-                        borderRadius: 3,
-                        fontWeight: 600,
-                        borderWidth: plan.highlight ? 0 : 2,
-                        borderColor: plan.name === 'Business' ? plan.color : undefined,
-                        color: plan.highlight ? 'white' : (plan.name === 'Business' ? plan.color : undefined),
-                      }}
-                    >
-                      {plan.buttonText}
-                    </Button>
-                  </Card>
-                </motion.div>
-              </Grid>
-            ))}
-          </Grid>
-        </Box>
-        
-        {/* Feature Comparison */}
-        <motion.div variants={itemVariants}>
-          <Box sx={{ mb: 10 }}>
-            <Typography variant="h4" component="h2" fontWeight={700} align="center" gutterBottom>
-              Feature Comparison
-            </Typography>
-            <Typography variant="body1" color="text.secondary" align="center" sx={{ mb: 5, maxWidth: 700, mx: 'auto' }}>
-              Compare our plans to find the right one for your needs
-            </Typography>
-            
-            <TableContainer component={Paper} sx={{ borderRadius: 4, boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)' }}>
-              <Table sx={{ minWidth: 650 }}>
-                <TableHead>
-                  <TableRow sx={{ bgcolor: alpha(theme.palette.primary.main, 0.05) }}>
-                    <TableCell sx={{ fontWeight: 600 }}>Feature</TableCell>
-                    <TableCell align="center" sx={{ fontWeight: 600 }}>Free</TableCell>
-                    <TableCell 
-                      align="center" 
-                      sx={{ 
-                        fontWeight: 600, 
-                        bgcolor: alpha(theme.palette.primary.main, 0.1),
-                        color: theme.palette.primary.main,
-                      }}
-                    >
-                      Pro
-                    </TableCell>
-                    <TableCell align="center" sx={{ fontWeight: 600 }}>Business</TableCell>
-                  </TableRow>
-                </TableHead>
-                
-                <TableBody>
-                  {featureComparisonData.categories.map((category) => [
-                    <TableRow key={`cat-${category.name}`} sx={{ bgcolor: alpha(theme.palette.grey[200], 0.5) }}>
-                      <TableCell colSpan={4} sx={{ fontWeight: 600 }}>
-                        {category.name}
-                      </TableCell>
-                    </TableRow>,
-                    
-                    ...category.features.map((feature, featureIdx) => (
-                      <TableRow 
-                        key={`feat-${category.name}-${featureIdx}`}
-                        sx={{ 
-                          '&:last-child td, &:last-child th': { border: 0 },
-                          '&:nth-of-type(even)': { bgcolor: alpha(theme.palette.grey[50], 0.5) },
-                        }}
-                      >
-                        <TableCell component="th" scope="row">
-                          {feature.name}
-                        </TableCell>
-                        <TableCell align="center">
-                          {feature.free ? 
-                            <CheckIcon size={18} color={theme.palette.success.main} /> : 
-                            <XIcon size={18} color={theme.palette.text.disabled} />
-                          }
-                        </TableCell>
-                        <TableCell 
-                          align="center"
-                          sx={{ bgcolor: alpha(theme.palette.primary.main, 0.03) }}
+                              <Typography 
+                                variant="body2" 
+                                sx={{ 
+                                  color: feature.included 
+                                    ? 'rgba(255, 255, 255, 0.9)' 
+                                    : 'rgba(255, 255, 255, 0.5)',
+                                  fontWeight: feature.included ? 500 : 'normal',
+                                }}
+                              >
+                                {feature.text}
+                              </Typography>
+                            </Box>
+                          ))}
+                        </Box>
+                      </CardContent>
+                      
+                      {/* Call to action */}
+                      <CardActions sx={{ px: 3, pb: 3, pt: 1 }}>
+                        <Button
+                          variant={plan.popular ? "contained" : "outlined"}
+                          fullWidth
+                          size="large"
+                          sx={{
+                            py: 1.5,
+                            borderRadius: '12px',
+                            color: plan.popular ? '#fff' : plan.color,
+                            bgcolor: plan.popular ? plan.color : 'transparent',
+                            borderColor: plan.color,
+                            fontWeight: 600,
+                            '&:hover': {
+                              bgcolor: plan.popular ? alpha(plan.color, 0.9) : alpha(plan.color, 0.1),
+                              borderColor: plan.color,
+                            }
+                          }}
                         >
-                          {feature.pro ? 
-                            <CheckIcon size={18} color={theme.palette.primary.main} /> : 
-                            <XIcon size={18} color={theme.palette.text.disabled} />
-                          }
-                        </TableCell>
-                        <TableCell align="center">
-                          {feature.business ? 
-                            <CheckIcon size={18} color={theme.palette.success.main} /> : 
-                            <XIcon size={18} color={theme.palette.text.disabled} />
-                          }
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ])}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Box>
-        </motion.div>
-        
-        {/* Testimonials */}
-        <motion.div variants={itemVariants}>
-          <Box 
-            sx={{ 
-              mb: 10, 
-              py: 8, 
-              px: { xs: 2, sm: 6 }, 
-              borderRadius: 4,
-              bgcolor: alpha(theme.palette.primary.main, 0.03),
-              position: 'relative',
-              overflow: 'hidden',
-            }}
-          >
-            {/* Background decorations */}
-            <Box
-              sx={{
-                position: 'absolute',
-                top: 0,
-                right: 0,
-                width: 200,
-                height: 200,
-                backgroundImage: 'radial-gradient(circle, rgba(67, 97, 238, 0.1) 0%, rgba(67, 97, 238, 0) 70%)',
-                borderRadius: '50%',
-              }}
-            />
-            <Box
-              sx={{
-                position: 'absolute',
-                bottom: -50,
-                left: -50,
-                width: 200,
-                height: 200,
-                backgroundImage: 'radial-gradient(circle, rgba(67, 97, 238, 0.05) 0%, rgba(67, 97, 238, 0) 70%)',
-                borderRadius: '50%',
-              }}
-            />
-            
-            <Typography variant="h4" component="h2" fontWeight={700} align="center" gutterBottom>
-              What Our Customers Say
-            </Typography>
-            <Typography variant="body1" color="text.secondary" align="center" sx={{ mb: 6 }}>
-              Join thousands of satisfied users who love our PDF tools
-            </Typography>
-            
-            <Grid container spacing={4}>
-              {[
-                {
-                  quote: "PDF Utility Pro has transformed our workflow. What used to take hours now takes minutes. The batch processing features alone are worth the subscription.",
-                  author: "Sarah Johnson",
-                  title: "Marketing Manager at TechCorp",
-                  plan: "Business Plan",
-                },
-                {
-                  quote: "As a student, the free plan gives me everything I need for my assignments. The interface is intuitive and the tools are reliable.",
-                  author: "Michael Chen",
-                  title: "Graduate Student",
-                  plan: "Free Plan",
-                },
-                {
-                  quote: "The Pro plan hits the sweet spot for our small business. We get all the essential features at a reasonable price, and the customer support is excellent.",
-                  author: "Emily Rodriguez",
-                  title: "Freelance Graphic Designer",
-                  plan: "Pro Plan",
-                },
-              ].map((testimonial, index) => (
-                <Grid item xs={12} md={4} key={index}>
-                  <Card 
-                    elevation={0}
-                    sx={{ 
-                      p: 3, 
-                      height: '100%',
-                      borderRadius: 3,
-                      display: 'flex',
-                      flexDirection: 'column',
-                    }}
-                  >
-                    <Box sx={{ mb: 2, display: 'flex' }}>
-                      {[...Array(5)].map((_, i) => (
-                        <AwardIcon 
-                          key={i} 
-                          size={16} 
-                          color={theme.palette.warning.main}
-                          style={{ marginRight: 4 }}
-                        />
-                      ))}
-                    </Box>
-                    
-                    <Typography 
-                      variant="body1" 
-                      component="p" 
-                      gutterBottom
-                      sx={{ 
-                        mb: 'auto',
-                        fontStyle: 'italic',
-                        lineHeight: 1.6,
-                      }}
-                    >
-                      "{testimonial.quote}"
-                    </Typography>
-                    
-                    <Box sx={{ mt: 3 }}>
-                      <Typography variant="subtitle2" fontWeight={600}>
-                        {testimonial.author}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary" display="block">
-                        {testimonial.title}
-                      </Typography>
-                      <Chip 
-                        label={testimonial.plan} 
-                        size="small" 
-                        color="primary"
-                        sx={{ mt: 1, fontWeight: 500, height: 24 }}
-                        variant="outlined"
-                      />
-                    </Box>
-                  </Card>
+                          {plan.id === 'free' ? 'Get Started' : 'Choose Plan'}
+                        </Button>
+                      </CardActions>
+                    </Card>
+                  </motion.div>
                 </Grid>
               ))}
             </Grid>
-          </Box>
-        </motion.div>
+          </motion.div>
+        </Container>
+      </Box>
+      
+      {/* Features Included Section */}
+      <Box 
+        sx={{
+          py: { xs: 6, md: 10 },
+          background: `linear-gradient(135deg, ${customColors.nightPurple} 0%, ${customColors.darkBlue} 100%)`,
+          position: 'relative',
+          overflow: 'hidden',
+        }}
+      >
+        {/* Decorative elements */}
+        <Box 
+          sx={{ 
+            position: 'absolute', 
+            top: '10%', 
+            right: '5%', 
+            width: '300px', 
+            height: '300px', 
+            borderRadius: '50%', 
+            background: `radial-gradient(circle, ${alpha(customColors.aqua, 0.1)} 0%, rgba(0,0,0,0) 70%)`,
+            filter: 'blur(60px)',
+            zIndex: 0,
+          }} 
+        />
         
-        {/* FAQ */}
-        <motion.div variants={itemVariants}>
-          <Box sx={{ mb: 10 }}>
-            <Typography variant="h4" component="h2" fontWeight={700} align="center" gutterBottom>
-              Frequently Asked Questions
-            </Typography>
-            <Typography variant="body1" color="text.secondary" align="center" sx={{ mb: 5, maxWidth: 700, mx: 'auto' }}>
-              Find answers to common questions about our pricing and plans
-            </Typography>
+        <Box 
+          sx={{ 
+            position: 'absolute', 
+            bottom: '10%', 
+            left: '5%', 
+            width: '400px', 
+            height: '400px', 
+            borderRadius: '50%', 
+            background: `radial-gradient(circle, ${alpha(customColors.brightPurple, 0.1)} 0%, rgba(0,0,0,0) 70%)`,
+            filter: 'blur(80px)',
+            zIndex: 0,
+          }} 
+        />
+        
+        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeIn}
+          >
+            <Box sx={{ textAlign: 'center', mb: 6 }}>
+              <Typography 
+                variant="h3" 
+                component="h2" 
+                fontWeight={700} 
+                sx={{ mb: 2, color: '#fff' }}
+              >
+                What's Included in Every Plan
+              </Typography>
+              <Typography 
+                variant="h6" 
+                sx={{ 
+                  maxWidth: 700, 
+                  mx: 'auto', 
+                  fontWeight: 'normal',
+                  color: 'rgba(255, 255, 255, 0.8)',
+                }}
+              >
+                Core features available across all our plans
+              </Typography>
+            </Box>
             
             <Grid container spacing={3}>
-              {faqItems.map((faq, index) => (
-                <Grid item xs={12} md={6} key={index}>
-                  <Accordion
-                    expanded={expandedFaq === `faq-${index}`}
-                    onChange={handleAccordionChange(`faq-${index}`)}
-                    disableGutters
-                    elevation={0}
+              {[
+                {
+                  title: 'PDF to JPG Conversion',
+                  description: 'Convert PDF pages to high-quality JPG images',
+                  icon: <Image />,
+                  color: customColors.aqua,
+                },
+                {
+                  title: 'JPG to PDF Conversion',
+                  description: 'Create PDF documents from your image files',
+                  icon: <FileTextIcon />,
+                  color: customColors.brightPurple,
+                },
+                {
+                  title: 'Basic PDF Editing',
+                  description: 'Add text, images, and make basic edits to your PDF',
+                  icon: <EditIcon />,
+                  color: customColors.lightAqua,
+                },
+                {
+                  title: 'Basic Watermarking',
+                  description: 'Add text or image watermarks to your documents',
+                  icon: <FileTextIcon />,
+                  color: customColors.brightPurple,
+                },
+                {
+                  title: 'PDF Signing',
+                  description: 'Add digital signatures to your documents',
+                  icon: <EditIcon />,
+                  color: customColors.aqua,
+                },
+                {
+                  title: 'PDF Unlocking',
+                  description: 'Remove password protection from PDF files',
+                  icon: <UnlockIcon />,
+                  color: customColors.lightAqua,
+                },
+              ].map((feature, index) => (
+                <Grid item xs={12} sm={6} md={4} key={index}>
+                  <Card
                     sx={{
-                      mb: 2,
+                      height: '100%',
+                      borderRadius: 4,
+                      background: 'rgba(20, 24, 60, 0.2)',
+                      backdropFilter: 'blur(10px)',
                       border: '1px solid',
-                      borderColor: 'divider',
-                      borderRadius: '10px !important',
-                      '&:before': {
-                        display: 'none',
-                      },
-                      '&.Mui-expanded': {
-                        margin: 0,
-                        borderColor: 'primary.main',
-                      },
-                      overflow: 'hidden',
+                      borderColor: 'rgba(122, 184, 255, 0.1)',
+                      transition: 'all 0.3s ease',
+                      '&:hover': {
+                        transform: 'translateY(-5px)',
+                        boxShadow: '0 15px 30px rgba(0, 0, 0, 0.2)',
+                        borderColor: alpha(feature.color, 0.3),
+                      }
                     }}
                   >
-                    <AccordionSummary
-                      expandIcon={<ChevronDownIcon size={18} />}
-                      sx={{
-                        px: 3,
-                        py: 1.5,
-                        bgcolor: expandedFaq === `faq-${index}` ? alpha(theme.palette.primary.main, 0.05) : 'transparent',
-                      }}
-                    >
-                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <HelpCircleIcon 
-                          size={18} 
-                          color={theme.palette.primary.main}
-                          style={{ marginRight: 12 }}
-                        />
-                        <Typography variant="subtitle1" fontWeight={600}>
-                          {faq.question}
+                    <CardContent sx={{ p: 3 }}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          mb: 2,
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            width: 48,
+                            height: 48,
+                            borderRadius: 2,
+                            bgcolor: alpha(feature.color, 0.15),
+                            color: feature.color,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            mr: 2,
+                          }}
+                        >
+                          {React.cloneElement(feature.icon, { size: 24 })}
+                        </Box>
+                        <Typography 
+                          variant="h6" 
+                          component="h3" 
+                          fontWeight={600}
+                          color="#fff"
+                        >
+                          {feature.title}
                         </Typography>
                       </Box>
-                    </AccordionSummary>
-                    <AccordionDetails sx={{ p: 3, pt: 0 }}>
-                      <Typography variant="body2" color="text.secondary">
-                        {faq.answer}
+                      <Typography variant="body2" color="rgba(255, 255, 255, 0.8)" sx={{ pl: 7 }}>
+                        {feature.description}
                       </Typography>
-                    </AccordionDetails>
-                  </Accordion>
+                    </CardContent>
+                  </Card>
                 </Grid>
               ))}
             </Grid>
-          </Box>
-        </motion.div>
-        
-        {/* CTA Section */}
-        <motion.div variants={itemVariants}>
-          <Box
-            sx={{
-              p: { xs: 4, md: 8 },
-              borderRadius: 4,
-              backgroundImage: 'linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%)',
-              color: 'white',
-              textAlign: 'center',
-              position: 'relative',
-              overflow: 'hidden',
-              mb: 6,
-            }}
+          </motion.div>
+        </Container>
+      </Box>
+      
+      {/* Compare Plans Section */}
+      <Box 
+        sx={{
+          py: { xs: 6, md: 10 },
+          bgcolor: customColors.darkBlue,
+          color: '#fff',
+          backgroundImage: 'radial-gradient(circle at 20% 70%, rgba(91, 14, 139, 0.15) 0%, rgba(10, 17, 58, 0.05) 50%)',
+        }}
+      >
+        <Container maxWidth="lg">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeIn}
           >
-            {/* Background decorative elements */}
-            <Box
-              sx={{
-                position: 'absolute',
-                top: '20%',
-                left: '10%',
-                width: '15rem',
-                height: '15rem',
-                background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%)',
-                borderRadius: '50%',
-              }}
-            />
-            <Box
-              sx={{
-                position: 'absolute',
-                bottom: '10%',
-                right: '10%',
-                width: '10rem',
-                height: '10rem',
-                background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%)',
-                borderRadius: '50%',
-              }}
-            />
-            
-            <Typography 
-              variant="h3" 
-              fontWeight={700} 
-              sx={{ mb: 3 }}
-            >
-              Start Using PDF Utility Today
-            </Typography>
-            <Typography variant="h6" sx={{ mb: 4, opacity: 0.9, maxWidth: 700, mx: 'auto' }}>
-              Begin with our free plan or try Pro features with a 14-day trial. No credit card required.
-            </Typography>
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, justifyContent: 'center' }}>
-              <Button
-                variant="contained"
-                size="large"
-                component={RouterLink}
-                to="/tools/merge-pdf"
-                sx={{
-                  bgcolor: 'white',
-                  color: 'primary.main',
-                  borderRadius: '50px',
-                  px: 6,
-                  py: 1.5,
-                  fontSize: '1.1rem',
-                  fontWeight: 600,
-                  '&:hover': {
-                    bgcolor: 'rgba(255, 255, 255, 0.9)',
-                  },
+            <Box sx={{ textAlign: 'center', mb: 6 }}>
+              <Typography 
+                variant="h3" 
+                component="h2" 
+                fontWeight={700} 
+                sx={{ mb: 2 }}
+              >
+                Compare Plans
+              </Typography>
+              <Typography 
+                variant="h6" 
+                sx={{ 
+                  maxWidth: 700, 
+                  mx: 'auto', 
+                  fontWeight: 'normal',
+                  color: 'rgba(255, 255, 255, 0.8)',
                 }}
               >
-                Try PDF Utility Free
-              </Button>
-              <Button
-                variant="outlined"
-                size="large"
-                component={RouterLink}
-                to="/contact"
-                sx={{
-                  borderRadius: '50px',
-                  px: 6,
-                  py: 1.5,
-                  fontSize: '1.1rem',
-                  fontWeight: 600,
-                  color: 'white',
-                  borderColor: 'white',
-                  '&:hover': {
-                    bgcolor: 'rgba(255, 255, 255, 0.1)',
-                    borderColor: 'white',
-                  },
-                }}
-              >
-                Contact Sales
-              </Button>
+                Find the perfect plan for your needs
+              </Typography>
             </Box>
-          </Box>
-        </motion.div>
-      </Container>
-    </motion.div>
+            
+            <Card
+              sx={{
+                borderRadius: 4,
+                overflow: 'hidden',
+                background: 'rgba(20, 24, 60, 0.3)',
+                backdropFilter: 'blur(20px)',
+                border: '1px solid',
+                borderColor: 'rgba(122, 184, 255, 0.15)',
+                boxShadow: '0 15px 35px rgba(0, 0, 0, 0.2)',
+              }}
+            >
+              <Box sx={{ width: '100%', overflowX: 'auto' }}>
+                <Box sx={{ minWidth: 800, p: { xs: 2, md: 3 } }}>
+                  {/* Table header */}
+                  <Grid container sx={{ mb: 2, pb: 2, borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
+                    <Grid item xs={4}>
+                      <Typography variant="subtitle1" fontWeight={600} color="#fff">
+                        Feature
+                      </Typography>
+                    </Grid>
+                    {pricingPlans.map((plan) => (
+                      <Grid item xs={2.67} key={plan.id} sx={{ textAlign: 'center' }}>
+                        <Typography 
+                          variant="subtitle1" 
+                          fontWeight={600} 
+                          sx={{ color: plan.color }}
+                        >
+                          {plan.name}
+                        </Typography>
+                      </Grid>
+                    ))}
+                  </Grid>
+                  
+                  {/* Table rows */}
+                  {[
+                    { feature: 'PDF to JPG Conversion', free: true, pro: true, business: true },
+                    { feature: 'JPG to PDF Conversion', free: true, pro: true, business: true },
+                    { feature: 'Basic Editing', free: 'Limited', pro: true, business: true },
+                    { feature: 'Advanced Editing', free: false, pro: true, business: true },
+                    { feature: 'PDF Cropping', free: true, pro: true, business: true },
+                    { feature: 'File Size Limit', free: '15MB', pro: '100MB', business: '500MB' },
+                    { feature: 'Digital Signatures', free: 'Basic', pro: 'Advanced', business: 'Advanced' },
+                    { feature: 'Watermarking', free: 'Basic', pro: 'Advanced', business: 'Custom' },
+                    { feature: 'File Uploads per Day', free: '5', pro: 'Unlimited', business: 'Unlimited' },
+                    { feature: 'PDF Encryption', free: false, pro: true, business: true },
+                    { feature: 'API Access', free: false, pro: false, business: true },
+                    { feature: 'Team Management', free: false, pro: false, business: true },
+                    { feature: 'Cloud Storage', free: false, pro: '5GB', business: '50GB' },
+                    { feature: 'Customer Support', free: 'Community', pro: 'Email', business: 'Priority' },
+                    { feature: 'Ad-free Experience', free: false, pro: true, business: true },
+                  ].map((row, index) => (
+                    <Grid 
+                      container 
+                      key={index} 
+                      sx={{ 
+                        py: 1.5,
+                        borderBottom: index !== 14 ? '1px solid rgba(255, 255, 255, 0.05)' : 'none',
+                        '&:hover': {
+                          bgcolor: 'rgba(255, 255, 255, 0.03)',
+                        },
+                      }}
+                    >
+                      <Grid item xs={4}>
+                        <Typography variant="body2" color="rgba(255, 255, 255, 0.9)">
+                          {row.feature}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={2.67} sx={{ textAlign: 'center' }}>
+                        {typeof row.free === 'boolean' ? (
+                          row.free ? (
+                            <CheckIcon size={18} color={customColors.aqua} />
+                          ) : (
+                            <CloseIcon size={18} color="rgba(255, 255, 255, 0.5)" />
+                          )
+                        ) : (
+                          <Typography 
+                            variant="body2" 
+                            sx={{ color: row.free === 'Limited' || row.free === 'Basic' ? customColors.aqua : 'rgba(255, 255, 255, 0.9)' }}
+                          >
+                            {row.free}
+                          </Typography>
+                        )}
+                      </Grid>
+                      <Grid item xs={2.67} sx={{ textAlign: 'center' }}>
+                        {typeof row.pro === 'boolean' ? (
+                          row.pro ? (
+                            <CheckIcon size={18} color={customColors.brightPurple} />
+                          ) : (
+                            <CloseIcon size={18} color="rgba(255, 255, 255, 0.5)" />
+                          )
+                        ) : (
+                          <Typography 
+                            variant="body2" 
+                            sx={{ color: row.pro === 'Limited' || row.pro === 'Basic' ? customColors.brightPurple : 'rgba(255, 255, 255, 0.9)' }}
+                          >
+                            {row.pro}
+                          </Typography>
+                        )}
+                      </Grid>
+                      <Grid item xs={2.67} sx={{ textAlign: 'center' }}>
+                        {typeof row.business === 'boolean' ? (
+                          row.business ? (
+                            <CheckIcon size={18} color={customColors.deepPurple} />
+                          ) : (
+                            <CloseIcon size={18} color="rgba(255, 255, 255, 0.5)" />
+                          )
+                        ) : (
+                          <Typography 
+                            variant="body2" 
+                            sx={{ color: row.business === 'Limited' || row.business === 'Basic' ? customColors.deepPurple : 'rgba(255, 255, 255, 0.9)' }}
+                          >
+                            {row.business}
+                          </Typography>
+                        )}
+                      </Grid>
+                    </Grid>
+                  ))}
+                </Box>
+              </Box>
+            </Card>
+          </motion.div>
+        </Container>
+      </Box>
+      
+      {/* FAQ Section */}
+      <Box 
+        sx={{
+          py: { xs: 6, md: 10 },
+          background: `linear-gradient(135deg, ${customColors.darkBlue} 0%, ${customColors.nightPurple} 100%)`,
+          position: 'relative',
+        }}
+      >
+        {/* Decorative elements */}
+        <Box 
+          sx={{ 
+            position: 'absolute', 
+            top: '20%', 
+            right: '10%', 
+            width: '300px', 
+            height: '300px', 
+            borderRadius: '50%', 
+            background: `radial-gradient(circle, ${alpha(customColors.aqua, 0.1)} 0%, rgba(0,0,0,0) 70%)`,
+            filter: 'blur(70px)',
+            zIndex: 0,
+          }} 
+        />
+        
+        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeIn}
+          >
+            <Box sx={{ textAlign: 'center', mb: 6 }}>
+              <Typography 
+                variant="h3" 
+                component="h2" 
+                fontWeight={700} 
+                sx={{ mb: 2, color: '#fff' }}
+              >
+                Frequently Asked Questions
+              </Typography>
+              <Typography 
+                variant="h6" 
+                sx={{ 
+                  maxWidth: 700, 
+                  mx: 'auto', 
+                  fontWeight: 'normal',
+                  color: 'rgba(255, 255, 255, 0.8)',
+                }}
+              >
+                Have more questions? Contact our support team
+              </Typography>
+            </Box>
+            
+            <Grid container spacing={3}>
+              {faqItems.map((item, index) => (
+                <Grid item xs={12} md={6} key={index}>
+                  <Card
+                    sx={{
+                      borderRadius: 4,
+                      overflow: 'hidden',
+                      background: 'rgba(20, 24, 60, 0.3)',
+                      backdropFilter: 'blur(20px)',
+                      border: '1px solid',
+                      borderColor: 'rgba(122, 184, 255, 0.1)',
+                      height: '100%',
+                      transition: 'all 0.3s ease',
+                      '&:hover': {
+                        transform: 'translateY(-5px)',
+                        boxShadow: '0 15px 30px rgba(0, 0, 0, 0.2)',
+                        borderColor: 'rgba(122, 184, 255, 0.2)',
+                      }
+                    }}
+                  >
+                    <CardContent sx={{ p: 3 }}>
+                      <Typography 
+                        variant="h6" 
+                        component="h3" 
+                        fontWeight={600} 
+                        sx={{ 
+                          mb: 2, 
+                          color: '#fff',
+                          display: 'flex',
+                          alignItems: 'flex-start',
+                        }}
+                      >
+                        <Box 
+                          sx={{ 
+                            mr: 2, 
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: 24,
+                            height: 24,
+                            borderRadius: '50%',
+                            bgcolor: alpha(customColors.aqua, 0.2),
+                            color: customColors.aqua,
+                            fontSize: '0.75rem',
+                            fontWeight: 'bold',
+                            flexShrink: 0,
+                          }}
+                        >
+                          Q
+                        </Box>
+                        {item.question}
+                      </Typography>
+                      <Typography 
+                        variant="body2" 
+                        sx={{ 
+                          color: 'rgba(255, 255, 255, 0.8)',
+                          ml: 5,
+                        }}
+                      >
+                        {item.answer}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          </motion.div>
+        </Container>
+      </Box>
+      
+      {/* Call to Action with Advanced Glassmorphism */}
+      <Box
+        sx={{
+          py: { xs: 6, md: 8 },
+          background: `linear-gradient(45deg, ${customColors.darkBlue} 0%, ${customColors.deepPurple} 100%)`,
+          position: 'relative',
+          overflow: 'hidden',
+        }}
+      >
+        {/* Decorative elements */}
+        <Box 
+          sx={{ 
+            position: 'absolute', 
+            top: 0, 
+            right: 0, 
+            width: '100%', 
+            height: '100%', 
+            opacity: 0.05,
+            background: 'url(/images/pattern.svg)',
+            backgroundSize: 'cover',
+            zIndex: 0,
+          }} 
+        />
+        
+        <Box 
+          sx={{ 
+            position: 'absolute', 
+            top: '10%', 
+            right: '5%', 
+            width: '300px', 
+            height: '300px', 
+            borderRadius: '50%', 
+            background: `radial-gradient(circle, rgba(0, 212, 255, 0.15) 0%, rgba(0,0,0,0) 70%)`,
+            filter: 'blur(80px)',
+            zIndex: 0,
+          }} 
+        />
+        
+        <Box 
+          sx={{ 
+            position: 'absolute', 
+            bottom: '10%', 
+            left: '5%', 
+            width: '200px', 
+            height: '200px', 
+            borderRadius: '50%', 
+            background: `radial-gradient(circle, rgba(162, 57, 255, 0.15) 0%, rgba(0,0,0,0) 70%)`,
+            filter: 'blur(70px)',
+            zIndex: 0,
+          }} 
+        />
+      
+        <Container maxWidth="md" sx={{ position: 'relative', zIndex: 1 }}>
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeIn}
+          >
+            <Paper
+              elevation={0}
+              sx={{
+                borderRadius: 5,
+                overflow: 'hidden',
+                background: 'rgba(17, 25, 68, 0.3)',
+                backdropFilter: 'blur(20px)',
+                border: '1px solid',
+                borderColor: 'rgba(122, 184, 255, 0.15)',
+                p: { xs: 3, md: 5 },
+                position: 'relative',
+                textAlign: 'center',
+              }}
+            >
+              {/* Glowing border effect */}
+              <Box
+                sx={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: '3px',
+                  background: `linear-gradient(to right, ${customColors.aqua}, ${customColors.brightPurple}, ${customColors.aqua})`,
+                  backgroundSize: '200% 100%',
+                  animation: 'gradientFlow 5s infinite linear',
+                  boxShadow: `0 0 20px ${customColors.aqua}`,
+                  '@keyframes gradientFlow': {
+                    '0%': { backgroundPosition: '0% 0%' },
+                    '100%': { backgroundPosition: '200% 0%' },
+                  }
+                }}
+              />
+              
+              {/* Gift box icon */}
+              <Box
+                sx={{
+                  width: 80,
+                  height: 80,
+                  borderRadius: '20px',
+                  background: `linear-gradient(135deg, ${alpha(customColors.aqua, 0.3)}, ${alpha(customColors.brightPurple, 0.3)})`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto 1.5rem',
+                  border: '1px solid',
+                  borderColor: 'rgba(122, 184, 255, 0.2)',
+                  boxShadow: '0 15px 30px rgba(0, 0, 0, 0.2)',
+                }}
+              >
+                <GiftIcon size={40} color={customColors.lightAqua} />
+              </Box>
+              
+              <Typography
+                variant="h3"
+                fontWeight={700}
+                color="white"
+                sx={{ mb: 3 }}
+              >
+                Start Your Free Trial Today
+              </Typography>
+              
+              <Typography
+                variant="h6"
+                sx={{ 
+                  mb: 4, 
+                  color: 'rgba(255, 255, 255, 0.9)', 
+                  fontWeight: 'normal',
+                  maxWidth: 700,
+                  mx: 'auto',
+                }}
+              >
+                Try any paid plan free for 7 days. No credit card required.
+                Experience all our premium features with no limitations.
+              </Typography>
+              
+              <Stack
+                direction={{ xs: 'column', sm: 'row' }}
+                spacing={3}
+                justifyContent="center"
+              >
+                <Button
+                  variant="contained"
+                  size="large"
+                  onClick={() => navigate('/signup')}
+                  sx={{
+                    px: 5,
+                    py: 1.5,
+                    borderRadius: '12px',
+                    background: `linear-gradient(135deg, ${customColors.aqua} 0%, ${customColors.brightPurple} 100%)`,
+                    color: '#fff',
+                    fontWeight: 600,
+                    border: '1px solid',
+                    borderColor: alpha(customColors.aqua, 0.3),
+                    boxShadow: '0 10px 20px rgba(0, 0, 0, 0.2)',
+                    '&:hover': {
+                      boxShadow: '0 15px 30px rgba(0, 0, 0, 0.3)',
+                    }
+                  }}
+                >
+                  Start Free Trial
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="large"
+                  onClick={() => navigate('/contact')}
+                  sx={{
+                    px: 4,
+                    py: 1.5,
+                    borderRadius: '12px',
+                    borderColor: alpha(customColors.aqua, 0.5),
+                    color: customColors.lightAqua,
+                    '&:hover': {
+                      borderColor: customColors.lightAqua,
+                      bgcolor: alpha(customColors.aqua, 0.1),
+                    }
+                  }}
+                >
+                  Contact Sales
+                </Button>
+              </Stack>
+              
+              <Typography 
+                variant="caption" 
+                sx={{ 
+                  display: 'block', 
+                  mt: 3, 
+                  color: 'rgba(255, 255, 255, 0.7)',
+                }}
+              >
+                No commitments. Cancel anytime.
+              </Typography>
+            </Paper>
+          </motion.div>
+        </Container>
+      </Box>
+      
+     
+    </>
   );
 };
+
+// Missing Icon Components
+const FileIcon = (props) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={props.size || 24}
+    height={props.size || 24}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+    <polyline points="13 2 13 9 20 9"></polyline>
+  </svg>
+);
+
+// const Users = (props) => (
+//   <svg
+//     xmlns="http://www.w3.org/2000/svg"
+//     width={props.size || 24}
+//     height={props.size || 24}
+//     viewBox="0 0 24 24"
+//     fill="none"
+//     stroke="currentColor"
+//     strokeWidth="2"
+//     strokeLinecap="round"
+//     strokeLinejoin="round"
+//   >
+//     <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+//     <circle cx="9" cy="7" r="4"></circle>
+//     <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+//     <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+//   </svg>
+// );
 
 export default PricingPage;

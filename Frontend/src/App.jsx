@@ -150,6 +150,7 @@ function App() {
               <Route path="pricing" element={<PricingPage />} />
               <Route path="signup" element={<SignupPage />} />
               <Route path="login" element={<LoginPage />} />
+            
             </Route>
             <Route path="/tools" element={<DashboardLayout />}>
               <Route path="merge-pdf" element={<MergePDFPage />} />

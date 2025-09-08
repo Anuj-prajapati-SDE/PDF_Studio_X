@@ -8,7 +8,7 @@ import MergeIcon from '@mui/icons-material/Merge';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import toast from 'react-hot-toast';
 import axios from 'axios';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+// import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 // Mock implementation - replace with actual API call in production
 const mergePDFs = async (files) => {

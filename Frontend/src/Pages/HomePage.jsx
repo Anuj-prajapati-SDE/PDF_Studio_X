@@ -306,7 +306,7 @@ const HomePage = () => {
         />
 
         {/* Chrome-like translucent plates */}
-        {[...Array(4)].map((_, i) => (
+        {/* {[...Array(4)].map((_, i) => (
           <Box
             key={`plate-${i}`}
             component={motion.div}
@@ -346,10 +346,10 @@ const HomePage = () => {
               zIndex: 0,
             }}
           />
-        ))}
+        ))} */}
 
 
-        <Container maxWidth="100%" sx={{ position: 'relative', zIndex: 2, overflow: 'visible' }}>
+        <Container maxWidth="100%" sx={{ position: 'relative', zIndex: 2, overflow: 'visible' , }} >
           <Grid
             container
             spacing={{ xs: 6, md: 0 }}
@@ -370,6 +370,7 @@ const HomePage = () => {
                     display: 'inline-flex',
                     position: 'relative',
                     transform: 'translateZ(0)',
+                     justifyContent: 'center'
                   }}
                   initial={{ y: 20, scale: 0.9, opacity: 0 }}
                   animate={{ y: 0, scale: 1, opacity: 1 }}
@@ -380,6 +381,7 @@ const HomePage = () => {
                       y: [-5, 5, -5],
                       rotate: [-2, 2, -2],
                     }}
+                    
                     transition={{
                       duration: 6,
                       repeat: Infinity,
@@ -390,6 +392,7 @@ const HomePage = () => {
                       sx={{
                         display: 'flex',
                         alignItems: 'center',
+                        
                         mb: 3,
                         gap: 1.5,
                         py: 1.5,
@@ -778,189 +781,7 @@ const HomePage = () => {
                 </Box>
 
                 {/* Enhanced users testimonial card with premium styling */}
-                <motion.div
-                  initial={{ opacity: 0, y: 40 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 1.4, duration: 1 }}
-                >
-                  <Box
-                    sx={{
-                      position: 'relative',
-                      display: 'flex',
-                      flexDirection: { xs: 'column', sm: 'row' },
-                      alignItems: 'flex-start',
-                      gap: 3,
-                      background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(104, 54, 230, 0.05) 100%)',
-                      backdropFilter: 'blur(20px)',
-                      borderRadius: '24px',
-                      p: 3.5,
-                      border: '1px solid rgba(255, 255, 255, 0.08)',
-                      boxShadow: '0 30px 60px -15px rgba(0, 0, 0, 0.3)',
-                      transform: 'perspective(1000px) rotateX(2deg)',
-                      transformOrigin: 'center top',
-                      '&:hover': {
-                        transform: 'perspective(1000px) rotateX(0deg) translateY(-5px)',
-                        boxShadow: '0 35px 65px -15px rgba(0, 0, 0, 0.35), 0 0 20px rgba(104, 54, 230, 0.2)',
-                      },
-                      transition: 'all 0.5s ease',
-                    }}
-                  >
-                    {/* Glass reflections */}
-                    <Box
-                      sx={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        height: '40%',
-                        background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0) 100%)',
-                        borderRadius: '24px 24px 0 0',
-                        zIndex: 0,
-                      }}
-                    />
-
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, zIndex: 1 }}>
-                      <Stack direction="row" spacing={-2.5}>
-                        {[...Array(5)].map((_, i) => (
-                          <motion.div
-                            key={i}
-                            initial={{ scale: 0, x: -30 }}
-                            animate={{ scale: 1, x: 0 }}
-                            transition={{ delay: 1.8 + i * 0.1, duration: 0.6, type: 'spring' }}
-                          >
-                            <Avatar
-                              src={`https://randomuser.me/api/portraits/${i % 2 === 0 ? 'women' : 'men'}/${i + 20}.jpg`}
-                              sx={{
-                                width: 54,
-                                height: 54,
-                                border: '4px solid rgba(104, 54, 230, 0.8)',
-                                backgroundColor: 'primary.main',
-                                boxShadow: '0 0 0 4px rgba(255, 255, 255, 0.8)',
-                                zIndex: 5 - i,
-                              }}
-                            />
-                          </motion.div>
-                        ))}
-                      </Stack>
-                      <Box>
-                        <Typography variant="body1" fontWeight={700} sx={{ lineHeight: 1.2, fontSize: '1.3rem' }}>
-                          <motion.span
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ duration: 0.8, delay: 2.2 }}
-                          >
-                            <CountUp end={50000} separator="," /> +
-                          </motion.span>{' '}
-                          <Box
-                            component="span"
-                            sx={{
-                              background: 'linear-gradient(90deg, #ffffff, #7df9ff)',
-                              backgroundClip: 'text',
-                              WebkitBackgroundClip: 'text',
-                              WebkitTextFillColor: 'transparent',
-                            }}
-                          >
-                            Happy Users
-                          </Box>
-                        </Typography>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.8 }}>
-                          {[...Array(5)].map((_, i) => (
-                            <motion.div
-                              key={i}
-                              initial={{ scale: 0 }}
-                              animate={{ scale: 1 }}
-                              transition={{ delay: 2.3 + i * 0.1, duration: 0.4 }}
-                            >
-                              <Box
-                                component="span"
-                                sx={{
-                                  color: '#FFD700',
-                                  display: 'inline-block',
-                                  fontSize: '1.1rem',
-                                  filter: 'drop-shadow(0 0 3px rgba(255, 215, 0, 0.6))',
-                                }}
-                              >
-                                ★
-                              </Box>
-                            </motion.div>
-                          ))}
-                          <Typography variant="body2" sx={{ opacity: 0.9, fontWeight: 600, ml: 0.7 }}>
-                            4.9/5 rating
-                          </Typography>
-                        </Box>
-                      </Box>
-                    </Box>
-
-                    <Divider
-                      orientation={matchMedia('(min-width:600px)').matches ? 'vertical' : 'horizontal'}
-                      flexItem
-                      sx={{
-                        borderColor: 'rgba(255,255,255,0.1)',
-                        display: { xs: 'block', sm: 'block' }
-                      }}
-                    />
-
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.8, zIndex: 1 }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                        <Avatar
-                          sx={{
-                            bgcolor: 'rgba(125, 249, 255, 0.15)',
-                            width: 38,
-                            height: 38,
-                            boxShadow: '0 0 20px rgba(125, 249, 255, 0.3)',
-                          }}
-                        >
-                          <LockIcon sx={{ fontSize: 18, color: '#7df9ff' }} />
-                        </Avatar>
-                        <Typography variant="body2" fontWeight={500} fontSize="0.95rem">
-                          100% Secure & Private
-                        </Typography>
-                      </Box>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                        <Avatar
-                          sx={{
-                            bgcolor: 'rgba(104, 54, 230, 0.15)',
-                            width: 38,
-                            height: 38,
-                            boxShadow: '0 0 20px rgba(104, 54, 230, 0.3)',
-                          }}
-                        >
-                          <FlashlightOn sx={{ fontSize: 18, color: '#8c5eff' }} />
-                        </Avatar>
-                        <Typography variant="body2" fontWeight={500} fontSize="0.95rem">
-                          Lightning Fast Processing
-                        </Typography>
-                      </Box>
-                    </Box>
-
-                    {/* Decorative badge */}
-                    <Box
-                      component={motion.div}
-                      initial={{ opacity: 0, y: -20, rotate: -10 }}
-                      animate={{ opacity: 1, y: 0, rotate: -10 }}
-                      transition={{ delay: 2.5, duration: 0.5 }}
-                      sx={{
-                        position: 'absolute',
-                        top: -20,
-                        right: 30,
-                        bgcolor: '#6836e6',
-                        color: 'white',
-                        borderRadius: 2,
-                        px: 2,
-                        py: 0.5,
-                        fontSize: '0.75rem',
-                        fontWeight: 700,
-                        boxShadow: '0 10px 25px -5px rgba(104, 54, 230, 0.5)',
-                        border: '2px solid rgba(255, 255, 255, 0.8)',
-                        zIndex: 2,
-                        textTransform: 'uppercase',
-                        letterSpacing: 1,
-                      }}
-                    >
-                      Top rated
-                    </Box>
-                  </Box>
-                </motion.div>
+                
               </motion.div>
             </Grid>
 
@@ -1038,7 +859,7 @@ const HomePage = () => {
                       }}
                       sx={{
                         position: 'absolute',
-                        // top: '50%',
+                        top: '50%',
                         left: '50%',
                         width: i % 3 === 0 ? 40 : i % 3 === 1 ? 25 : 15,
                         height: i % 3 === 0 ? 40 : i % 3 === 1 ? 25 : 15,
@@ -1065,62 +886,21 @@ const HomePage = () => {
                 </motion.div>
 
               </Box>
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
-                <Button
-                  variant="contained"
-                  size="large"
-                  component={RouterLink}
-                  to="/tools/merge-pdf"
-                  sx={{
-                    bgcolor: 'white',
-                    color: 'primary.main',
-                    borderRadius: '50px',
-                    px: 4,
-                    py: 1.5,
-                    fontSize: '1rem',
-                    fontWeight: 600,
-                    '&:hover': {
-                      bgcolor: '#f0f0f0',
-                    },
-                    boxShadow: '0 5px 15px rgba(255, 255, 255, 0.2)',
-                  }}
-                  startIcon={<CloudUpload />}
-                >
-                  Try Now - It's Free
-                </Button>
-
-                <Button
-                  variant="outlined"
-                  size="large"
-                  color="inherit"
-                  component={RouterLink}
-                  to="/about"
-                  sx={{
-                    borderRadius: '50px',
-                    px: 4,
-                    py: 1.5,
-                    fontSize: '1rem',
-                    fontWeight: 600,
-                    borderColor: 'rgba(255, 255, 255, 0.5)',
-                    '&:hover': {
-                      bgcolor: 'rgba(255, 255, 255, 0.1)',
-                      borderColor: 'white',
-                    },
-                  }}
-                >
-                  Learn More
-                </Button>
-              </Box>
+           
             </Grid>
           </Grid>
-            <Grid
-              container
-              sx={{
-                position: 'relative',
-                '&::before': {
+        </Container>
+
+        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2, mb: { xs: 8, md: 10 }, mt: { xs: 4, md: 6 } }}>
+          <Grid
+            container
+            sx={{
+              position: 'relative',
+              '&::before': {
                   content: '""',
                   position: 'absolute',
                   top: 10,
+                
                   minWidth: '100%',
                   borderRadius: '20px',
                   left: 0,
@@ -1130,6 +910,7 @@ const HomePage = () => {
                   zIndex: 0,
                 }
               }}
+              style={{ justifyContent: 'space-around', paddingTop: "20px" }}
             >
               {[
                 { label: 'Files Processed', count: '10M+', icon: <PictureAsPdf />, description: 'Trusted by professionals' },
@@ -1149,6 +930,7 @@ const HomePage = () => {
                       position: 'absolute',
                       right: 0,
                       top: '20%',
+                     
                       height: '60%',
                       width: '1px',
                       bgcolor: 'rgba(255, 255, 255, 0.15)',
@@ -1167,6 +949,7 @@ const HomePage = () => {
                     <motion.div
                       whileHover={{ y: -5 }}
                       transition={{ duration: 0.3 }}
+                      
                     >
                       <Box
                         sx={{
@@ -1223,8 +1006,7 @@ const HomePage = () => {
                 </Grid>
               ))}
             </Grid>
-        </Container>
-
+ </Container>
 
 
         {/* Features Section */}
@@ -1232,10 +1014,10 @@ const HomePage = () => {
 
      {/* How It Works Section */}
 {/* How It Works Section */}
-        <HowItWorksSection />
+        {/* <HowItWorksSection /> */}
        
         {/* Testimonials Section */}
-        <TestimonialSection testimonials={testimonials}></TestimonialSection>
+        {/* <TestimonialSection testimonials={testimonials}></TestimonialSection> */}
 
         {/* CTA Section */}
         <CTASection />

@@ -729,7 +729,7 @@ const HowItWorksSection = () => {
               }}
             >
               Transform Your PDFs in Three Simple Steps
-              
+               
               {/* Decorative elements */}
               <Box
                 component={motion.div}

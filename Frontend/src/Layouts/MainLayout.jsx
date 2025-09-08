@@ -1,22 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
-import { Box, AppBar, Container, useScrollTrigger, Slide } from '@mui/material';
+import { Box, Container } from '@mui/material';
 import { motion } from 'framer-motion';
-import Header from '../components/common/Header';
+import Header from '../Components/common/Header';
 import Footer from '../Components/common/Footer';
 import FloatingActionButton from '../Components/common/FloatingActionButton';
 // import ParticlesBackground from '../Components/common/ParticlesBackground';
-
-// Hide AppBar on scroll down
-function HideOnScroll({ children }) {
-  const trigger = useScrollTrigger();
-
-  return (
-    <Slide appear={false} direction="down" in={!trigger}>
-      {children}
-    </Slide>
-  );
-}
 
 const MainLayout = () => {
   const location = useLocation();
@@ -57,20 +46,7 @@ const MainLayout = () => {
       {/* <ParticlesBackground /> */}
       
       {/* Header */}
-      <HideOnScroll>
-        <AppBar 
-          position="sticky" 
-          elevation={0} 
-          sx={{ 
-            bgcolor: showParticles ? 'transparent' : 'rgba(255, 255, 255, 0.95)', 
-            backdropFilter: 'blur(10px)',
-            borderBottom: '1px solid',
-            borderColor: 'divider',
-          }}
-        >
-          <Header />
-        </AppBar>
-      </HideOnScroll>
+      <Header />
       
       {/* Main content */}
       <Box component="main" sx={{ flexGrow: 1 }}>

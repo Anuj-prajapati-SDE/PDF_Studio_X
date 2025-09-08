@@ -74,7 +74,6 @@ const PdfLogo = ({ size = 40, light = false }) => (
 
 const Header = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const [dateTime, setDateTime] = useState(new Date());
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -153,22 +152,6 @@ const Header = () => {
     setUserMenuAnchor(null);
   };
 
-  // Check if the page is scrolled
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 20) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
-
   // Desktop navigation links
   const navLinks = [
     { title: 'Home', path: '/' },
@@ -192,17 +175,10 @@ const Header = () => {
       color="transparent"
       elevation={0}
       sx={{
-        background: scrolled 
-          ? 'rgba(255, 255, 255, 0.8)'
-          : 'transparent',
-        backdropFilter: scrolled ? 'blur(10px)' : 'none',
-        boxShadow: scrolled 
-          ? '0 4px 20px rgba(0, 0, 0, 0.08)'
-          : 'none',
-        borderBottom: scrolled 
-          ? '1px solid rgba(0, 0, 0, 0.05)'
-          : 'none',
-        transition: 'all 0.3s ease',
+        background: 'rgba(255, 255, 255, 0.9)',
+        backdropFilter: 'blur(10px)',
+        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+        borderBottom: '1px solid rgba(0, 0, 0, 0.05)',
       }}
     >
       <Container maxWidth="xl">
@@ -211,7 +187,6 @@ const Header = () => {
           sx={{ 
             height: { xs: 70, md: 80 },
             py: 0.5,
-            transition: 'height 0.3s ease',
           }}
         >
           {/* Logo */}
@@ -238,10 +213,7 @@ const Header = () => {
                   fontWeight: 700,
                   ml: 1.5,
                   fontSize: { xs: '1.25rem', md: '1.5rem' },
-                  color: scrolled 
-                    ? 'text.primary' 
-                    : { xs: 'text.primary', md: 'white' },
-                  transition: 'color 0.3s ease',
+                  color: 'text.primary',
                 }}
               >
                 <Box 
@@ -258,13 +230,11 @@ const Header = () => {
                 <Box 
                   component="span" 
                   sx={{ 
-                    color: scrolled 
-                      ? 'text.primary' 
-                      : { xs: 'text.primary', md: 'white' },
+                    color: 'text.primary',
                     ml: 0.5,
                   }}
                 >
-                  Utility
+                StudioX
                 </Box>
               </Typography>
             </Box>
@@ -292,7 +262,7 @@ const Header = () => {
                 sx={{
                   px: 2,
                   py: 1,
-                  color: scrolled ? 'text.primary' : 'white',
+                  color: 'text.primary',
                   fontWeight: 600,
                   fontSize: '0.95rem',
                   display: 'flex',
@@ -308,9 +278,7 @@ const Header = () => {
                     left: 0,
                     right: 0,
                     bottom: 0,
-                    background: scrolled 
-                      ? 'rgba(99, 102, 241, 0.08)'
-                      : 'rgba(255, 255, 255, 0.1)',
+                    background: 'rgba(99, 102, 241, 0.08)',
                     borderRadius: '10px',
                     opacity: 0,
                     transition: 'opacity 0.3s ease',
@@ -349,7 +317,7 @@ const Header = () => {
                   sx={{
                     px: 2,
                     py: 1,
-                    color: scrolled ? 'text.primary' : 'white',
+                    color: 'text.primary',
                     fontWeight: 600,
                     fontSize: '0.95rem',
                     position: 'relative',
@@ -363,9 +331,7 @@ const Header = () => {
                       left: 0,
                       right: 0,
                       bottom: 0,
-                      background: scrolled 
-                        ? 'rgba(99, 102, 241, 0.08)'
-                        : 'rgba(255, 255, 255, 0.1)',
+                      background: 'rgba(99, 102, 241, 0.08)',
                       borderRadius: '10px',
                       opacity: 0,
                       transition: 'opacity 0.3s ease',
@@ -432,18 +398,12 @@ const Header = () => {
                     textTransform: 'none',
                     py: 0.5,
                     px: { xs: 1, sm: 1.5 },
-                    background: scrolled 
-                      ? 'rgba(99, 102, 241, 0.08)'
-                      : 'rgba(255, 255, 255, 0.1)',
+                    background: 'rgba(99, 102, 241, 0.08)',
                     border: '1px solid',
-                    borderColor: scrolled 
-                      ? 'rgba(99, 102, 241, 0.2)'
-                      : 'rgba(255, 255, 255, 0.1)',
-                    color: scrolled ? 'text.primary' : 'white',
+                    borderColor: 'rgba(99, 102, 241, 0.2)',
+                    color: 'text.primary',
                     '&:hover': {
-                      background: scrolled 
-                        ? 'rgba(99, 102, 241, 0.15)'
-                        : 'rgba(255, 255, 255, 0.2)',
+                      background: 'rgba(99, 102, 241, 0.15)',
                     },
                   }}
                 >
@@ -500,16 +460,12 @@ const Header = () => {
               sx={{
                 ml: { xs: 0, sm: 1 },
                 display: { md: 'none' },
-                color: scrolled ? '#6366f1' : 'white',
-                backgroundColor: scrolled 
-                  ? 'rgba(99, 102, 241, 0.08)'
-                  : 'rgba(255, 255, 255, 0.1)',
+                color: '#6366f1',
+                backgroundColor: 'rgba(99, 102, 241, 0.08)',
                 borderRadius: '10px',
                 p: 1,
                 '&:hover': {
-                  backgroundColor: scrolled 
-                    ? 'rgba(99, 102, 241, 0.15)'
-                    : 'rgba(255, 255, 255, 0.2)',
+                  backgroundColor: 'rgba(99, 102, 241, 0.15)',
                 },
               }}
             >

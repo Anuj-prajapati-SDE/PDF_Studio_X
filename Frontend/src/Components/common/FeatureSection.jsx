@@ -63,7 +63,7 @@ const FeatureSection = ({ tools }) => {
           </Typography>
         </Box>
 
-        <Grid container spacing={{ xs: 2, sm: 3, md: 4 }}>
+        <Grid container spacing={{ xs: 2, sm: 3, md: 2.5 }} justifyContent={'center'}>
           {tools.map((tool, index) => (
             <Grid item xs={12} sm={8} md={6} lg={2} key={index}>
               <Card

@@ -15,7 +15,6 @@ import {
   Checkbox
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { motion } from 'framer-motion';
 import { 
   Visibility, 
   VisibilityOff, 
@@ -106,9 +105,10 @@ const SignupPage = () => {
   return (
     <Box
       sx={{
-        minHeight: '100vh',
+        minHeight: '125vh',
         display: 'flex',
         position: 'relative',
+        alignItems:"end",
         backgroundColor: 'rgb(10, 10, 30)',
         overflow: 'hidden',
       }}
@@ -125,278 +125,17 @@ const SignupPage = () => {
           zIndex: 0,
         }}
       />
-
-      {/* Animated gradient orbs */}
-      {[...Array(5)].map((_, i) => (
-        <Box
-          key={i}
-          component={motion.div}
-          initial={{ 
-            x: Math.random() * 100 - 50, 
-            y: Math.random() * 100 - 50,
-            scale: Math.random() * 0.5 + 0.5,
-            opacity: Math.random() * 0.4 + 0.2
-          }}
-          animate={{ 
-            x: Math.random() * 100 - 50, 
-            y: Math.random() * 100 - 50,
-            scale: Math.random() * 0.5 + 0.8,
-            opacity: Math.random() * 0.4 + 0.3
-          }}
-          transition={{
-            repeat: Infinity,
-            repeatType: 'mirror',
-            duration: 20 + i * 5,
-            ease: 'easeInOut',
-          }}
-          sx={{
-            position: 'absolute',
-            top: `${Math.random() * 100}%`,
-            left: `${Math.random() * 100}%`,
-            width: { xs: '15rem', sm: '20rem', md: '30rem' },
-            height: { xs: '15rem', sm: '20rem', md: '30rem' },
-            background: i % 3 === 0 
-              ? 'radial-gradient(circle, rgba(104, 54, 230, 0.15) 0%, rgba(104, 54, 230, 0) 70%)'
-              : i % 3 === 1
-                ? 'radial-gradient(circle, rgba(125, 249, 255, 0.15) 0%, rgba(125, 249, 255, 0) 70%)'
-                : 'radial-gradient(circle, rgba(230, 54, 189, 0.1) 0%, rgba(230, 54, 189, 0) 70%)',
-            borderRadius: '50%',
-            filter: 'blur(50px)',
-            transform: 'translate(-50%, -50%)',
-            zIndex: 0,
-          }}
-        />
-      ))}
-
-      {/* Grid pattern */}
-      <Box
-        sx={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'40\' height=\'40\' viewBox=\'0 0 40 40\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%236836e6\' fill-opacity=\'0.05\' fill-rule=\'evenodd\'%3E%3Cpath d=\'M0 40L40 0H20L0 20M40 40V20L20 40\'/%3E%3C/g%3E%3C/svg%3E")',
-          opacity: 0.3,
-          zIndex: 0,
-        }}
-      />
-      
+  
       <Container maxWidth="xl" sx={{ zIndex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', py: 4 }}>
         <Grid container spacing={0} sx={{ 
-          maxWidth: 1400,
+          maxWidth: 600,
           backgroundColor: 'rgba(20, 20, 40, 0.5)',
           backdropFilter: 'blur(20px)',
           borderRadius: '24px',
           overflow: 'hidden',
           boxShadow: '0 25px 60px rgba(0,0,0,0.2), 0 0 30px rgba(104, 54, 230, 0.1)',
           border: '1px solid rgba(255,255,255,0.05)',
-        }}>
-          
-          {/* Left panel - Image/Branding */}
-          {isMediumScreen && (
-            <Grid 
-              item 
-              xs={12} 
-              md={6}
-              sx={{ 
-                position: 'relative',
-                minHeight: 700,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                p: 6,
-                overflow: 'hidden',
-                background: 'linear-gradient(135deg, rgba(104, 54, 230, 0.8) 0%, rgba(48, 17, 125, 0.9) 100%)',
-              }}
-            >
-              <Box 
-                component={motion.div}
-                initial={{ rotate: -5, scale: 0.95 }}
-                animate={{ rotate: 0, scale: 1 }}
-                transition={{ duration: 1 }}
-                sx={{
-                  position: 'relative',
-                  width: '100%',
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'center',
-                  zIndex: 2,
-                  px: 4,
-                }}
-              >
-                <motion.div
-                  initial={{ y: -30, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.2, duration: 0.8 }}
-                >
-                  <Typography 
-                    variant="h3" 
-                    fontWeight={800} 
-                    sx={{ 
-                      color: '#fff', 
-                      mb: 2, 
-                      letterSpacing: '-0.5px',
-                      textShadow: '0 2px 10px rgba(0, 0, 0, 0.2)',
-                      fontSize: { xs: '2rem', sm: '2.2rem', md: '2.5rem' },
-                    }}
-                  >
-                    Join our Premium
-                    <Box 
-                      component="span" 
-                      sx={{ 
-                        display: 'block', 
-                        background: 'linear-gradient(90deg, #fff, #7df9ff)',
-                        backgroundClip: 'text',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                        fontSize: { xs: '2.2rem', sm: '2.5rem', md: '3rem' },
-                      }}
-                    >
-                      Document Platform
-                    </Box>
-                  </Typography>
-                </motion.div>
-                
-                <motion.div
-                  initial={{ y: 30, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.5, duration: 0.8 }}
-                >
-                  <Typography 
-                    variant="subtitle1" 
-                    sx={{ 
-                      mb: 4, 
-                      color: 'rgba(255,255,255,0.8)',
-                      maxWidth: 450,
-                      lineHeight: 1.6,
-                    }}
-                  >
-                    Transform how you work with documents. Our platform offers powerful tools for document management, editing, and collaboration.
-                  </Typography>
-                </motion.div>
-
-                {/* Feature highlights */}
-                <Box sx={{ mb: 4 }}>
-                  {[
-                    { label: 'Advanced Document Processing', delay: 0.7 },
-                    { label: 'Secure and Private', delay: 0.9 },
-                    { label: 'Collaborate in Real-time', delay: 1.1 },
-                  ].map((feature, index) => (
-                    <motion.div
-                      key={index}
-                      initial={{ x: -30, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      transition={{ delay: feature.delay, duration: 0.8 }}
-                    >
-                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                        <CheckCircle sx={{ color: '#7df9ff', mr: 1.5, fontSize: 22 }} />
-                        <Typography variant="body1" color="white" fontWeight={500}>
-                          {feature.label}
-                        </Typography>
-                      </Box>
-                    </motion.div>
-                  ))}
-                </Box>
-
-                {/* "Already have an account" for mobile */}
-                <Box sx={{ mt: 'auto', display: { xs: 'none', md: 'block' } }}>
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 1.3, duration: 0.8 }}
-                  >
-                    <Box 
-                      sx={{ 
-                        mt: 6, 
-                        py: 2.5, 
-                        px: 3, 
-                        borderRadius: '12px',
-                        backdropFilter: 'blur(10px)',
-                        backgroundColor: 'rgba(255,255,255,0.1)',
-                        border: '1px solid rgba(255,255,255,0.1)',
-                      }}
-                    >
-                      <Typography color="white" variant="body2" sx={{ mb: 1 }}>
-                        Already have an account?
-                      </Typography>
-                      <Button 
-                        component={Link} 
-                        to="/login" 
-                        variant="outlined" 
-                        sx={{
-                          color: 'white',
-                          borderColor: '#7df9ff',
-                          borderRadius: '10px',
-                          textTransform: 'none',
-                          fontWeight: 600,
-                          '&:hover': {
-                            borderColor: '#7df9ff',
-                            backgroundColor: 'rgba(125, 249, 255, 0.1)',
-                          }
-                        }}
-                        endIcon={<ArrowForward />}
-                      >
-                        Sign In
-                      </Button>
-                    </Box>
-                  </motion.div>
-                </Box>
-              </Box>
-              
-              {/* Decorative elements */}
-              <Box
-                component={motion.div}
-                animate={{ 
-                  y: ['-2%', '2%', '-2%'],
-                  rotate: ['-1deg', '1deg', '-1deg'],
-                }}
-                transition={{ 
-                  repeat: Infinity,
-                  duration: 10,
-                  ease: 'easeInOut',
-                }}
-                sx={{
-                  position: 'absolute',
-                  top: 'auto',
-                  bottom: '-10%',
-                  left: '-10%',
-                  width: '120%',
-                  height: '45%',
-                  background: 'linear-gradient(180deg, rgba(125, 249, 255, 0) 0%, rgba(125, 249, 255, 0.1) 100%)',
-                  borderRadius: '100% 100% 0 0',
-                  filter: 'blur(20px)',
-                  zIndex: 1,
-                }}
-              />
-              
-              <Box
-                component={motion.div}
-                animate={{ 
-                  opacity: [0.7, 0.9, 0.7],
-                  scale: [1, 1.05, 1],
-                }}
-                transition={{ 
-                  repeat: Infinity,
-                  duration: 8,
-                  ease: 'easeInOut',
-                }}
-                sx={{
-                  position: 'absolute',
-                  top: '10%',
-                  right: '5%',
-                  width: '40%',
-                  height: '40%',
-                  background: 'radial-gradient(circle, rgba(230, 54, 189, 0.2) 0%, rgba(230, 54, 189, 0) 70%)',
-                  borderRadius: '50%',
-                  filter: 'blur(40px)',
-                  zIndex: 0,
-                }}
-              />
-            </Grid>
-          )}
+        }}>      
           
           {/* Right panel - Signup Form */}
           <Grid 
@@ -410,24 +149,17 @@ const SignupPage = () => {
               justifyContent: 'center',
             }}
           >
-            <motion.div
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.8 }}
-            >
-              <Box sx={{ mb: 4, display: 'flex', alignItems: 'center' }}>
+            <div>
+              <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Avatar sx={{ 
                   width: 50, 
                   height: 50, 
                   bgcolor: '#6836e6',
                   boxShadow: '0 0 20px rgba(104, 54, 230, 0.4)'
                 }}>
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
-                  >
+                  <div>
                     <Lock />
-                  </motion.div>
+                  </div>
                 </Avatar>
                 <Box sx={{ ml: 2 }}>
                   <Typography
@@ -448,16 +180,11 @@ const SignupPage = () => {
                   </Typography>
                 </Box>
               </Box>
-            </motion.div>
+            </div>
 
-            <motion.div
-              initial={{ y: 30, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.3, duration: 0.8 }}
-            >
+            <div>
               <Box component="form" sx={{ mb: 3 }}>
-                <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6}>
+              
                     <StyledTextField
                       fullWidth
                       label="First Name"
@@ -471,8 +198,6 @@ const SignupPage = () => {
                       }}
                       sx={{ mb: 2 }}
                     />
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
                     <StyledTextField
                       fullWidth
                       label="Last Name"
@@ -486,8 +211,8 @@ const SignupPage = () => {
                       }}
                       sx={{ mb: 2 }}
                     />
-                  </Grid>
-                </Grid>
+                 
+          
                 
                 <StyledTextField
                   fullWidth
@@ -578,35 +303,25 @@ const SignupPage = () => {
                   sx={{ mb: 3 }}
                 />
 
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
+                <div>
                   <GradientButton
                     fullWidth
                     variant="contained"
                     size="large"
                     sx={{ py: 1.5 }}
                     endIcon={
-                      <motion.div
-                        animate={{ x: [0, 5, 0] }}
-                        transition={{ repeat: Infinity, duration: 1.5 }}
-                      >
+                      <div>
                         <ArrowForward />
-                      </motion.div>
+                      </div>
                     }
                   >
                     Create Account
                   </GradientButton>
-                </motion.div>
+                </div>
               </Box>
-            </motion.div>
+            </div>
 
-            <motion.div
-              initial={{ y: 30, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.5, duration: 0.8 }}
-            >
+            <div>
               <Box sx={{ my: 3, display: 'flex', alignItems: 'center' }}>
                 <Divider sx={{ flex: 1, borderColor: 'rgba(255,255,255,0.1)' }} />
                 <Typography variant="body2" sx={{ px: 2, color: 'rgba(255,255,255,0.6)' }}>
@@ -615,47 +330,34 @@ const SignupPage = () => {
                 <Divider sx={{ flex: 1, borderColor: 'rgba(255,255,255,0.1)' }} />
               </Box>
 
-              <Grid container spacing={2}>
+              <Grid container spacing={2} justifyContent="center">
                 <Grid item xs={12} sm={4}>
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
+                  <div>
                     <SocialButton fullWidth startIcon={<Google />}>
                       Google
                     </SocialButton>
-                  </motion.div>
+                  </div>
                 </Grid>
                 <Grid item xs={12} sm={4}>
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
+                  <div>
                     <SocialButton fullWidth startIcon={<Facebook />}>
                       Facebook
                     </SocialButton>
-                  </motion.div>
+                  </div>
                 </Grid>
                 <Grid item xs={12} sm={4}>
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
+                  <div>
                     <SocialButton fullWidth startIcon={<Apple />}>
                       Apple
                     </SocialButton>
-                  </motion.div>
+                  </div>
                 </Grid>
               </Grid>
-            </motion.div>
+            </div>
 
             {/* "Already have an account" for mobile */}
             {!isMediumScreen && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.7, duration: 0.8 }}
-              >
+              <div>
                 <Box sx={{ mt: 4, textAlign: 'center' }}>
                   <Typography variant="body2" sx={{ mb: 1.5, color: 'rgba(255,255,255,0.7)' }}>
                     Already have an account?
@@ -681,7 +383,7 @@ const SignupPage = () => {
                     Sign In
                   </Button>
                 </Box>
-              </motion.div>
+              </div>
             )}
           </Grid>
         </Grid>

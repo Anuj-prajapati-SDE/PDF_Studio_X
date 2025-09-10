@@ -697,8 +697,8 @@ const HomePage = () => {
                       }}
                       sx={{
                         position: 'absolute',
-                        top: '50%',
-                        left: '50%',
+                        top: '60%',
+                        left: '20%',
                         width: i % 3 === 0 ? 40 : i % 3 === 1 ? 25 : 15,
                         height: i % 3 === 0 ? 40 : i % 3 === 1 ? 25 : 15,
                         background: i % 4 === 0

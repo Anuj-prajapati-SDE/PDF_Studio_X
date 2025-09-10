@@ -12,15 +12,7 @@ import {
   alpha
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { 
-  motion, 
-  useScroll, 
-  useTransform, 
-  useMotionTemplate, 
-  useSpring, 
-  useAnimation,
-  useInView 
-} from 'framer-motion';
+import { motion } from 'framer-motion';
 import { 
   CloudUpload as UploadIcon,
   Dns as ProcessIcon,
@@ -31,24 +23,21 @@ import {
   Check as CheckIcon
 } from '@mui/icons-material';
 
-// Current date/time and user data
-const CURRENT_DATETIME = "2025-05-09 09:52:03";
-const CURRENT_USER = "Anuj-prajapati-SDE";
 
 // Premium glass morphism card component
-const GlassCard = styled(motion.div)(({ theme, gradientStyle = 'primary' }) => {
-  // Define gradient styles
+const GlassCard = styled(Box)(({ theme, gradientStyle = 'primary' }) => {
+  // Define gradient styles using theme colors
   const gradients = {
-    primary: 'linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(79, 70, 229, 0.12) 100%)',
-    purple: 'linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(124, 58, 237, 0.12) 100%)',
-    blue: 'linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(37, 99, 235, 0.12) 100%)',
+    primary: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.08)} 0%, ${alpha(theme.palette.primary.dark, 0.12)} 100%)`,
+    secondary: `linear-gradient(135deg, ${alpha(theme.palette.secondary.main, 0.08)} 0%, ${alpha(theme.palette.secondary.dark, 0.12)} 100%)`,
+    info: `linear-gradient(135deg, ${alpha(theme.palette.info.main, 0.08)} 0%, ${alpha(theme.palette.info.dark, 0.12)} 100%)`,
   };
   
-  // Define border colors
+  // Define border colors using theme colors
   const borders = {
-    primary: 'rgba(99, 102, 241, 0.2)',
-    purple: 'rgba(139, 92, 246, 0.2)',
-    blue: 'rgba(59, 130, 246, 0.2)',
+    primary: alpha(theme.palette.primary.main, 0.2),
+    secondary: alpha(theme.palette.secondary.main, 0.2),
+    info: alpha(theme.palette.info.main, 0.2),
   };
 
   return {
@@ -79,18 +68,18 @@ const GlassCard = styled(motion.div)(({ theme, gradientStyle = 'primary' }) => {
 
 // Premium gradient display
 const GradientDisplay = styled(Box)(({ theme, gradient = 'primary' }) => {
-  // Define gradient styles
+  // Define gradient styles using theme colors
   const gradients = {
-    primary: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-    purple: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
-    blue: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+    primary: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+    secondary: `linear-gradient(135deg, ${theme.palette.secondary.main} 0%, ${theme.palette.secondary.dark} 100%)`,
+    info: `linear-gradient(135deg, ${theme.palette.info.main} 0%, ${theme.palette.info.dark} 100%)`,
   };
   
-  // Define shadow colors
+  // Define shadow colors using theme colors
   const shadows = {
-    primary: '0 8px 16px -4px rgba(99, 102, 241, 0.5)',
-    purple: '0 8px 16px -4px rgba(139, 92, 246, 0.5)',
-    blue: '0 8px 16px -4px rgba(59, 130, 246, 0.5)',
+    primary: `0 8px 16px -4px ${alpha(theme.palette.primary.main, 0.5)}`,
+    secondary: `0 8px 16px -4px ${alpha(theme.palette.secondary.main, 0.5)}`,
+    info: `0 8px 16px -4px ${alpha(theme.palette.info.main, 0.5)}`,
   };
 
   return {
@@ -104,7 +93,7 @@ const GradientDisplay = styled(Box)(({ theme, gradient = 'primary' }) => {
 });
 
 // Shimmer effect component
-const Shimmer = styled(motion.div)({
+const Shimmer = styled(Box)({
   position: 'absolute',
   top: 0,
   left: 0,
@@ -116,7 +105,7 @@ const Shimmer = styled(motion.div)({
 });
 
 // Glowing dot component with pulsing animation
-const GlowDot = ({ size = 6, color = '#6366f1', pulseSize = 16, ...props }) => (
+const GlowDot = ({ size = 6, color = '#ffffff', pulseSize = 16, ...props }) => (
   <Box sx={{ position: 'relative', ...props }}>
     <Box
       sx={{
@@ -183,7 +172,7 @@ const STEPS = [
     title: 'Select Operations',
     description: 'Choose from our comprehensive suite of PDF tools to perform the exact operations you need, from merging and splitting to compression and encryption.',
     icon: <ProcessIcon sx={{ fontSize: '2rem' }} />,
-    gradient: 'purple',
+    gradient: 'secondary',
     delay: 0.1,
     iconAnimation: {
       rotate: [0, 10, 0, -10, 0],
@@ -200,7 +189,7 @@ const STEPS = [
     title: 'Download Results',
     description: 'Once processing is complete, download your transformed PDF files instantly. All files are automatically deleted after processing for your privacy.',
     icon: <DownloadIcon sx={{ fontSize: '2rem' }} />,
-    gradient: 'blue',
+    gradient: 'info',
     delay: 0.2,
     iconAnimation: {
       y: [0, 5, 0],
@@ -224,259 +213,68 @@ const FEATURES = [
   'API access available'
 ];
 
-// Component for the current time and user display
-const UserInfoDisplay = ({ currentTime, currentUser }) => {
-  const [seconds, setSeconds] = useState(parseInt(currentTime.split(':')[2]));
-  
-  // Extract user initials
-  const userParts = currentUser.split('-');
-  const userInitials = userParts.length > 1 
-    ? `${userParts[0][0]}${userParts[1][0]}`.toUpperCase()
-    : userParts[0].substring(0, 2).toUpperCase();
-  
-  // Update the seconds
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setSeconds(prev => (prev + 1) % 60);
-    }, 1000);
-    
-    return () => clearInterval(timer);
-  }, []);
-
-  // Format time with the updated seconds
-  const [date, time] = currentTime.split(' ');
-  const formattedTime = `${time.substring(0, 5)}:${seconds.toString().padStart(2, '0')}`;
-
-  return (
-    <Box
-      component={motion.div}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.7, delay: 0.5 }}
-      sx={{
-        position: 'relative',
-        mt: { xs: 4, md: 6 },
-        backdropFilter: 'blur(10px)',
-        backgroundColor: 'rgba(255, 255, 255, 0.04)',
-        borderRadius: '16px',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
-        p: { xs: 2, md: 3 },
-        display: 'flex',
-        flexDirection: { xs: 'column', sm: 'row' },
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: 2,
-        overflow: 'hidden',
-      }}
-    >
-      <Shimmer
-        animate={{ x: [-500, 500] }}
-        transition={{ 
-          repeat: Infinity, 
-          duration: 2.5,
-          ease: 'easeInOut',
-          repeatDelay: 5,
-        }}
-      />
-
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-        <Avatar
-          sx={{
-            background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-            color: 'white',
-            fontWeight: 700,
-            width: { xs: 40, md: 48 },
-            height: { xs: 40, md: 48 },
-            boxShadow: '0 5px 15px rgba(99, 102, 241, 0.4)',
-          }}
-        >
-          {userInitials}
-        </Avatar>
-        <Box>
-          <Typography 
-            variant="body2" 
-            sx={{ 
-              color: 'rgba(255, 255, 255, 0.7)',
-              fontSize: '0.75rem',
-              mb: 0.5,
-            }}
-          >
-            CURRENT USER
-          </Typography>
-          <Typography
-            variant="body1"
-            sx={{
-              color: 'white',
-              fontWeight: 600,
-              fontSize: '1rem',
-            }}
-          >
-            {currentUser}
-          </Typography>
-        </Box>
-      </Box>
-
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-        <TimeIcon 
-          sx={{ 
-            color: '#6366f1',
-            fontSize: { xs: '1.5rem', md: '2rem' },
-          }} 
-        />
-        <Box>
-          <Typography
-            variant="body2"
-            sx={{
-              color: 'rgba(255, 255, 255, 0.7)',
-              fontSize: '0.75rem',
-              mb: 0.5,
-            }}
-          >
-            UTC TIME
-          </Typography>
-          <Box
-            component={motion.div}
-            animate={{
-              opacity: [1, 1, 1],
-            }}
-          >
-            <Typography
-              variant="body1"
-              sx={{
-                color: 'white',
-                fontWeight: 600,
-                fontSize: { xs: '0.9rem', md: '1rem' },
-                fontFamily: 'monospace',
-                letterSpacing: 1,
-              }}
-            >
-              {date} {' '}
-              <Box
-                component="span"
-                sx={{
-                  color: '#6366f1',
-                }}
-              >
-                {formattedTime}
-              </Box>
-            </Typography>
-          </Box>
-        </Box>
-      </Box>
-
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 1,
-          backgroundColor: 'rgba(16, 185, 129, 0.1)',
-          backdropFilter: 'blur(10px)',
-          borderRadius: '20px',
-          py: 0.75,
-          px: 2,
-          border: '1px solid rgba(16, 185, 129, 0.2)',
-        }}
-      >
-        <SecurityIcon 
-          fontSize="small" 
-          sx={{ color: '#10B981' }} 
-        />
-        <Typography 
-          variant="caption" 
-          sx={{ 
-            color: '#10B981',
-            fontWeight: 600,
-            whiteSpace: 'nowrap',
-          }}
-        >
-          Secure Connection
-        </Typography>
-      </Box>
-    </Box>
-  );
-};
-
 // Step Card Component
-const StepCard = ({ step, index, sectionRef }) => {
-  const cardRef = useRef(null);
-  const isInView = useInView(cardRef, { once: true, amount: 0.3 });
+const StepCard = ({ step, index }) => {
+  const theme = useTheme();
   
-  // Scroll-based animation calculations
-  const { scrollYProgress } = useScroll({
-    target: cardRef,
-    offset: ["start end", "end start"],
-    containerRef: sectionRef
-  });
-  
-  // Smoothen the scroll progress for better animation
-  const smoothProgress = useSpring(scrollYProgress, { stiffness: 100, damping: 30 });
-  
-  // Transform values based on scroll position
-  const translateY = useTransform(smoothProgress, [0, 0.5, 1], [50, 0, -30]);
-  const opacity = useTransform(smoothProgress, [0, 0.3, 0.9], [0.3, 1, 0.8]);
-  const scale = useTransform(smoothProgress, [0, 0.5, 1], [0.9, 1, 0.98]);
-  const rotate = useTransform(smoothProgress, [0, 0.5, 1], [-0.5, 0, 0.5]);
-  
-  // 3D tilt effect
-  const [tilt, setTilt] = useState({ x: 0, y: 0 });
-  
-  const handleTiltMove = (e) => {
-    if (!cardRef.current) return;
-    
-    const rect = cardRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-    
-    const tiltX = (y - centerY) / 20;
-    const tiltY = (centerX - x) / 20;
-    
-    setTilt({ x: tiltX, y: tiltY });
+  const getGradient = (gradientType) => {
+    switch(gradientType) {
+      case 'primary':
+        return `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`;
+      case 'secondary':
+        return `linear-gradient(135deg, ${theme.palette.secondary.main} 0%, ${theme.palette.secondary.dark} 100%)`;
+      case 'info':
+        return `linear-gradient(135deg, ${theme.palette.info.main} 0%, ${theme.palette.info.dark} 100%)`;
+      default:
+        return `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`;
+    }
   };
-  
-  const handleTiltLeave = () => {
-    setTilt({ x: 0, y: 0 });
+
+  const getShadow = (gradientType) => {
+    switch(gradientType) {
+      case 'primary':
+        return `0 8px 16px -3px ${alpha(theme.palette.primary.main, 0.4)}`;
+      case 'secondary':
+        return `0 8px 16px -3px ${alpha(theme.palette.secondary.main, 0.4)}`;
+      case 'info':
+        return `0 8px 16px -3px ${alpha(theme.palette.info.main, 0.4)}`;
+      default:
+        return `0 8px 16px -3px ${alpha(theme.palette.primary.main, 0.4)}`;
+    }
   };
+
+  const getColor = (gradientType) => {
+    switch(gradientType) {
+      case 'primary':
+        return theme.palette.primary.main;
+      case 'secondary':
+        return theme.palette.secondary.main;
+      case 'info':
+        return theme.palette.info.main;
+      default:
+        return theme.palette.primary.main;
+    }
+  };
+
 
   return (
     <Box
-      ref={cardRef}
-      component={motion.div}
-      style={{
-        y: translateY,
-        opacity,
-        scale,
-        rotateZ: rotate,
-      }}
-      onMouseMove={handleTiltMove}
-      onMouseLeave={handleTiltLeave}
+     
       sx={{
         position: 'relative',
-        transformStyle: 'preserve-3d',
-        perspective: '1000px',
+       
       }}
     >
       <GlassCard
         gradientStyle={step.gradient}
-        style={{
-          transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
-          transition: 'transform 0.2s ease',
+        sx={{
+          p: { xs: 3, md: 4 },
+          position: 'relative',
+          overflow: 'hidden',
         }}
-        whileHover={{ y: -5 }}
-        transition={{ type: 'spring', stiffness: 400, damping: 10 }}
       >
         {/* Shimmer effect */}
-        <Shimmer
-          animate={{ x: [-500, 500] }}
-          transition={{ 
-            repeat: Infinity, 
-            duration: 2.5,
-            ease: 'easeInOut',
-            repeatDelay: 5,
-          }}
-        />
+        <Shimmer />
         
         <Box sx={{ position: 'relative', zIndex: 10 }}>
           {/* Step number badge */}
@@ -491,19 +289,11 @@ const StepCard = ({ step, index, sectionRef }) => {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              background: step.gradient === 'primary'
-                ? 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)'
-                : step.gradient === 'purple'
-                  ? 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)'
-                  : 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+              background: getGradient(step.gradient),
               color: 'white',
               fontWeight: 800,
               fontSize: '1.5rem',
-              boxShadow: step.gradient === 'primary'
-                ? '0 8px 16px -3px rgba(99, 102, 241, 0.4)'
-                : step.gradient === 'purple'
-                  ? '0 8px 16px -3px rgba(139, 92, 246, 0.4)'
-                  : '0 8px 16px -3px rgba(59, 130, 246, 0.4)',
+              boxShadow: getShadow(step.gradient),
             }}
           >
             {step.id}
@@ -534,10 +324,7 @@ const StepCard = ({ step, index, sectionRef }) => {
             
             {/* Glow dot for visual interest */}
             <GlowDot
-              color={
-                step.gradient === 'primary' ? '#6366f1' :
-                step.gradient === 'purple' ? '#8b5cf6' : '#3b82f6'
-              }
+              color={getColor(step.gradient)}
               size={5}
               pulseSize={20}
               sx={{ position: 'absolute', bottom: 10, right: 10 }}
@@ -551,11 +338,7 @@ const StepCard = ({ step, index, sectionRef }) => {
             sx={{
               fontWeight: 700,
               mb: 2,
-              background: step.gradient === 'primary'
-                ? 'linear-gradient(to right, #6366f1, #4f46e5)'
-                : step.gradient === 'purple'
-                  ? 'linear-gradient(to right, #8b5cf6, #7c3aed)'
-                  : 'linear-gradient(to right, #3b82f6, #2563eb)',
+              background: getGradient(step.gradient),
               backgroundClip: 'text',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
@@ -585,39 +368,14 @@ const StepCard = ({ step, index, sectionRef }) => {
 const HowItWorksSection = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
-  const sectionRef = useRef(null);
-  const titleRef = useRef(null);
-  const isInView = useInView(titleRef, { once: true, amount: 0.3 });
-  const controls = useAnimation();
   
-  // Animation for the main title
-  useEffect(() => {
-    if (isInView) {
-      controls.start("visible");
-    }
-  }, [controls, isInView]);
-  
-  const titleVariants = {
-    hidden: { opacity: 0, y: -50 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] }
-    }
-  };
-  
-  // Parse date and time (for display)
-  const [date, time] = CURRENT_DATETIME.split(" ");
-
   return (
     <Box
-      ref={sectionRef}
       sx={{
         position: 'relative',
         overflow: 'hidden',
         py: { xs: 10, md: 15 },
-        backgroundColor: '#0f172a', // Deep blue background
+        // backgroundColor: theme.palette.background.dark,
         color: 'white',
       }}
     >
@@ -628,11 +386,6 @@ const HowItWorksSection = () => {
           sx={{
             position: 'absolute',
             inset: 0,
-            background: `
-              radial-gradient(circle at 10% 10%, rgba(99, 102, 241, 0.15) 0%, rgba(99, 102, 241, 0) 50%),
-              radial-gradient(circle at 90% 20%, rgba(139, 92, 246, 0.15) 0%, rgba(139, 92, 246, 0) 60%),
-              radial-gradient(circle at 50% 80%, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0) 60%)
-            `,
             zIndex: 0,
           }}
         />
@@ -642,7 +395,7 @@ const HowItWorksSection = () => {
           sx={{
             position: 'absolute',
             inset: 0,
-            backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%236366f1\' fill-opacity=\'0.03\' fill-rule=\'evenodd\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/svg%3E")',
+        
             opacity: 0.5,
             zIndex: 0,
           }}
@@ -670,10 +423,10 @@ const HowItWorksSection = () => {
               width: { xs: '30rem', md: '40rem' },
               height: { xs: '30rem', md: '40rem' },
               background: i === 0 
-                ? 'radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, rgba(99, 102, 241, 0) 70%)'
+                ? `radial-gradient(circle, ${alpha(theme.palette.primary.main, 0.08)} 0%, ${alpha(theme.palette.primary.main, 0)} 70%)`
                 : i === 1 
-                  ? 'radial-gradient(circle, rgba(139, 92, 246, 0.08) 0%, rgba(139, 92, 246, 0) 70%)'
-                  : 'radial-gradient(circle, rgba(59, 130, 246, 0.08) 0%, rgba(59, 130, 246, 0) 70%)',
+                  ? `radial-gradient(circle, ${alpha(theme.palette.secondary.main, 0.08)} 0%, ${alpha(theme.palette.secondary.main, 0)} 70%)`
+                  : `radial-gradient(circle, ${alpha(theme.palette.info.main, 0.08)} 0%, ${alpha(theme.palette.info.main, 0)} 70%)`,
               borderRadius: '50%',
               filter: 'blur(80px)',
               transform: 'translate(-50%, -50%)',
@@ -685,112 +438,101 @@ const HowItWorksSection = () => {
 
       <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
         {/* Section Header */}
-        <motion.div
-          ref={titleRef}
-          initial="hidden"
-          animate={controls}
-          variants={titleVariants}
-        >
-          <Box sx={{ textAlign: 'center', mb: { xs: 6, md: 10 } }}>
-            <Chip
-              label="HOW IT WORKS"
+        <Box sx={{ textAlign: 'center', mb: { xs: 6, md: 10 } }}>
+          <Chip
+            label="HOW IT WORKS"
+            sx={{
+              fontWeight: 600,
+              px: 2.5,
+              py: 3,
+              borderRadius: '30px',
+              backgroundColor: alpha(theme.palette.primary.main, 0.1),
+              color: theme.palette.primary.main,
+              border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+              mb: 3,
+              backdropFilter: 'blur(8px)',
+              fontSize: '0.75rem',
+              letterSpacing: '0.05em',
+            }}
+          />
+          
+          <Typography
+            variant="h2"
+            component="h2"
+            sx={{
+              fontWeight: 800,
+              mb: 2,
+              background: `linear-gradient(to right, ${theme.palette.primary.main}, ${theme.palette.primary.light}, ${theme.palette.primary.dark})`,
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              fontSize: { xs: '2.5rem', sm: '3rem', md: '4rem' },
+              letterSpacing: '-0.02em',
+              lineHeight: 1.1,
+              mx: 'auto',
+              maxWidth: '800px',
+              px: 2,
+              position: 'relative',
+            }}
+          >
+            Transform Your PDFs in Three Simple Steps
+             
+            {/* Decorative elements */}
+            <Box
+              component={motion.div}
+              animate={{ 
+                rotate: [0, 360],
+              }}
+              transition={{ 
+                repeat: Infinity,
+                duration: 20,
+                ease: 'linear',
+              }}
               sx={{
-                fontWeight: 600,
-                px: 2.5,
-                py: 3,
-                borderRadius: '30px',
-                backgroundColor: 'rgba(99, 102, 241, 0.1)',
-                color: '#6366f1',
-                border: '1px solid rgba(99, 102, 241, 0.2)',
-                mb: 3,
-                backdropFilter: 'blur(8px)',
-                fontSize: '0.75rem',
-                letterSpacing: '0.05em',
+                position: 'absolute',
+                top: -10,
+                right: { xs: 0, md: -40 },
+                width: { xs: 30, md: 50 },
+                height: { xs: 30, md: 50 },
+                borderRadius: '50%',
+                border: `2px dashed ${alpha(theme.palette.primary.main, 0.3)}`,
+                zIndex: -1,
               }}
             />
-            
-            <Typography
-              variant="h2"
-              component="h2"
-              sx={{
-                fontWeight: 800,
-                mb: 2,
-                background: 'linear-gradient(to right, #6366f1, #818cf8, #4f46e5)',
-                backgroundClip: 'text',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                fontSize: { xs: '2.5rem', sm: '3rem', md: '4rem' },
-                letterSpacing: '-0.02em',
-                lineHeight: 1.1,
-                mx: 'auto',
-                maxWidth: '800px',
-                px: 2,
-                position: 'relative',
-              }}
-            >
-              Transform Your PDFs in Three Simple Steps
-               
-              {/* Decorative elements */}
-              <Box
-                component={motion.div}
-                animate={{ 
-                  rotate: [0, 360],
-                }}
-                transition={{ 
-                  repeat: Infinity,
-                  duration: 20,
-                  ease: 'linear',
-                }}
-                sx={{
-                  position: 'absolute',
-                  top: -10,
-                  right: { xs: 0, md: -40 },
-                  width: { xs: 30, md: 50 },
-                  height: { xs: 30, md: 50 },
-                  borderRadius: '50%',
-                  border: '2px dashed rgba(99, 102, 241, 0.3)',
-                  zIndex: -1,
-                }}
-              />
-            </Typography>
-            
-            <Typography
-              variant="h5"
-              sx={{
-                color: 'rgba(255, 255, 255, 0.7)',
-                fontWeight: 400,
-                maxWidth: 700,
-                mx: 'auto',
-                mb: 2,
-                fontSize: { xs: '1.1rem', md: '1.3rem' },
-              }}
-            >
-              Our intuitive process makes document management effortless and secure
-            </Typography>
-          </Box>
-        </motion.div>
+          </Typography>
+          
+          <Typography
+            variant="h5"
+            sx={{
+              color: 'rgba(255, 255, 255, 0.7)',
+              fontWeight: 400,
+              maxWidth: 700,
+              mx: 'auto',
+              mb: 2,
+              fontSize: { xs: '1.1rem', md: '1.3rem' },
+            }}
+          >
+            Our intuitive process makes document management effortless and secure
+          </Typography>
+        </Box>
 
         {/* Steps Display */}
         <Grid 
-          container 
+          // container 
           spacing={{ xs: 4, sm: 6, md: 8 }}
           sx={{ mb: { xs: 6, md: 10 } }}
+          
+       
         >
           {STEPS.map((step, index) => (
-            <Grid item xs={12} md={4} key={step.id}>
-              <StepCard step={step} index={index} sectionRef={sectionRef} />
+            <Grid item xs={12} md={4} key={step.id} marginBottom={5} >
+              <StepCard step={step} index={index}   />
             </Grid>
           ))}
         </Grid>
 
         {/* Features List */}
-        <Box
-          component={motion.div}
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.4 }}
-          sx={{ mb: 6 }}
-        >
+        <Box sx={{ mb: 6 }}>
           <GlassCard
             gradientStyle="primary"
             sx={{
@@ -818,9 +560,6 @@ const HowItWorksSection = () => {
               {FEATURES.map((feature, index) => (
                 <Grid item xs={6} sm={4} key={index}>
                   <Box
-                    component={motion.div}
-                    whileHover={{ y: -5 }}
-                    transition={{ type: 'spring', stiffness: 300, damping: 10 }}
                     sx={{
                       p: 2,
                       borderRadius: '12px',
@@ -832,6 +571,10 @@ const HowItWorksSection = () => {
                       alignItems: 'center',
                       justifyContent: 'center',
                       gap: 1.5,
+                      transition: 'transform 0.2s ease',
+                      '&:hover': {
+                        transform: 'translateY(-5px)',
+                      }
                     }}
                   >
                     <Box
@@ -839,11 +582,11 @@ const HowItWorksSection = () => {
                         width: 28,
                         height: 28,
                         borderRadius: '50%',
-                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                        backgroundColor: alpha(theme.palette.primary.main, 0.1),
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: '#6366f1',
+                        color: theme.palette.primary.main,
                       }}
                     >
                       <CheckIcon fontSize="small" />
@@ -864,11 +607,7 @@ const HowItWorksSection = () => {
           </GlassCard>
         </Box>
 
-        {/* User Info Display */}
-        <UserInfoDisplay 
-          currentTime={CURRENT_DATETIME} 
-          currentUser={CURRENT_USER} 
-        />
+      
       </Container>
     </Box>
   );

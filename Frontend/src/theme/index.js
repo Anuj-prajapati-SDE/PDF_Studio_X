@@ -183,13 +183,7 @@ const baseTheme = createTheme({
             boxShadow: '0 8px 25px rgba(67, 97, 238, 0.28)',
           },
         },
-        containedSecondary: {
-          backgroundImage: 'linear-gradient(135deg, #f72585 0%, #e31b70 100%)',
-          '&:hover': {
-            backgroundImage: 'linear-gradient(135deg, #e31b70 0%, #c4006e 100%)',
-            boxShadow: '0 8px 25px rgba(247, 37, 133, 0.28)',
-          },
-        },
+        
         outlined: {
           borderWidth: 2,
           '&:hover': {

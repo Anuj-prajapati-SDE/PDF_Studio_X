@@ -17,7 +17,7 @@ import MainLayout from './layouts/MainLayout';
 import DashboardLayout from './layouts/DashboardLayout';
 
 // Pages
-import HomePage from './pages/HomePage';
+import HomePage from './Pages/Home/HomePage';
 import MergePDFPage from './pages/MergePDFPage';
 import SplitPDFPage from './pages/SplitPDFPage';
 import ConvertPDFPage from './pages/ConvertPDFPage';
@@ -141,7 +141,7 @@ function App() {
         }} 
       />
       <BrowserRouter>
-        <AnimatePresence mode="wait">
+       
           <Routes>
             <Route path="/" element={<MainLayout />}>
               <Route index element={<HomePage />} />
@@ -176,7 +176,7 @@ function App() {
             </Route>
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
-        </AnimatePresence>
+      
       </BrowserRouter>
     </ThemeProvider>
   );

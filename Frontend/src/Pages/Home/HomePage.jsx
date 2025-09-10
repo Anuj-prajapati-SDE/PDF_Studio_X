@@ -1,28 +1,18 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect} from 'react';
 import {
   Box,
   Button,
   Container,
   Grid,
   Typography,
-  Card,
-  CardContent,
-  Avatar,
-  Stack,
-  Chip,
-  Paper,
-  Divider,
   useTheme,
-  useMediaQuery,
 } from '@mui/material';
-import Lottie from 'lottie-react';
+
 
 import { motion, useAnimation } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { Link as RouterLink } from 'react-router-dom';
-import CountUp from 'react-countup';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { EffectCoverflow, Pagination, Autoplay } from 'swiper/modules';
+
 
 // Icons
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
@@ -33,15 +23,14 @@ import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 
 import LockIcon from '@mui/icons-material/Lock';
 // import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+// import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
-import { CheckCircle, CloudDone, CloudUpload, Crop, Devices, FileCopy, FlashlightOn, FlashOn, FormatColorFill, InfoOutline, InfoOutlined, InsertDriveFile, MoreHoriz, PictureAsPdf, Search, Security, Settings, Speed, TextFields } from '@mui/icons-material';
-import { Feather } from 'react-feather';
-import FeatureSection from '../Components/common/FeatureSection';
-import HowItWorksSection from '../Components/common/HowItWorkSection';
-import TestimonialSection from '../Components/common/TestimonialSection';
-import CTASection from '../Components/common/CTASection';
+import {  Devices,  InfoOutlined, PictureAsPdf,  Security, Speed, } from '@mui/icons-material';
+import HowItWorksSection from '../../Components/common/HowItWorkSection';
+import FeatureSection from '../../Components/common/FeatureSection';
+import TestimonialSection from '../../Components/common/TestimonialSection';
+import CTASection from '../../Components/common/CTASection';
 // import WaveSeparator from '../Components/common/WaveSeparator';
 
 
@@ -82,61 +71,12 @@ const testimonials = [
     rating: 5,
   },
 ];
+ 
 
 const HomePage = () => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const isTablet = useMediaQuery(theme.breakpoints.down('lg'));
 
-  // Animation hooks
-  const controls = useAnimation();
-  const [ref, inView] = useInView({
-    threshold: 0.3,
-    triggerOnce: false,
-  });
-
-  useEffect(() => {
-    if (inView) {
-      controls.start('visible');
-    }
-  }, [controls, inView]);
-
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        duration: 0.8,
-        ease: [0.43, 0.13, 0.23, 0.96],
-      },
-    },
-  };
-
-  const fadeInUpVariants = {
-    hidden: { y: 40, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        duration: 0.8,
-        ease: [0.43, 0.13, 0.23, 0.96],
-      },
-    },
-  };
-
-  const tools = [
+   const tools = [
     {
       title: 'Merge PDF',
       description: 'Combine multiple PDFs into a single document',
@@ -180,6 +120,19 @@ const HomePage = () => {
       color: theme.palette.primary.main,
     },
   ];
+  // Animation hooks
+  const controls = useAnimation();
+  const [ref, inView] = useInView({
+    threshold: 0.3,
+    triggerOnce: false,
+  });
+
+  useEffect(() => {
+    if (inView) {
+      controls.start('visible');
+    }
+  }, [controls, inView]);
+
 
   return (
     <Box sx={{ overflow: 'hidden' }}>
@@ -208,78 +161,6 @@ const HomePage = () => {
         >
         </Box>
 
-
-        {/* Animated geometric patterns */}
-        <Box
-          component={motion.div}
-          animate={{
-            rotate: [0, 360],
-            scale: [1, 1.05, 1],
-            opacity: [0.6, 0.8, 0.6],
-          }}
-          transition={{
-            duration: 60,
-            repeat: Infinity,
-            repeatType: 'loop',
-            ease: 'linear',
-          }}
-          sx={{
-            position: 'absolute',
-            top: '-20%',
-            left: '-20%',
-            width: '140%',
-            height: '140%',
-            // background: 'url("data:image/svg+xml,%3Csvg width=\'100\' height=\'100\' viewBox=\'0 0 100 100\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z\' fill=\'%237d49ff\' fill-opacity=\'0.03\' fill-rule=\'evenodd\'/%3E%3C/svg%3E")',
-            backgroundSize: '80px 80px',
-          }}
-        />
-
-        {/* Floating dynamic gradient orbs */}
-        {[...Array(8)].map((_, i) => (
-          <Box
-            key={i}
-            component={motion.div}
-            initial={{
-              x: Math.random() * 100 - 50,
-              y: Math.random() * 100 - 50,
-              scale: Math.random() * 0.5 + 0.7,
-              opacity: Math.random() * 0.3 + 0.2
-            }}
-            animate={{
-              x: Math.random() * 100 - 50,
-              y: Math.random() * 100 - 50,
-              scale: Math.random() * 0.5 + 0.9,
-              opacity: Math.random() * 0.3 + 0.3
-            }}
-            transition={{
-              repeat: Infinity,
-              repeatType: 'mirror',
-              duration: 25 + i * 5,
-              ease: 'easeInOut',
-            }}
-            sx={{
-              position: 'absolute',
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
-              width: { xs: '20rem', sm: '30rem', md: '40rem' },
-              height: { xs: '20rem', sm: '30rem', md: '40rem' },
-              background: i % 4 === 0
-                ? 'radial-gradient(circle, rgba(125, 249, 255, 0.15) 0%, rgba(125, 249, 255, 0) 70%)'
-                : i % 4 === 1
-                  ? 'radial-gradient(circle, rgba(104, 54, 230, 0.15) 0%, rgba(104, 54, 230, 0) 70%)'
-                  : i % 4 === 2
-                    ? 'radial-gradient(circle, rgba(230, 54, 189, 0.15) 0%, rgba(230, 54, 189, 0) 70%)'
-                    : 'radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 70%)',
-              borderRadius: '50%',
-              filter: 'blur(50px)',
-              transform: 'translate(-50%, -50%)',
-              mixBlendMode: 'screen',
-            }}
-          />
-        ))}
-
-       
-
         {/* Lens flare effect */}
         <Box
           component={motion.div}
@@ -305,50 +186,7 @@ const HomePage = () => {
           }}
         />
 
-        {/* Chrome-like translucent plates */}
-        {/* {[...Array(4)].map((_, i) => (
-          <Box
-            key={`plate-${i}`}
-            component={motion.div}
-            initial={{
-              x: i % 2 === 0 ? -200 : 200,
-              y: (i * 200) - 400,
-              rotate: i % 2 === 0 ? -15 : 15,
-              scale: 0.8,
-            }}
-            animate={{
-              x: i % 2 === 0 ? -50 : 50,
-              y: (i * 220) - 350,
-              rotate: i % 2 === 0 ? -8 : 8,
-              scale: 1,
-            }}
-            transition={{
-              repeat: Infinity,
-              repeatType: 'mirror',
-              duration: 20 + i * 5,
-              ease: 'easeInOut',
-            }}
-            sx={{
-              position: 'absolute',
-              width: { xs: '100%', md: '80%' },
-              height: { xs: 400, md: 600 },
-              background: i % 2 === 0
-                ? 'linear-gradient(135deg, rgba(125, 249, 255, 0.08) 0%, rgba(125, 249, 255, 0.03) 100%)'
-                : 'linear-gradient(135deg, rgba(104, 54, 230, 0.08) 0%, rgba(104, 54, 230, 0.03) 100%)',
-              borderRadius: '30px',
-              backdropFilter: 'blur(8px)',
-              border: '1px solid rgba(255, 255, 255, 0.05)',
-              left: i % 2 === 0 ? '0%' : 'auto',
-              right: i % 2 === 0 ? 'auto' : '0%',
-              top: `${10 + i * 20}%`,
-              transform: `rotate(${i % 2 === 0 ? -5 : 5}deg)`,
-              boxShadow: '0 25px 50px rgba(0, 0, 0, 0.1)',
-              zIndex: 0,
-            }}
-          />
-        ))} */}
-
-
+      
         <Container maxWidth="100%" sx={{ position: 'relative', zIndex: 2, overflow: 'visible' , }} >
           <Grid
             container
@@ -1006,18 +844,16 @@ const HomePage = () => {
                 </Grid>
               ))}
             </Grid>
- </Container>
+         </Container>
 
-
-        {/* Features Section */}
+       
+         {/* Features Section */}
        <FeatureSection tools={tools}></FeatureSection>
 
-     {/* How It Works Section */}
-{/* How It Works Section */}
-        {/* <HowItWorksSection /> */}
-       
+       {/* How It Works Section */}
+        <HowItWorksSection />
         {/* Testimonials Section */}
-        {/* <TestimonialSection testimonials={testimonials}></TestimonialSection> */}
+        <TestimonialSection testimonials={testimonials}></TestimonialSection>
 
         {/* CTA Section */}
         <CTASection />

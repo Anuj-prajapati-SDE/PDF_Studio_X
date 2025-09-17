@@ -21,32 +21,33 @@ import DashboardLayout from './layouts/DashboardLayout';
 
 // Pages
 import HomePage from './Pages/Home/HomePage';
-import MergePDFPage from './pages/MergePDFPage';
-import SplitPDFPage from './pages/SplitPDFPage';
-import ConvertPDFPage from './pages/ConvertPDFPage';
-import CreatePDFPage from './Pages/CreatePDFPage';
-import ProtectPDFPage from './Pages/ProtectedPDFPage';
+import MergePDFPage from './Pages/UserDashboard/MergePDFPage';
+import SplitPDFPage from './Pages/UserDashboard/SplitPDFPage';
+import ConvertPDFPage from './Pages/UserDashboard/ConvertPDFPage';
+import CreatePDFPage from './Pages/UserDashboard/CreatePDFPage';
+import ProtectPDFPage from './Pages/UserDashboard/ProtectedPDFPage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import PricingPage from './Pages/PricingPage';
 import NotFoundPage from './pages/NotFoundPage';
-import CompressPDFPage from './Pages/CompressPDFpage';
-import PDFToWordPage from './Pages/PDFToWordPage';
-import PDFToPowerPointPage from './Pages/PDFToPowerPointPage';
-import PDFToExcelPage from './Pages/PDFToExcelPage';
-import WordToPDFPage from './Pages/WordToPDFPage';
-import PowerPointToPDFPage from './Pages/PowerPointToPDFPage';
-import ExcelToPDFPage from './Pages/ExcelToPDFPage';
-import ImageCompressionPage from './Pages/ImageCompressionPage';
-import PDFToJPGPage from './Pages/PDFToJPGPage';
-import SignPDFPage from './Pages/SignPDFPage';
-import WatermarkPDFPage from './Pages/WaterMarkPDFPage';
-import UnlockPDFPage from './Pages/UnlockPDFPage';
-import CropPDFPage from './Pages/CropPDFPage';
-import EditPDFPage from './Pages/EditPDFPage';
-import SignupPage from './Pages/SignupPage';
-import LoginPage from './Pages/LoginPage';
-import OTPVerification from './Components/common/OTPVerification';
+import CompressPDFPage from './Pages/UserDashboard/CompressPDFpage';
+import PDFToWordPage from './Pages/UserDashboard/PDFToWordPage';
+import PDFToPowerPointPage from './Pages/UserDashboard/PDFToPowerPointPage';
+import PDFToExcelPage from './Pages/UserDashboard/PDFToExcelPage';
+import WordToPDFPage from './Pages/UserDashboard/WordToPDFPage';
+import PowerPointToPDFPage from './Pages/UserDashboard/PowerPointToPDFPage';
+import ExcelToPDFPage from './Pages/UserDashboard/ExcelToPDFPage';
+import ImageCompressionPage from './Pages/UserDashboard/ImageCompressionPage';
+import PDFToJPGPage from './Pages/UserDashboard/PDFToJPGPage';
+import WatermarkPDFPage from './Pages/UserDashboard/WaterMarkPDFPage';
+import UnlockPDFPage from './Pages/UserDashboard/UnlockPDFPage';
+import CropPDFPage from './Pages/UserDashboard/CropPDFPage';
+import EditPDFPage from './Pages/UserDashboard/EditPDFPage';
+import SignupPage from './Pages/Auth/SignupPage';
+import LoginPage from './Pages/Auth/LoginPage';
+import OTPVerification from './Pages/Auth/OTPVerification';
+import ForgotPasswordPage from './Pages/Auth/ForgotPasswordPage';
+import ResetPasswordPage from './Pages/Auth/ResetPasswordPage';
 // import JPGToPDFPage from './Pages/JPGToPDF.JSX';
 
 // Global styles
@@ -155,6 +156,8 @@ function App() {
               <Route path="pricing" element={<PricingPage />} />
               <Route path="signup" element={<SignupPage />} />
               <Route path="login" element={<LoginPage />} />
+              <Route path="forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="reset-password" element={<ResetPasswordPage />} />
               <Route path="otp-verification" element={<OTPVerification />} />
             
             </Route>
@@ -174,7 +177,7 @@ function App() {
               <Route path="image-compression" element={<ImageCompressionPage/>} />
               <Route path="pdf-to-jpg" element={<PDFToJPGPage/>} />
               {/* <Route path="jpg-to-pdf" element={<JPGToPDFPage/>} /> */}
-              <Route path="add-sign" element={<SignPDFPage/>} />
+              {/* <Route path="add-sign" element={<SignPDFPage/>} /> */}
               <Route path="watermark-pdf" element={<WatermarkPDFPage/>} />
               <Route path="unlock-pdf" element={<UnlockPDFPage/>} />
               <Route path="crop-pdf" element={<CropPDFPage/>} />

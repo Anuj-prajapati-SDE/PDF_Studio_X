@@ -215,6 +215,72 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Forgot password
+  const forgotPassword = async (email) => {
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/forgot-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Forgot password error:', error);
+      return {
+        success: false,
+        message: 'Network error. Please try again.'
+      };
+    }
+  };
+
+  // Reset password
+  const resetPassword = async (token, newPassword) => {
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/reset-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token, newPassword }),
+      });
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Reset password error:', error);
+      return {
+        success: false,
+        message: 'Network error. Please try again.'
+      };
+    }
+  };
+
+  // Verify reset token
+  const verifyResetToken = async (token) => {
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/verify-reset-token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token }),
+      });
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Verify reset token error:', error);
+      return {
+        success: false,
+        message: 'Network error. Please try again.'
+      };
+    }
+  };
+
   // Update user profile
   const updateUser = (updatedUserData) => {
     setUser(prev => ({ ...prev, ...updatedUserData }));
@@ -246,6 +312,10 @@ export const AuthProvider = ({ children }) => {
     loginWithOTP,
     verifyLoginOTP,
     resendOTP,
+    // Password reset methods
+    forgotPassword,
+    resetPassword,
+    verifyResetToken,
     // Utility methods
     updateUser,
     isTokenValid,

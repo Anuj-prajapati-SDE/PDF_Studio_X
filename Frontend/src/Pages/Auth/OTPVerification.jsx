@@ -16,7 +16,8 @@ import {
   CheckCircle,
   Error as ErrorIcon,
   Email,
-  Timer
+  Timer,
+  Lock
 } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
@@ -176,9 +177,18 @@ const OTPVerification = ({
     setIsVerifying(true);
 
     try {
-      const endpoint = purpose === 'signup' 
-        ? '/api/auth/verify-signup-otp' 
-        : '/api/auth/verify-login-otp';
+      let endpoint;
+      
+      // Determine the endpoint based on purpose
+      if (purpose === 'signup') {
+        endpoint = '/api/auth/verify-signup-otp';
+      } else if (purpose === 'login') {
+        endpoint = '/api/auth/verify-login-otp';
+      } else if (purpose === 'reset-password') {
+        endpoint = '/api/auth/verify-reset-otp';
+      } else {
+        endpoint = '/api/auth/verify-login-otp'; // Default fallback
+      }
 
       const response = await fetch(`http://localhost:5000${endpoint}`, {
         method: 'POST',
@@ -273,6 +283,11 @@ const OTPVerification = ({
         title: 'Secure Login',
         description: 'Please enter the verification code sent to your email to complete your login.',
         icon: <CheckCircle sx={{ fontSize: 40, color: '#6836e6' }} />
+      },
+      'reset-password': {
+        title: 'Password Reset Verification',
+        description: 'Please enter the verification code sent to your email to reset your password.',
+        icon: <Lock sx={{ fontSize: 40, color: '#6836e6' }} />
       },
       verification: {
         title: 'Email Verification',
@@ -471,7 +486,11 @@ const OTPVerification = ({
               },
             }}
           >
-            Back to {purpose === 'signup' ? 'Sign Up' : 'Login'}
+            {purpose === 'signup' 
+              ? 'Back to Sign Up' 
+              : purpose === 'reset-password'
+                ? 'Back to Forgot Password'
+                : 'Back to Login'}
           </Button>
         </Box>
       </Paper>

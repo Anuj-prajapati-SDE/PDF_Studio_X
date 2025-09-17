@@ -59,11 +59,11 @@ import {
   ZapOff,
   FilePlus
 } from 'react-feather';
-import Sidebar from '../components/common/Sidebar';
+import Sidebar from './Sidebar';
 
 const drawerWidth = 280;
 
-const DashboardLayout = () => {
+const DashboardLayout = () => { 
   const [mobileOpen, setMobileOpen] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('lg'));
@@ -97,126 +97,8 @@ const DashboardLayout = () => {
   const handleNotificationMenuClose = () => {
     setNotificationAnchorEl(null);
   };
-  
-  // Quick access tools for the dashboard
-  // const quickAccessTools = [
-  //   {
-  //     title: 'Merge PDF',
-  //     description: 'Combine multiple PDF files into one',
-  //     icon: <LayersIcon size={24} color={theme.palette.primary.main} />,
-  //     path: '/tools/merge-pdf',
-  //     color: alpha(theme.palette.primary.main, 0.1),
-  //   },
-  //   {
-  //     title: 'Split PDF',
-  //     description: 'Extract pages from your document',
-  //     icon: <ScissorsIcon size={24} color={theme.palette.warning.main} />,
-  //     path: '/tools/split-pdf',
-  //     color: alpha(theme.palette.warning.main, 0.1),
-  //   },
-  //   {
-  //     title: 'Convert PDF',
-  //     description: 'Transform to other formats',
-  //     icon: <RefreshCwIcon size={24} color={theme.palette.success.main} />,
-  //     path: '/tools/convert-pdf',
-  //     color: alpha(theme.palette.success.main, 0.1),
-  //   },
-  //   {
-  //     title: 'Create PDF',
-  //     description: 'Generate new PDF documents',
-  //     icon: <FilePlusIcon size={24} color={theme.palette.secondary.main} />,
-  //     path: '/tools/create-pdf',
-  //     color: alpha(theme.palette.secondary.main, 0.1),
-  //   },
-  //   {
-  //     title: 'Protect PDF',
-  //     description: 'Add password protection',
-  //     icon: <ShieldIcon size={24} color={theme.palette.error.main} />,
-  //     path: '/tools/protect-pdf',
-  //     color: alpha(theme.palette.error.main, 0.1),
-  //   },
-  // ];
-  // In the quickAccessTools array, add all the new tools:
 
-const  quickAccessTools= [
-  {
-    title: 'Merge PDF',
-    description: 'Combine multiple PDF files into one document',
-    path: '/tools/merge-pdf',
-    icon: <LayersIcon size={24} color={theme.palette.primary.main} />,
-    color: alpha(theme.palette.primary.main, 0.1),
-  },
-  {
-    title: 'Split PDF',
-    description: 'Extract pages from your document',
-    path: '/tools/split-pdf',
-    icon: <ScissorsIcon size={24} color={theme.palette.warning.main} />,
-    color: alpha(theme.palette.warning.main, 0.1),
-  },
-  {
-    title: 'Compress PDF',
-    description: 'Reduce file size while preserving quality',
-    path: '/tools/compress-pdf',
-    icon: <ZapOff size={24} color={theme.palette.success.main} />,
-    color: alpha(theme.palette.success.main, 0.1),
-  },
-  {
-    title: 'PDF to Word',
-    description: 'Convert PDF to editable Word document',
-    path: '/tools/pdf-to-word',
-    icon: <FileTextIcon size={24} color="#2b5797" />,
-    color: alpha('#2b5797', 0.1),
-  },
-  {
-    title: 'PDF to PowerPoint',
-    description: 'Convert PDF to PowerPoint presentation',
-    path: '/tools/pdf-to-powerpoint',
-    icon: <LayersIcon size={24} color="#B7472A" />,
-    color: alpha('#B7472A', 0.1),
-  },
-  {
-    title: 'PDF to Excel',
-    description: 'Extract tables from PDF to Excel',
-    path: '/tools/pdf-to-excel',
-    icon: <GridView size={24} color="#217346" />,
-    color: alpha('#217346', 0.1),
-  },
-  {
-    title: 'Word to PDF',
-    description: 'Convert Word documents to PDF format',
-    path: '/tools/word-to-pdf',
-    icon: <FilePlus size={24} color={theme.palette.error.main} />,
-    color: alpha(theme.palette.error.main, 0.1),
-  },
-  {
-    title: 'PowerPoint to PDF',
-    description: 'Convert PowerPoint presentations to PDF',
-    path: '/tools/powerpoint-to-pdf',
-    icon: <FilePlus size={24} color={theme.palette.error.main} />,
-    color: alpha(theme.palette.error.main, 0.1),
-  },
-  {
-    title: 'Excel to PDF',
-    description: 'Convert Excel spreadsheets to PDF',
-    path: '/tools/excel-to-pdf',
-    icon: <FilePlus size={24} color={theme.palette.error.main} />,
-    color: alpha(theme.palette.error.main, 0.1),
-  },
-  {
-    title: 'Create PDF',
-    description: 'Generate new PDF documents',
-    path: '/tools/create-pdf',
-    icon: <FilePlus size={24} color={theme.palette.secondary.main} />,
-    color: alpha(theme.palette.secondary.main, 0.1),
-  },
-  {
-    title: 'Protect PDF',
-    description: 'Add password protection',
-    path: '/tools/protect-pdf',
-    icon: <ShieldIcon size={24} color={theme.palette.error.main} />,
-    color: alpha(theme.palette.error.main, 0.1),
-  }
-];
+
   
   // Mock notifications
   const notifications = [
@@ -280,19 +162,19 @@ const  quickAccessTools= [
   };
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'background.default' }}>
+        <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#030018', color: 'white' }}>
       <AppBar
         position="fixed"
         elevation={0}
         sx={{
           width: { lg: `calc(100% - ${drawerWidth}px)` },
           ml: { lg: `${drawerWidth}px` },
-          bgcolor: 'background.paper',
-          color: 'text.primary',
+          bgcolor: 'rgba(20, 20, 40, 0.9)',
+          color: 'white',
           backdropFilter: 'blur(20px)',
           borderBottom: '1px solid',
-          borderColor: 'divider',
-          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)',
+          borderColor: 'rgba(255, 255, 255, 0.1)',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.2)',
         }}
       >
         <Toolbar sx={{ minHeight: { xs: 64, sm: 70 } }}>
@@ -317,9 +199,9 @@ const  quickAccessTools= [
                 width: { xs: searchFocused ? '100%' : 'auto', sm: 'auto', md: 300 },
                 position: searchFocused && isMobile ? 'absolute' : 'relative',
                 left: searchFocused && isMobile ? 0 : 'auto',
-                background: alpha(theme.palette.background.default, 0.8),
+                background: 'rgba(255, 255, 255, 0.05)',
                 border: '1px solid',
-                borderColor: searchFocused ? 'primary.main' : 'divider',
+                borderColor: searchFocused ? '#7df9ff' : 'rgba(255, 255, 255, 0.2)',
                 borderRadius: 8,
                 px: 2,
                 py: 0.5,
@@ -329,12 +211,12 @@ const  quickAccessTools= [
                 transition: 'all 0.3s ease',
               }}
             >
-              <SearchIcon sx={{ color: 'text.secondary', mr: 1 }} />
+              <SearchIcon sx={{ color: 'rgba(255, 255, 255, 0.7)', mr: 1 }} />
               <InputBase
                 placeholder="Search tools, documents..."
                 onFocus={() => setSearchFocused(true)}
                 onBlur={() => setSearchFocused(false)}
-                sx={{ flex: 1, fontSize: '0.875rem' }}
+                sx={{ flex: 1, fontSize: '0.875rem', color: 'white' }}
               />
               {searchFocused && isMobile && (
                 <Button size="small" onClick={() => setSearchFocused(false)}>
@@ -372,11 +254,11 @@ const  quickAccessTools= [
                 sx={{ 
                   display: 'flex', 
                   alignItems: 'center',
-                  color: 'text.secondary',
+                  color: 'white',
                   fontWeight: 500,
                   textDecoration: 'none',
                   '&:hover': {
-                    color: 'primary.main',
+                    color: '#7df9ff',
                   }
                 }}
               >
@@ -390,10 +272,10 @@ const  quickAccessTools= [
                   color="inherit"
                   sx={{ 
                     fontWeight: 500,
-                    color: 'text.secondary',
+                    color: 'rgba(255, 255, 255, 0.7)',
                     textDecoration: 'none',
                     '&:hover': {
-                      color: 'primary.main',
+                      color: '#7df9ff',
                     }
                   }}
                 >
@@ -401,8 +283,9 @@ const  quickAccessTools= [
                 </MuiLink>
               )}
               <Typography 
-                color="primary" 
+               
                 sx={{ 
+                  color: '#7df9ff',
                   fontWeight: 600,
                 }}
               >
@@ -697,137 +580,61 @@ const  quickAccessTools= [
           p: { xs: 2, sm: 3, md: 4 },
           mt: 9,
           minHeight: '100vh',
+          position: 'relative',
+          overflow: 'hidden'
         }}
       >
-        {/* User Info Dashboard Header */}
-        <Paper
-          elevation={0}
-          sx={{
-            p: { xs: 2, md: 3 },
-            mb: 4,
-            borderRadius: 4,
-            background: 'linear-gradient(135deg, #fafbff 0%, #f5f7ff 100%)',
-            border: '1px solid',
-            borderColor: alpha(theme.palette.primary.main, 0.1),
-            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.03)',
+        {/* Lens flare effects */}
+        <Box
+          component={motion.div}
+          animate={{
+            opacity: [0.3, 0.7, 0.3],
+            scale: [1, 1.2, 1],
           }}
-        >
-          <Grid container spacing={3} alignItems="center">
-            <Grid item xs={12} md={6}>
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <Avatar 
-                  sx={{ 
-                    bgcolor: theme.palette.primary.main,
-                    background: 'linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%)',
-                    width: 52, 
-                    height: 52,
-                    mr: 2,
-                    boxShadow: '0 4px 14px rgba(67, 97, 238, 0.3)',
-                  }}
-                >
-                  {username.substr(0, 2).toUpperCase()}
-                </Avatar>
-                
-                <Box>
-                  <Typography variant="h5" fontWeight={700}>
-                    Welcome back, {username.split('-')[0]}
-                  </Typography>
-                  <Typography variant="body1" color="text.secondary">
-                    Let's manage your PDF documents
-                  </Typography>
-                </Box>
-              </Box>
-            </Grid>
-            
-            <Grid item xs={12} md={6}>
-              <Box sx={{ 
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: { xs: 'flex-start', md: 'flex-end' },
-                gap: 2,
-                flexWrap: 'wrap',
-                mt: { xs: 2, md: 0 }
-              }}>
-                <Box sx={{ textAlign: 'center' }}>
-                  <Typography variant="body2" color="text.secondary">Date (UTC)</Typography>
-                  <Typography variant="subtitle1" fontWeight={600}>
-                    {currentDate}
-                  </Typography>
-                </Box>
-                <Divider orientation="vertical" flexItem sx={{ height: 40, mx: 1 }} />
-                <Box sx={{ textAlign: 'center' }}>
-                  <Typography variant="body2" color="text.secondary">Time (UTC)</Typography>
-                  <Typography variant="subtitle1" fontWeight={600}>
-                    {currentTime}
-                  </Typography>
-                </Box>
-                <Divider orientation="vertical" flexItem sx={{ height: 40, mx: 1 }} />
-                <Box sx={{ textAlign: 'center' }}>
-                  <Typography variant="body2" color="text.secondary">Files Processed</Typography>
-                  <Typography variant="subtitle1" fontWeight={600}>
-                    126
-                  </Typography>
-                </Box>
-              </Box>
-            </Grid>
-          </Grid>
-        </Paper>
-        
-        {/* Quick Access Tools */}
-        <Box sx={{ mb: 4 }}>
-          <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
-            Quick Access
-          </Typography>
-          <Grid container spacing={2}>
-            {quickAccessTools.map((tool, index) => (
-              <Grid item xs={6} sm={4} md={2.4} key={index}>
-                <Card
-                  onClick={() => navigate(tool.path)}
-                  sx={{
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    p: 2,
-                    borderRadius: 4,
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                    border: '1px solid',
-                    borderColor: 'divider',
-                    '&:hover': {
-                      transform: 'translateY(-4px)',
-                      boxShadow: '0 10px 25px rgba(0, 0, 0, 0.08)',
-                      borderColor: 'primary.main',
-                    }
-                  }}
-                >
-                  <Box 
-                    sx={{ 
-                      width: 60,
-                      height: 60,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      borderRadius: 3,
-                      bgcolor: tool.color,
-                      mb: 1.5,
-                    }}
-                  >
-                    {tool.icon}
-                  </Box>
-                  <Typography variant="subtitle2" fontWeight={600} align="center" gutterBottom>
-                    {tool.title}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary" align="center">
-                    {tool.description}
-                  </Typography>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-        </Box>
-        
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: 'easeInOut'
+          }}
+          sx={{
+            position: 'absolute',
+            top: '15%',
+            right: '5%',
+            width: '20rem',
+            height: '20rem',
+            background: 'radial-gradient(circle, rgba(125, 249, 255, 0.2) 0%, rgba(125, 249, 255, 0) 70%)',
+            filter: 'blur(50px)',
+            borderRadius: '50%',
+            mixBlendMode: 'screen',
+            zIndex: 0
+          }}
+        />
+        <Box
+          component={motion.div}
+          animate={{
+            opacity: [0.3, 0.7, 0.3],
+            scale: [1, 1.2, 1],
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: 'easeInOut'
+          }}
+          sx={{
+            position: 'absolute',
+            bottom: '15%',
+            left: '5%',
+            width: '20rem',
+            height: '20rem',
+            background: 'radial-gradient(circle, rgba(104, 54, 230, 0.2) 0%, rgba(125, 249, 255, 0) 70%)',
+            filter: 'blur(50px)',
+            borderRadius: '50%',
+            mixBlendMode: 'screen',
+            zIndex: 0
+          }}
+        />
+      
+      
         {/* Main Content from Routes */}
         <motion.div
           key={location.pathname}

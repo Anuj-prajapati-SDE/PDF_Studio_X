@@ -58,7 +58,7 @@ const Sidebar = ({ onClose }) => {
       id: 'dashboard',
       title: 'Dashboard',
       icon: <HomeIcon size={20} />,
-      path: '/dashboard',
+      path: '/tools/dashboard',
     },
     {
       id: 'pdf-tools',
@@ -66,10 +66,10 @@ const Sidebar = ({ onClose }) => {
       icon: <FileIcon size={20} />,
       collapsible: true,
       items: [
+        { name: 'Create PDF', path: '/tools/create-pdf', icon: <FileTextIcon size={18} /> },
         { name: 'Merge PDF', path: '/tools/merge-pdf', icon: <LayersIcon size={18} /> },
         { name: 'Split PDF', path: '/tools/split-pdf', icon: <ScissorsIcon size={18} /> },
         { name: 'Convert PDF', path: '/tools/convert-pdf', icon: <RefreshCwIcon size={18} /> },
-        { name: 'Create PDF', path: '/tools/create-pdf', icon: <FileTextIcon size={18} /> },
         { name: 'Protect PDF', path: '/tools/protect-pdf', icon: <ShieldIcon size={18} /> },
       ]
     },
@@ -118,7 +118,8 @@ const Sidebar = ({ onClose }) => {
         display: 'flex', 
         flexDirection: 'column', 
         height: '100%', 
-        background: 'linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(250,251,255,1) 100%)',
+        bgcolor: '#030018',
+        color: 'white',
       }}
     >
       {/* Logo & Branding */}
@@ -128,7 +129,7 @@ const Sidebar = ({ onClose }) => {
           display: 'flex', 
           alignItems: 'center',
           borderBottom: '1px solid',
-          borderColor: 'divider',
+          borderColor: 'rgba(255, 255, 255, 0.1)',
         }}
       >
         <Box 
@@ -144,59 +145,15 @@ const Sidebar = ({ onClose }) => {
             boxShadow: '0 4px 10px rgba(67, 97, 238, 0.3)',
           }}
         >
-          <Typography variant="h6" sx={{ color: 'white', fontWeight: 800 }}>P</Typography>
+          <Typography variant="h6" sx={{ color: 'white', fontWeight: 800 }}>PDF</Typography>
         </Box>
-        <Typography variant="h6" fontWeight={700} noWrap>
-          PDF Utility
+        <Typography variant="h6" fontWeight={700} noWrap sx={{ color: 'white' }}>
+         Studio X
         </Typography>
       </Box>
       
-      {/* User Profile Summary */}
-      <Box sx={{ p: 3 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-          <Avatar
-            sx={{
-              width: 48,
-              height: 48,
-              mr: 2,
-              background: 'linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%)',
-              boxShadow: '0 4px 10px rgba(67, 97, 238, 0.2)',
-              fontSize: '1rem',
-              fontWeight: 600,
-            }}
-          >
-            AP
-          </Avatar>
-          <Box>
-            <Typography variant="subtitle1" fontWeight={600} noWrap>
-              Anuj Prajapati
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Free Plan
-            </Typography>
-          </Box>
-        </Box>
-        
-        <Button
-          variant="outlined"
-          fullWidth
-          startIcon={<StarIcon size={16} />}
-          sx={{ 
-            borderRadius: 3,
-            mt: 1,
-            py: 1,
-            fontWeight: 600,
-            borderWidth: 1.5,
-            '&:hover': {
-              borderWidth: 1.5,
-            }
-          }}
-        >
-          Upgrade to Pro
-        </Button>
-      </Box>
       
-      <Divider sx={{ mb: 2 }} />
+      <Divider sx={{ mb: 2, borderColor: 'rgba(255, 255, 255, 0.1)' }} />
       
       {/* Navigation Menu */}
       <Box sx={{ flexGrow: 1, overflowY: 'auto', px: 2 }}>
@@ -213,9 +170,10 @@ const Sidebar = ({ onClose }) => {
                         minHeight: 48,
                         px: 2.5,
                         position: 'relative',
-                        bgcolor: openSubMenu === item.id ? alpha(theme.palette.primary.main, 0.08) : 'transparent',
+                        bgcolor: openSubMenu === item.id ? 'rgba(104, 54, 230, 0.1)' : 'transparent',
+                        color: openSubMenu === item.id ? '#7df9ff' : 'white',
                         '&:hover': {
-                          bgcolor: alpha(theme.palette.primary.main, 0.12),
+                          bgcolor: 'rgba(104, 54, 230, 0.15)',
                         },
                         '&::before': openSubMenu === item.id ? {
                           content: '""',
@@ -224,7 +182,7 @@ const Sidebar = ({ onClose }) => {
                           left: 0,
                           height: 24,
                           width: 3,
-                          bgcolor: 'primary.main',
+                          bgcolor: '#7df9ff',
                           transform: 'translateY(-50%)',
                           borderRadius: '0 4px 4px 0',
                         } : {},
@@ -233,7 +191,7 @@ const Sidebar = ({ onClose }) => {
                       <ListItemIcon 
                         sx={{ 
                           minWidth: 36, 
-                          color: openSubMenu === item.id ? 'primary.main' : alpha(theme.palette.text.primary, 0.6)
+                          color: openSubMenu === item.id ? '#7df9ff' : 'rgba(255, 255, 255, 0.7)'
                         }}
                       >
                         {item.icon}
@@ -242,13 +200,13 @@ const Sidebar = ({ onClose }) => {
                         primary={item.title}
                         primaryTypographyProps={{ 
                           fontWeight: openSubMenu === item.id ? 600 : 500,
-                          color: openSubMenu === item.id ? 'primary.main' : 'inherit',
+                          color: openSubMenu === item.id ? '#7df9ff' : 'white',
                           fontSize: '0.95rem',
                         }}
                       />
                       {openSubMenu === item.id ? 
-                        <ChevronDownIcon size={18} color={theme.palette.primary.main} /> : 
-                        <ChevronRightIcon size={18} color={alpha(theme.palette.text.primary, 0.5)} />
+                        <ChevronDownIcon size={18} color="#7df9ff" /> : 
+                        <ChevronRightIcon size={18} color="rgba(255, 255, 255, 0.5)" />
                       }
                     </ListItemButton>
                   </ListItem>
@@ -272,10 +230,10 @@ const Sidebar = ({ onClose }) => {
                                 py: 0.75,
                                 mb: 0.5,
                                 position: 'relative',
-                                bgcolor: active ? alpha(theme.palette.primary.main, 0.12) : 'transparent',
-                                color: active ? 'primary.main' : 'inherit',
+                                bgcolor: active ? 'rgba(104, 54, 230, 0.15)' : 'transparent',
+                                color: active ? '#7df9ff' : 'rgba(255, 255, 255, 0.8)',
                                 '&:hover': {
-                                  bgcolor: alpha(theme.palette.primary.main, 0.08),
+                                  bgcolor: 'rgba(104, 54, 230, 0.1)',
                                 },
                                 '&::before': active ? {
                                   content: '""',
@@ -284,7 +242,7 @@ const Sidebar = ({ onClose }) => {
                                   left: 0,
                                   height: 20,
                                   width: 3,
-                                  bgcolor: 'primary.main',
+                                  bgcolor: '#7df9ff',
                                   transform: 'translateY(-50%)',
                                   borderRadius: '0 4px 4px 0',
                                 } : {},
@@ -293,7 +251,7 @@ const Sidebar = ({ onClose }) => {
                               <ListItemIcon 
                                 sx={{ 
                                   minWidth: 28, 
-                                  color: active ? 'primary.main' : alpha(theme.palette.text.primary, 0.5)
+                                  color: active ? '#7df9ff' : 'rgba(255, 255, 255, 0.6)'
                                 }}
                               >
                                 {subItem.icon}
@@ -303,6 +261,7 @@ const Sidebar = ({ onClose }) => {
                                 primaryTypographyProps={{ 
                                   fontSize: '0.875rem',
                                   fontWeight: active ? 600 : 400,
+                                  color: active ? '#7df9ff' : 'rgba(255, 255, 255, 0.8)'
                                 }}
                               />
                             </ListItemButton>
@@ -323,10 +282,10 @@ const Sidebar = ({ onClose }) => {
                       minHeight: 48,
                       px: 2.5,
                       position: 'relative',
-                      bgcolor: isActive(item.path) ? alpha(theme.palette.primary.main, 0.12) : 'transparent',
-                      color: isActive(item.path) ? 'primary.main' : 'inherit',
+                      bgcolor: isActive(item.path) ? 'rgba(104, 54, 230, 0.15)' : 'transparent',
+                      color: isActive(item.path) ? '#7df9ff' : 'white',
                       '&:hover': {
-                        bgcolor: alpha(theme.palette.primary.main, 0.08),
+                        bgcolor: 'rgba(104, 54, 230, 0.1)',
                       },
                       '&::before': isActive(item.path) ? {
                         content: '""',
@@ -335,7 +294,7 @@ const Sidebar = ({ onClose }) => {
                         left: 0,
                         height: 24,
                         width: 3,
-                        bgcolor: 'primary.main',
+                        bgcolor: '#7df9ff',
                         transform: 'translateY(-50%)',
                         borderRadius: '0 4px 4px 0',
                       } : {},
@@ -344,7 +303,7 @@ const Sidebar = ({ onClose }) => {
                     <ListItemIcon 
                       sx={{ 
                         minWidth: 36, 
-                        color: isActive(item.path) ? 'primary.main' : alpha(theme.palette.text.primary, 0.6)
+                        color: isActive(item.path) ? '#7df9ff' : 'rgba(255, 255, 255, 0.7)'
                       }}
                     >
                       {item.icon}
@@ -354,6 +313,7 @@ const Sidebar = ({ onClose }) => {
                       primaryTypographyProps={{ 
                         fontWeight: isActive(item.path) ? 600 : 500,
                         fontSize: '0.95rem',
+                        color: isActive(item.path) ? '#7df9ff' : 'white',
                       }}
                     />
                     {item.badge && (
@@ -377,9 +337,9 @@ const Sidebar = ({ onClose }) => {
                           height: 20,
                           fontSize: '0.625rem',
                           fontWeight: 700,
-                          bgcolor: alpha(theme.palette.warning.main, 0.1),
-                          color: theme.palette.warning.main,
-                          border: `1px solid ${alpha(theme.palette.warning.main, 0.2)}`,
+                          bgcolor: 'rgba(255, 193, 7, 0.2)',
+                          color: '#ffc107',
+                          border: '1px solid rgba(255, 193, 7, 0.3)',
                         }}
                       />
                     )}
@@ -397,24 +357,24 @@ const Sidebar = ({ onClose }) => {
           sx={{
             p: 2.5,
             borderRadius: 3,
-            bgcolor: alpha(theme.palette.primary.main, 0.03),
+            bgcolor: 'rgba(104, 54, 230, 0.08)',
             border: '1px solid',
-            borderColor: alpha(theme.palette.primary.main, 0.08),
+            borderColor: 'rgba(104, 54, 230, 0.15)',
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-            <DatabaseIcon size={16} color={theme.palette.primary.main} style={{ marginRight: 8 }} />
-            <Typography variant="subtitle2" fontWeight={600}>
+            <DatabaseIcon size={16} color="#7df9ff" style={{ marginRight: 8 }} />
+            <Typography variant="subtitle2" fontWeight={600} sx={{ color: 'white' }}>
               Storage
             </Typography>
           </Box>
           
           <Box sx={{ mt: 1.5, mb: 1 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.6)' }}>
                 65% of 100 MB used
               </Typography>
-              <Typography variant="caption" fontWeight={600}>
+              <Typography variant="caption" fontWeight={600} sx={{ color: 'white' }}>
                 65 MB
               </Typography>
             </Box>
@@ -424,10 +384,10 @@ const Sidebar = ({ onClose }) => {
               sx={{ 
                 height: 6, 
                 borderRadius: 3,
-                bgcolor: alpha(theme.palette.primary.main, 0.1),
+                bgcolor: 'rgba(104, 54, 230, 0.2)',
                 '& .MuiLinearProgress-bar': {
                   borderRadius: 3,
-                  background: 'linear-gradient(90deg, #4361ee, #3a0ca3)',
+                  background: 'linear-gradient(90deg, #7df9ff, #4361ee)',
                 }
               }} 
             />
@@ -437,13 +397,18 @@ const Sidebar = ({ onClose }) => {
             size="small"
             fullWidth
             startIcon={<ZapIcon size={14} />}
-            color="primary"
             variant="outlined"
             sx={{ 
               mt: 1.5, 
               borderRadius: 2,
               textTransform: 'none',
               fontWeight: 600,
+              color: '#7df9ff',
+              borderColor: 'rgba(125, 249, 255, 0.4)',
+              '&:hover': {
+                borderColor: '#7df9ff',
+                backgroundColor: 'rgba(125, 249, 255, 0.1)',
+              }
             }}
           >
             Upgrade for more space

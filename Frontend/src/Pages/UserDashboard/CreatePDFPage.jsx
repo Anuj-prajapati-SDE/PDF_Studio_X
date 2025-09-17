@@ -13,8 +13,6 @@ import {
   LinearProgress,
   Alert,
   TextField,
-  Tab,
-  Tabs,
   IconButton,
   Menu,
   MenuItem,
@@ -30,11 +28,11 @@ import {
   alpha,
   useTheme,
   Chip,
+  Container,
 } from '@mui/material';
 import {
   FilePlus as FilePlusIcon,
   Image as ImageIcon,
-  Type as TextIcon,
   File as FileIcon,
   Download as DownloadIcon,
   Trash2 as TrashIcon,
@@ -43,72 +41,23 @@ import {
   Check as CheckIcon,
   Upload as UploadIcon,
   RefreshCw as RefreshIcon,
-  AlignLeft as AlignLeftIcon,
-  AlignCenter as AlignCenterIcon,
-  AlignRight as AlignRightIcon,
-  Bold as BoldIcon,
-  Italic as ItalicIcon,
-  Underline as UnderlineIcon,
-  PenTool as PenToolIcon,
   Zap as ZapIcon,
 } from 'react-feather';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
-
-// TabPanel component for tab content
-function TabPanel(props) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`create-pdf-tabpanel-${index}`}
-      aria-labelledby={`create-pdf-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box sx={{ pt: 3 }}>
-          {children}
-        </Box>
-      )}
-    </div>
-  );
-}
+import { PentagonOutlined } from '@mui/icons-material';
 
 const CreatePDFPage = () => {
   const theme = useTheme();
-  const [activeTab, setActiveTab] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
   const [processedFile, setProcessedFile] = useState(null);
   const [error, setError] = useState(null);
-
-  // Blank PDF options
-  const [pageCount, setPageCount] = useState(1);
-  const [pageSize, setPageSize] = useState('A4');
-  const [orientation, setOrientation] = useState('portrait');
-  const [margins, setMargins] = useState(20);
-
-  // From text options
-  const [textContent, setTextContent] = useState('');
-  const [fontFamily, setFontFamily] = useState('Arial');
-  const [fontSize, setFontSize] = useState(12);
-  const [textAlignment, setTextAlignment] = useState('left');
-  const [textStyles, setTextStyles] = useState({
-    bold: false,
-    italic: false,
-    underline: false,
-  });
 
   // From images options
   const [images, setImages] = useState([]);
   const [imagesPerPage, setImagesPerPage] = useState(1);
   const [preserveAspectRatio, setPreserveAspectRatio] = useState(true);
-
-  // Handle tab change
-  const handleTabChange = (event, newValue) => {
-    setActiveTab(newValue);
-  };
+  const [pageSize, setPageSize] = useState('A4');
 
   // Handle image uploads
   const onDropImages = useCallback(acceptedFiles => {
@@ -256,17 +205,7 @@ const CreatePDFPage = () => {
 
   // Validation
   const isValid = () => {
-    if (activeTab === 0) {
-      // Blank PDF validation
-      return pageCount > 0 && pageCount <= 100;
-    } else if (activeTab === 1) {
-      // Text to PDF validation
-      return textContent.trim().length > 0;
-    } else if (activeTab === 2) {
-      // Images to PDF validation
-      return images.length > 0;
-    }
-    return false;
+  return images.length > 0;
   };
 
   return (
@@ -275,13 +214,57 @@ const CreatePDFPage = () => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6 }}
     >
-      <Box sx={{ position: 'relative', minHeight: '100vh' }}>
-        <Box sx={{ mb: 5 }}>
-          <Typography variant="h4" component="h1" fontWeight={700} gutterBottom>
+      <Box sx={{ 
+        position: 'relative', 
+        minHeight: '100vh',
+        bgcolor: '#030018',
+        color: 'white',
+        pt: 2,
+        pb: 8,
+        px: 2
+      }}>
+        {/* Lens flare effect */}
+        <Box
+          component={motion.div}
+          animate={{
+            opacity: [0.3, 0.7, 0.3],
+            scale: [1, 1.2, 1],
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: 'easeInOut'
+          }}
+          sx={{
+            position: 'absolute',
+            top: '15%',
+            right: '10%',
+            width: '20rem',
+            height: '20rem',
+            background: 'radial-gradient(circle, rgba(125, 249, 255, 0.4) 0%, rgba(125, 249, 255, 0) 70%)',
+            filter: 'blur(50px)',
+            borderRadius: '50%',
+            mixBlendMode: 'screen',
+            zIndex: 0,
+          }}
+        />
+        <Box sx={{ mb: 5, position: 'relative', zIndex: 1 }}>
+          <Typography 
+            variant="h4" 
+            component="h1" 
+            fontWeight={700} 
+            gutterBottom
+            sx={{
+              background: 'linear-gradient(90deg, #7df9ff, #6836e6)',
+              backgroundClip: 'text',
+              color: 'transparent',
+              display: 'inline-block',
+            }}
+          >
             Create PDF
           </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph>
-            Generate new PDF documents from scratch, text content, or images.
+          <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.7)' }} paragraph>
+            Generate PDF documents from your images.
           </Typography>
         </Box>
 
@@ -291,357 +274,37 @@ const CreatePDFPage = () => {
             initial="hidden"
             animate="visible"
           >
-            <Card sx={{ borderRadius: 4, mb: 4 }}>
+            <Card sx={{ 
+              borderRadius: 4, 
+              mb: 4, 
+              background: 'rgba(255, 255, 255, 0.03)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              position: 'relative',
+              zIndex: 1,
+              boxShadow: '0 4px 30px rgba(0, 0, 0, 0.3)'
+            }}>
               <CardContent sx={{ p: 0 }}>
-                <Tabs
-                  value={activeTab}
-                  onChange={handleTabChange}
-                  variant="fullWidth"
-                  sx={{
-                    borderBottom: '1px solid',
-                    borderColor: 'divider',
-                    '& .MuiTab-root': {
-                      py: 2.5,
-                      fontWeight: 600,
-                    },
-                  }}
-                >
-                  <Tab 
-                    icon={<FileIcon size={18} />} 
-                    iconPosition="start"
-                    label="Blank PDF" 
-                    id="create-pdf-tab-0"
-                    aria-controls="create-pdf-tabpanel-0" 
-                  />
-                  <Tab 
-                    icon={<TextIcon size={18} />} 
-                    iconPosition="start"
-                    label="From Text" 
-                    id="create-pdf-tab-1"
-                    aria-controls="create-pdf-tabpanel-1" 
-                  />
-                  <Tab 
-                    icon={<ImageIcon size={18} />} 
-                    iconPosition="start"
-                    label="From Images" 
-                    id="create-pdf-tab-2"
-                    aria-controls="create-pdf-tabpanel-2" 
-                  />
-                </Tabs>
+                <Box sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  py: 2.5,
+                  borderBottom: '1px solid',
+                  borderColor: 'rgba(255, 255, 255, 0.1)',
+                  mb: 3
+                }}>
+                  <ImageIcon size={20} color="#7df9ff" style={{ marginRight: '10px' }} />
+                  <Typography 
+                    variant="h6" 
+                    fontWeight={600} 
+                    sx={{ color: '#7df9ff' }}
+                  >
+                    Create PDF from Images
+                  </Typography>
+                </Box>
 
-                <Box sx={{ p: 3 }}>
-                  {/* Blank PDF Tab */}
-                  <TabPanel value={activeTab} index={0}>
-                    <Grid container spacing={3}>
-                      <Grid item xs={12} sm={6}>
-                        <TextField
-                          fullWidth
-                          label="Number of Pages"
-                          type="number"
-                          value={pageCount}
-                          onChange={(e) => setPageCount(Math.max(1, Math.min(100, parseInt(e.target.value) || 1)))}
-                          inputProps={{ min: 1, max: 100 }}
-                          helperText="Maximum 100 pages"
-                        />
-                      </Grid>
-                      
-                      <Grid item xs={12} sm={6}>
-                        <FormControl fullWidth>
-                          <InputLabel id="page-size-label">Page Size</InputLabel>
-                          <Select
-                            labelId="page-size-label"
-                            id="page-size"
-                            value={pageSize}
-                            label="Page Size"
-                            onChange={(e) => setPageSize(e.target.value)}
-                          >
-                            <MenuItem value="A4">A4 (210 × 297 mm)</MenuItem>
-                            <MenuItem value="A5">A5 (148 × 210 mm)</MenuItem>
-                            <MenuItem value="Letter">Letter (8.5 × 11 in)</MenuItem>
-                            <MenuItem value="Legal">Legal (8.5 × 14 in)</MenuItem>
-                            <MenuItem value="Tabloid">Tabloid (11 × 17 in)</MenuItem>
-                          </Select>
-                        </FormControl>
-                      </Grid>
-                      
-                      <Grid item xs={12} sm={6}>
-                        <FormControl fullWidth>
-                          <InputLabel id="orientation-label">Orientation</InputLabel>
-                          <Select
-                            labelId="orientation-label"
-                            id="orientation"
-                            value={orientation}
-                            label="Orientation"
-                            onChange={(e) => setOrientation(e.target.value)}
-                          >
-                            <MenuItem value="portrait">Portrait</MenuItem>
-                            <MenuItem value="landscape">Landscape</MenuItem>
-                          </Select>
-                        </FormControl>
-                      </Grid>
-                      
-                      <Grid item xs={12} sm={6}>
-                        <TextField
-                          fullWidth
-                          label="Margins (mm)"
-                          type="number"
-                          value={margins}
-                          onChange={(e) => setMargins(Math.max(0, Math.min(50, parseInt(e.target.value) || 0)))}
-                          inputProps={{ min: 0, max: 50 }}
-                        />
-                      </Grid>
-                      
-                      <Grid item xs={12}>
-                        <Card 
-                          variant="outlined" 
-                          sx={{ 
-                            p: 3, 
-                            borderRadius: 2, 
-                            bgcolor: alpha(theme.palette.primary.main, 0.03) 
-                          }}
-                        >
-                          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                            <ZapIcon size={18} color={theme.palette.primary.main} style={{ marginRight: 10 }} />
-                            <Typography variant="subtitle1" fontWeight={600}>
-                              Preview
-                            </Typography>
-                          </Box>
-                          
-                          <Box 
-                            sx={{ 
-                              width: '100%',
-                              height: 250,
-                              border: '1px solid',
-                              borderColor: 'divider',
-                              borderRadius: 1,
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              position: 'relative',
-                              overflow: 'hidden',
-                            }}
-                          >
-                            {/* Page preview */}
-                            <Box 
-                              sx={{ 
-                                width: orientation === 'portrait' ? 150 : 210,
-                                height: orientation === 'portrait' ? 210 : 150,
-                                bgcolor: 'white',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                                position: 'relative',
-                                borderRadius: 1,
-                              }}
-                            >
-                              {/* Margins visualization */}
-                              <Box 
-                                sx={{ 
-                                  position: 'absolute',
-                                  top: 0,
-                                  left: 0,
-                                  right: 0,
-                                  bottom: 0,
-                                  border: `1px dashed ${alpha(theme.palette.primary.main, 0.5)}`,
-                                  borderWidth: `${margins/5}px`,
-                                }}
-                              />
-                              
-                              <Typography 
-                                variant="caption" 
-                                sx={{ 
-                                  position: 'absolute', 
-                                  top: '50%', 
-                                  left: '50%', 
-                                  transform: 'translate(-50%, -50%)',
-                                  color: 'text.secondary',
-                                  fontStyle: 'italic',
-                                }}
-                              >
-                                {pageSize} • {orientation}
-                              </Typography>
-                            </Box>
-                            
-                            <Typography 
-                              variant="body2"
-                              color="text.secondary"
-                              sx={{ 
-                                position: 'absolute',
-                                bottom: 10,
-                                right: 10,
-                              }}
-                            >
-                              {pageCount} {pageCount === 1 ? 'page' : 'pages'}
-                            </Typography>
-                          </Box>
-                        </Card>
-                      </Grid>
-                    </Grid>
-                  </TabPanel>
-
-                  {/* From Text Tab */}
-                  <TabPanel value={activeTab} index={1}>
-                    <Grid container spacing={3}>
-                      <Grid item xs={12}>
-                        <Box 
-                          sx={{ 
-                            mb: 2, 
-                            display: 'flex',
-                            flexWrap: 'wrap',
-                            gap: 1,
-                            alignItems: 'center',
-                          }}
-                        >
-                          <FormControl sx={{ width: 150 }}>
-                            <InputLabel id="font-family-label">Font</InputLabel>
-                            <Select
-                              labelId="font-family-label"
-                              id="font-family"
-                              value={fontFamily}
-                              label="Font"
-                              size="small"
-                              onChange={(e) => setFontFamily(e.target.value)}
-                            >
-                              <MenuItem value="Arial">Arial</MenuItem>
-                              <MenuItem value="Times New Roman">Times New Roman</MenuItem>
-                              <MenuItem value="Courier New">Courier New</MenuItem>
-                              <MenuItem value="Georgia">Georgia</MenuItem>
-                              <MenuItem value="Verdana">Verdana</MenuItem>
-                            </Select>
-                          </FormControl>
-                          
-                          <TextField
-                            label="Size"
-                            type="number"
-                            value={fontSize}
-                            size="small"
-                            onChange={(e) => setFontSize(Math.max(8, Math.min(72, parseInt(e.target.value) || 12)))}
-                            inputProps={{ min: 8, max: 72 }}
-                            sx={{ width: 80 }}
-                          />
-                          
-                          <Box sx={{ display: 'flex', ml: { xs: 0, sm: 1 } }}>
-                            <Tooltip title="Bold">
-                              <IconButton 
-                                size="small" 
-                                color={textStyles.bold ? 'primary' : 'default'}
-                                onClick={() => toggleTextStyle('bold')}
-                                sx={{ 
-                                  bgcolor: textStyles.bold ? alpha(theme.palette.primary.main, 0.1) : 'transparent',
-                                  borderRadius: 1,
-                                }}
-                              >
-                                <BoldIcon size={18} />
-                              </IconButton>
-                            </Tooltip>
-                            
-                            <Tooltip title="Italic">
-                              <IconButton 
-                                size="small" 
-                                color={textStyles.italic ? 'primary' : 'default'}
-                                onClick={() => toggleTextStyle('italic')}
-                                sx={{ 
-                                  bgcolor: textStyles.italic ? alpha(theme.palette.primary.main, 0.1) : 'transparent',
-                                  borderRadius: 1,
-                                }}
-                              >
-                                <ItalicIcon size={18} />
-                              </IconButton>
-                            </Tooltip>
-                            
-                            <Tooltip title="Underline">
-                              <IconButton 
-                                size="small" 
-                                color={textStyles.underline ? 'primary' : 'default'}
-                                onClick={() => toggleTextStyle('underline')}
-                                sx={{ 
-                                  bgcolor: textStyles.underline ? alpha(theme.palette.primary.main, 0.1) : 'transparent',
-                                  borderRadius: 1,
-                                }}
-                              >
-                                <UnderlineIcon size={18} />
-                              </IconButton>
-                            </Tooltip>
-                          </Box>
-                          
-                          <Box sx={{ display: 'flex', ml: { xs: 0, sm: 'auto' } }}>
-                            <Tooltip title="Align Left">
-                              <IconButton 
-                                size="small" 
-                                color={textAlignment === 'left' ? 'primary' : 'default'}
-                                onClick={() => setTextAlignment('left')}
-                                sx={{ 
-                                  bgcolor: textAlignment === 'left' ? alpha(theme.palette.primary.main, 0.1) : 'transparent',
-                                  borderRadius: 1,
-                                }}
-                              >
-                                <AlignLeftIcon size={18} />
-                              </IconButton>
-                            </Tooltip>
-                            
-                            <Tooltip title="Align Center">
-                              <IconButton 
-                                size="small" 
-                                color={textAlignment === 'center' ? 'primary' : 'default'}
-                                onClick={() => setTextAlignment('center')}
-                                sx={{ 
-                                  bgcolor: textAlignment === 'center' ? alpha(theme.palette.primary.main, 0.1) : 'transparent',
-                                  borderRadius: 1,
-                                }}
-                              >
-                                <AlignCenterIcon size={18} />
-                              </IconButton>
-                            </Tooltip>
-                            
-                            <Tooltip title="Align Right">
-                              <IconButton 
-                                size="small" 
-                                color={textAlignment === 'right' ? 'primary' : 'default'}
-                                onClick={() => setTextAlignment('right')}
-                                sx={{ 
-                                  bgcolor: textAlignment === 'right' ? alpha(theme.palette.primary.main, 0.1) : 'transparent',
-                                  borderRadius: 1,
-                                }}
-                              >
-                                <AlignRightIcon size={18} />
-                              </IconButton>
-                            </Tooltip>
-                          </Box>
-                        </Box>
-                        
-                        <TextField
-                          fullWidth
-                          label="Text Content"
-                          multiline
-                          rows={10}
-                          value={textContent}
-                          onChange={(e) => setTextContent(e.target.value)}
-                          placeholder="Enter the text you want to convert to PDF..."
-                          sx={{
-                            '& .MuiOutlinedInput-root': {
-                              fontFamily: fontFamily,
-                              fontSize: `${fontSize}px`,
-                              fontWeight: textStyles.bold ? 700 : 400,
-                              fontStyle: textStyles.italic ? 'italic' : 'normal',
-                              textDecoration: textStyles.underline ? 'underline' : 'none',
-                              '& textarea': {
-                                textAlign: textAlignment,
-                              }
-                            }
-                          }}
-                        />
-                      </Grid>
-                      
-                      <Grid item xs={12}>
-                        <FormControlLabel
-                          control={<Switch checked={pageSize === 'A4'} onChange={(e) => setPageSize(e.target.checked ? 'A4' : 'Letter')} />}
-                          label="Use A4 paper size"
-                        />
-                      </Grid>
-                    </Grid>
-                  </TabPanel>
-
-                  {/* From Images Tab */}
-                  <TabPanel value={activeTab} index={2}>
-                    {images.length === 0 ? (
+                <Box sx={{ px: 3, pb: 3 }}>
+                  {images.length === 0 ? (
                       <Paper
                         {...getImageRootProps()}
                         elevation={0}
@@ -651,7 +314,7 @@ const CreatePDFPage = () => {
                           borderStyle: 'dashed',
                           borderWidth: 2,
                           borderColor: isImageDragActive ? 'primary.main' : 'divider',
-                          bgcolor: isImageDragActive ? alpha(theme.palette.primary.main, 0.05) : 'background.paper',
+                          bgcolor: isImageDragActive ? 'rgba(125, 249, 255, 0.1)' : 'rgba(0, 0, 0, 0.3)',
                           p: 6,
                           textAlign: 'center',
                           cursor: 'pointer',
@@ -771,8 +434,8 @@ const CreatePDFPage = () => {
                                 }}
                               >
                                 <input {...getImageInputProps()} />
-                                <PlusIcon size={30} color={theme.palette.text.secondary} />
-                                <Typography variant="body2" align="center" color="text.secondary" sx={{ mt: 1 }}>
+                                <PlusIcon size={30} color={"rgba(255, 255, 255, 0.7)"} />
+                                <Typography variant="body2" align="center" color="rgba(255, 255, 255, 0.7)" sx={{ mt: 1 }}>
                                   Add More Images
                                 </Typography>
                               </Card>
@@ -844,14 +507,21 @@ const CreatePDFPage = () => {
                         </Grid>
                       </>
                     )}
-                  </TabPanel>
                 </Box>
 
-                <Box sx={{ p: 3, borderTop: '1px solid', borderColor: 'divider', textAlign: 'right' }}>
+                <Box sx={{ p: 3, borderTop: '1px solid', borderColor: 'rgba(255, 255, 255, 0.1)', textAlign: 'right', background: 'rgba(0, 0, 0, 0.3)' }}>
                   <Button
                     variant="outlined"
                     onClick={handleReset}
-                    sx={{ mr: 2 }}
+                    sx={{ 
+                      mr: 2,
+                      color: 'rgba(255, 255, 255, 0.8)',
+                      borderColor: 'rgba(255, 255, 255, 0.2)',
+                      '&:hover': {
+                        borderColor: 'rgba(255, 255, 255, 0.5)',
+                        backgroundColor: 'rgba(255, 255, 255, 0.05)'
+                      }
+                    }}
                   >
                     Reset
                   </Button>
@@ -866,6 +536,11 @@ const CreatePDFPage = () => {
                       borderRadius: '50px',
                       position: 'relative',
                       overflow: 'hidden',
+                      background: 'linear-gradient(90deg, #7df9ff, #6836e6)',
+                      '&:hover': {
+                        background: 'linear-gradient(90deg, #7df9ff, #6836e6)',
+                        boxShadow: '0 4px 15px rgba(125, 249, 255, 0.4)'
+                      },
                       '& .rotating': {
                         animation: 'spin 2s linear infinite',
                       },
@@ -873,6 +548,10 @@ const CreatePDFPage = () => {
                         '0%': { transform: 'rotate(0deg)' },
                         '100%': { transform: 'rotate(360deg)' },
                       },
+                      '&.Mui-disabled': {
+                        background: 'rgba(255, 255, 255, 0.1)',
+                        color: 'rgba(255, 255, 255, 0.4)'
+                      }
                     }}
                   >
                     {isProcessing ? 'Creating...' : 'Create PDF'}
@@ -883,10 +562,19 @@ const CreatePDFPage = () => {
 
             {isProcessing && (
               <Box sx={{ mt: 2 }}>
-                <Typography variant="body2" color="text.secondary" gutterBottom>
+                <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }} gutterBottom>
                   Creating your PDF...
                 </Typography>
-                <LinearProgress sx={{ height: 6, borderRadius: 3 }} />
+                <LinearProgress 
+                  sx={{ 
+                    height: 6, 
+                    borderRadius: 3,
+                    background: 'rgba(255, 255, 255, 0.1)',
+                    '& .MuiLinearProgress-bar': {
+                      background: 'linear-gradient(90deg, #7df9ff, #6836e6)',
+                    }
+                  }} 
+                />
               </Box>
             )}
             
@@ -905,7 +593,14 @@ const CreatePDFPage = () => {
             initial="hidden"
             animate="visible"
           >
-            <Card sx={{ borderRadius: 4, mb: 4 }}>
+            <Card sx={{ 
+              borderRadius: 4, 
+              mb: 4,
+              background: 'rgba(255, 255, 255, 0.03)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              boxShadow: '0 4px 30px rgba(0, 0, 0, 0.3)'
+            }}>
               <CardContent sx={{ p: 0 }}>
                 <Box
                   sx={{
@@ -914,7 +609,8 @@ const CreatePDFPage = () => {
                     alignItems: 'center',
                     borderBottom: '1px solid',
                     borderColor: 'divider',
-                    bgcolor: 'success.lighter',
+                    bgcolor: 'rgba(75, 219, 106, 0.2)',
+                    color: 'white',
                   }}
                 >
                   <Box
@@ -922,7 +618,7 @@ const CreatePDFPage = () => {
                       width: 48,
                       height: 48,
                       borderRadius: '50%',
-                      bgcolor: 'success.main',
+                      bgcolor: '#4DDB6A',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -954,7 +650,7 @@ const CreatePDFPage = () => {
                       flexDirection: 'column',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      bgcolor: alpha(theme.palette.error.main, 0.1),
+                      bgcolor: alpha('#ff4d4f', 0.1),
                       borderRadius: 2,
                       position: 'relative',
                     }}
@@ -971,7 +667,7 @@ const CreatePDFPage = () => {
                         justifyContent: 'center',
                       }}
                     >
-                      <FileIcon size={40} color={theme.palette.error.main} />
+                      <FileIcon size={40} color="#ff4d4f" />
                     </Box>
                     
                     <Box
@@ -982,7 +678,7 @@ const CreatePDFPage = () => {
                         width: 32,
                         height: 32,
                         borderRadius: '50%',
-                        bgcolor: 'success.main',
+                        bgcolor: '#4DDB6A',
                         color: 'white',
                         display: 'flex',
                         alignItems: 'center',
@@ -1010,6 +706,11 @@ const CreatePDFPage = () => {
                     sx={{
                       px: 4,
                       borderRadius: '50px',
+                      background: 'linear-gradient(90deg, #7df9ff, #6836e6)',
+                      '&:hover': {
+                        background: 'linear-gradient(90deg, #7df9ff, #6836e6)',
+                        boxShadow: '0 4px 15px rgba(125, 249, 255, 0.4)'
+                      },
                     }}
                   >
                     Download PDF
@@ -1018,12 +719,12 @@ const CreatePDFPage = () => {
                 
                 <Divider />
                 
-                <Box sx={{ p: 3, textAlign: 'center' }}>
+                <Box sx={{ p: 3, textAlign: 'center', borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
                   <Button
                     variant="text"
                     startIcon={<FilePlusIcon size={16} />}
                     onClick={handleReset}
-                    color="primary"
+                    sx={{ color: '#7df9ff', '&:hover': { backgroundColor: 'rgba(125, 249, 255, 0.1)' } }}
                   >
                     Create Another PDF
                   </Button>
@@ -1034,12 +735,22 @@ const CreatePDFPage = () => {
         )}
         
         {/* Info Section */}
-        <Box sx={{ mt: 8 }}>
-          <Divider sx={{ mb: 4 }} />
+        <Box sx={{ mt: 8, position: 'relative', zIndex: 1 }}>
+          <Divider sx={{ mb: 4, borderColor: 'rgba(255, 255, 255, 0.1)' }} />
           
           <Grid container spacing={4}>
             <Grid item xs={12} md={6}>
-              <Typography variant="h5" gutterBottom fontWeight={700}>
+              <Typography 
+                variant="h5" 
+                gutterBottom 
+                fontWeight={700}
+                sx={{
+                  background: 'linear-gradient(90deg, #7df9ff, #6836e6)',
+                  backgroundClip: 'text',
+                  color: 'transparent',
+                  display: 'inline-block',
+                }}
+              >
                 How to Create a PDF
               </Typography>
               
@@ -1074,8 +785,8 @@ const CreatePDFPage = () => {
                         width: 28,
                         height: 28,
                         borderRadius: '50%',
-                        bgcolor: 'primary.main',
-                        color: 'white',
+                        bgcolor: '#7df9ff',
+                        color: '#030018',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -1101,56 +812,7 @@ const CreatePDFPage = () => {
               </Box>
             </Grid>
             
-            <Grid item xs={12} md={6}>
-              <Typography variant="h6" gutterBottom fontWeight={700}>
-                PDF Creation Tips
-              </Typography>
-              
-              <Grid container spacing={2} sx={{ mt: 1 }}>
-                {[
-                  {
-                    title: 'Optimize Image Resolution',
-                    description: 'For image-based PDFs, use high-resolution images while keeping file size manageable.',
-                  },
-                  {
-                    title: 'Fonts Matter',
-                    description: 'Choose readable fonts when creating text-based PDFs, especially for documents intended for screen reading.',
-                  },
-                  {
-                    title: 'Consider Page Orientation',
-                    description: 'Use landscape for wide content like tables, and portrait for text-heavy documents.',
-                  },
-                  {
-                    title: 'Set Appropriate Margins',
-                    description: 'Leave enough margin space to ensure content is visible when printed or viewed on different devices.',
-                  },
-                ].map((item, index) => (
-                  <Grid item xs={12} sm={6} key={index}>
-                    <Card
-                      variant="outlined"
-                      sx={{
-                        borderRadius: 2,
-                        height: '100%',
-                        transition: 'all 0.2s ease',
-                        '&:hover': {
-                          borderColor: 'primary.main',
-                          boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
-                        },
-                      }}
-                    >
-                      <CardContent>
-                        <Typography variant="subtitle1" fontWeight={600} gutterBottom>
-                          {item.title}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {item.description}
-                        </Typography>
-                      </CardContent>
-                    </Card>
-                  </Grid>
-                ))}
-              </Grid>
-              
+            <Grid item xs={12} md={6}>      
               <Box
                 sx={{
                   mt: 3,
@@ -1161,7 +823,7 @@ const CreatePDFPage = () => {
                 }}
               >
                 <Typography variant="subtitle1" fontWeight={600} sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                  <PenToolIcon size={16} style={{ marginRight: 8 }} color={theme.palette.info.main} />
+                  <PentagonOutlined size={16} style={{ marginRight: 8 }} color={theme.palette.info.main} />
                   Advanced PDF Creation
                 </Typography>
                 <Typography variant="body2">

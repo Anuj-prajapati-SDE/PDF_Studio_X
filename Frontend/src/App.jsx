@@ -48,6 +48,7 @@ import LoginPage from './Pages/Auth/LoginPage';
 import OTPVerification from './Pages/Auth/OTPVerification';
 import ForgotPasswordPage from './Pages/Auth/ForgotPasswordPage';
 import ResetPasswordPage from './Pages/Auth/ResetPasswordPage';
+import DashboardPage from './Pages/UserDashboard/DashboardPage';
 // import JPGToPDFPage from './Pages/JPGToPDF.JSX';
 
 // Global styles
@@ -180,8 +181,9 @@ function App() {
               {/* <Route path="add-sign" element={<SignPDFPage/>} /> */}
               <Route path="watermark-pdf" element={<WatermarkPDFPage/>} />
               <Route path="unlock-pdf" element={<UnlockPDFPage/>} />
-              <Route path="crop-pdf" element={<CropPDFPage/>} />
+              <Route path="crop-pdf" element={<CropPDFPage/>} />  
               <Route path="edit-pdf" element={<EditPDFPage/>} />
+              <Route path="dashboard" element={<DashboardPage/>} />
             </Route>
             <Route path="*" element={<NotFoundPage />} />
           </Routes>

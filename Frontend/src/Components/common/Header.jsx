@@ -234,26 +234,8 @@ const Header = () => {
                   color: 'text.primary',
                 }}
               >
-                <Box 
-                  component="span" 
-                  sx={{ 
-                    background: 'linear-gradient(to right, #6366f1, #4839eb)',
-                    backgroundClip: 'text',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                  }}
-                >
-                  PDF
-                </Box>
-                <Box 
-                  component="span" 
-                  sx={{ 
-                    color: 'text.primary',
-                    ml: 0.5,
-                  }}
-                >
                 StudioX
-                </Box>
+              
               </Typography>
             </Box>
           </RouterLink>
@@ -645,7 +627,7 @@ const Header = () => {
         <Box sx={{ mt: 1.5, display: 'flex', justifyContent: 'center' }}>
           <Button
             component={RouterLink}
-            to="/tools"
+            to="/tools/dashboard"
             onClick={handleToolsMenuClose}
             variant="contained"
             disableElevation

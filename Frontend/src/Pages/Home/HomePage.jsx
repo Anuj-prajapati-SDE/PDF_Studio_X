@@ -121,7 +121,7 @@ const HomePage = () => {
     },
   ];
   // Animation hooks
-  const controls = useAnimation();
+  const controls = useAnimation(); 
   const [ref, inView] = useInView({
     threshold: 0.3,
     triggerOnce: false,

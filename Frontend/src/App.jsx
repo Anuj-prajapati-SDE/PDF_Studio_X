@@ -12,6 +12,9 @@ import 'swiper/css/pagination';
 // Theme
 import theme from './theme';
 
+// Context
+import { AuthProvider } from './context/AuthContext';
+
 // Layouts
 import MainLayout from './layouts/MainLayout';
 import DashboardLayout from './layouts/DashboardLayout';
@@ -41,8 +44,9 @@ import WatermarkPDFPage from './Pages/WaterMarkPDFPage';
 import UnlockPDFPage from './Pages/UnlockPDFPage';
 import CropPDFPage from './Pages/CropPDFPage';
 import EditPDFPage from './Pages/EditPDFPage';
-import SignupPage from './Pages/SignUpPage';
+import SignupPage from './Pages/SignupPage';
 import LoginPage from './Pages/LoginPage';
+import OTPVerification from './Components/common/OTPVerification';
 // import JPGToPDFPage from './Pages/JPGToPDF.JSX';
 
 // Global styles
@@ -125,22 +129,23 @@ function App() {
   }, []);
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <GlobalStyles styles={globalStyles} />
-      <Toaster 
-        position="top-center" 
-        toastOptions={{
-          style: {
-            borderRadius: '10px',
-            background: '#333',
-            color: '#fff',
-            padding: '16px',
-            fontSize: '16px',
-          }
-        }} 
-      />
-      <BrowserRouter>
+    <AuthProvider>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <GlobalStyles styles={globalStyles} />
+        <Toaster 
+          position="top-center" 
+          toastOptions={{
+            style: {
+              borderRadius: '10px',
+              background: '#333',
+              color: '#fff',
+              padding: '16px',
+              fontSize: '16px',
+            }
+          }} 
+        />
+        <BrowserRouter>
        
           <Routes>
             <Route path="/" element={<MainLayout />}>
@@ -150,6 +155,7 @@ function App() {
               <Route path="pricing" element={<PricingPage />} />
               <Route path="signup" element={<SignupPage />} />
               <Route path="login" element={<LoginPage />} />
+              <Route path="otp-verification" element={<OTPVerification />} />
             
             </Route>
             <Route path="/tools" element={<DashboardLayout />}>
@@ -176,9 +182,9 @@ function App() {
             </Route>
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
-      
-      </BrowserRouter>
-    </ThemeProvider>
+        </BrowserRouter>
+      </ThemeProvider>
+    </AuthProvider>
   );
 }
 

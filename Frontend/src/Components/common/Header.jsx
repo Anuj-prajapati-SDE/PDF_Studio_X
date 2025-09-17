@@ -24,7 +24,7 @@ import {
   useTheme,
   alpha,
 } from '@mui/material';
-import { Link as RouterLink, useLocation } from 'react-router-dom';
+import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import {
   Menu as MenuIcon,
   Close as CloseIcon,
@@ -38,9 +38,13 @@ import {
   AccessTime as TimeIcon,
   Person as PersonIcon,
   NotificationsNone as NotificationsIcon,
+  Logout as LogoutIcon,
+  Login as LoginIcon,
 } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Grid } from 'react-feather';
+import { useAuth } from '../../context/AuthContext';
+import toast from 'react-hot-toast';
 
 // Logo component
 const PdfLogo = ({ size = 40, light = false }) => (
@@ -79,6 +83,8 @@ const Header = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout, isAuthenticated } = useAuth();
   
   // Tools menu
   const [toolsAnchorEl, setToolsAnchorEl] = useState(null);
@@ -152,6 +158,17 @@ const Header = () => {
     setUserMenuAnchor(null);
   };
 
+  const handleLogout = () => {
+    logout();
+    setUserMenuAnchor(null);
+    toast.success('Logged out successfully');
+    navigate('/');
+  };
+
+  const handleLoginClick = () => {
+    navigate('/login');
+  };
+
   // Desktop navigation links
   const navLinks = [
     { title: 'Home', path: '/' },
@@ -162,6 +179,7 @@ const Header = () => {
   
   // Get current user's initials for avatar
   const getUserInitials = (name) => {
+    if (!name) return 'U';
     return name.split('-')
       .map(part => part[0])
       .join('')
@@ -380,76 +398,110 @@ const Header = () => {
               gap: { xs: 1, md: 2 },
             }}
           >
-        
-            {/* User profile button */}
-            <Tooltip title="Account settings">
-              <Box
-                component={motion.div}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.97 }}
-              >
-                <Button
-                  onClick={handleUserMenuOpen}
-                  aria-controls={isUserMenuOpen ? 'user-menu' : undefined}
-                  aria-haspopup="true"
-                  aria-expanded={isUserMenuOpen ? 'true' : undefined}
-                  sx={{
-                    borderRadius: '10px',
-                    textTransform: 'none',
-                    py: 0.5,
-                    px: { xs: 1, sm: 1.5 },
-                    background: 'rgba(99, 102, 241, 0.08)',
-                    border: '1px solid',
-                    borderColor: 'rgba(99, 102, 241, 0.2)',
-                    color: 'text.primary',
-                    '&:hover': {
-                      background: 'rgba(99, 102, 241, 0.15)',
-                    },
-                  }}
+            {isAuthenticated ? (
+              /* User profile button */
+              <Tooltip title="Account settings">
+                <Box
+                  component={motion.div}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.97 }}
                 >
-                  <Avatar
+                  <Button
+                    onClick={handleUserMenuOpen}
+                    aria-controls={isUserMenuOpen ? 'user-menu' : undefined}
+                    aria-haspopup="true"
+                    aria-expanded={isUserMenuOpen ? 'true' : undefined}
                     sx={{
-                      width: 32,
-                      height: 32,
-                      backgroundColor: '#6366f1',
-                      fontSize: '0.875rem',
-                      fontWeight: 600,
+                      borderRadius: '10px',
+                      textTransform: 'none',
+                      py: 0.5,
+                      px: { xs: 1, sm: 1.5 },
+                      background: 'rgba(99, 102, 241, 0.08)',
+                      border: '1px solid',
+                      borderColor: 'rgba(99, 102, 241, 0.2)',
+                      color: 'text.primary',
+                      '&:hover': {
+                        background: 'rgba(99, 102, 241, 0.15)',
+                      },
                     }}
                   >
-                    {getUserInitials('Anuj-prajapati-SDE')}
-                  </Avatar>
-                  
-                  <Box sx={{ 
-                    ml: 1.5, 
-                    display: { xs: 'none', sm: 'block' },
-                    textAlign: 'left',
-                  }}>
-                    <Typography 
-                      component="span" 
-                      sx={{ 
-                        fontSize: '0.85rem',
+                    <Avatar
+                      sx={{
+                        width: 32,
+                        height: 32,
+                        backgroundColor: '#6366f1',
+                        fontSize: '0.875rem',
                         fontWeight: 600,
-                        display: 'block',
-                        lineHeight: 1.2,
                       }}
                     >
-                      {isSmall ? 'Anuj' : 'Anuj-prajapati'}
-                    </Typography>
-                    <Typography 
-                      component="span" 
-                      sx={{ 
-                        fontSize: '0.7rem',
-                        opacity: 0.8,
-                        display: 'block',
-                        lineHeight: 1.2,
-                      }}
-                    >
-                      SDE
-                    </Typography>
-                  </Box>
-                </Button>
-              </Box>
-            </Tooltip>
+                      {getUserInitials(user?.name)}
+                    </Avatar>
+                    
+                    <Box sx={{ 
+                      ml: 1.5, 
+                      display: { xs: 'none', sm: 'block' },
+                      textAlign: 'left',
+                    }}>
+                      <Typography 
+                        component="span" 
+                        sx={{ 
+                          fontSize: '0.85rem',
+                          fontWeight: 600,
+                          display: 'block',
+                          lineHeight: 1.2,
+                        }}
+                      >
+                        {isSmall ? user?.name?.split('-')[0] : user?.name}
+                      </Typography>
+                      <Typography 
+                        component="span" 
+                        sx={{ 
+                          fontSize: '0.7rem',
+                          opacity: 0.8,
+                          display: 'block',
+                          lineHeight: 1.2,
+                        }}
+                      >
+                        {user?.role || 'User'}
+                      </Typography>
+                    </Box>
+                  </Button>
+                </Box>
+              </Tooltip>
+            ) : (
+              /* Login button for non-authenticated users */
+              <Tooltip title="Sign in to your account">
+                <Box
+                  component={motion.div}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  <Button
+                    onClick={handleLoginClick}
+                    sx={{
+                      borderRadius: '10px',
+                      textTransform: 'none',
+                      py: 0.8,
+                      px: { xs: 2, sm: 2.5 },
+                      background: 'linear-gradient(135deg, #6366f1 0%, #4839eb 100%)',
+                      color: 'white',
+                      fontWeight: 600,
+                      fontSize: '0.9rem',
+                      boxShadow: '0 4px 15px rgba(99, 102, 241, 0.3)',
+                      '&:hover': {
+                        background: 'linear-gradient(135deg, #5754e8 0%, #3f37d4 100%)',
+                        boxShadow: '0 6px 20px rgba(99, 102, 241, 0.4)',
+                        transform: 'translateY(-1px)',
+                      },
+                      transition: 'all 0.3s ease',
+                    }}
+                    startIcon={<LoginIcon />}
+                  >
+                    {isSmall ? 'Login' : 'Sign In'}
+                  </Button>
+                </Box>
+              </Tooltip>
+            )}
 
             {/* Mobile menu toggle */}
             <IconButton
@@ -618,112 +670,115 @@ const Header = () => {
       </Menu>
       
       {/* User menu */}
-      <Menu
-        id="user-menu"
-        anchorEl={userMenuAnchor}
-        open={isUserMenuOpen}
-        onClose={handleUserMenuClose}
-        MenuListProps={{
-          'aria-labelledby': 'user-button',
-        }}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'right',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
-        }}
-        PaperProps={{
-          elevation: 0,
-          sx: {
-            mt: 1.5,
-            overflow: 'visible',
-            borderRadius: '14px',
-            minWidth: 220,
-            backgroundColor: 'rgba(255, 255, 255, 0.9)',
-            backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255, 255, 255, 0.8)',
-            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)',
-            p: 1,
-            '&:before': {
-              content: '""',
-              display: 'block',
-              position: 'absolute',
-              top: 0,
-              right: 14,
-              width: 12,
-              height: 12,
-              bgcolor: 'rgba(255, 255, 255, 0.9)',
+      {/* User menu - only show when authenticated */}
+      {isAuthenticated && (
+        <Menu
+          id="user-menu"
+          anchorEl={userMenuAnchor}
+          open={isUserMenuOpen}
+          onClose={handleUserMenuClose}
+          MenuListProps={{
+            'aria-labelledby': 'user-button',
+          }}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'right',
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'right',
+          }}
+          PaperProps={{
+            elevation: 0,
+            sx: {
+              mt: 1.5,
+              overflow: 'visible',
+              borderRadius: '14px',
+              minWidth: 220,
+              backgroundColor: 'rgba(255, 255, 255, 0.9)',
               backdropFilter: 'blur(20px)',
-              transform: 'translateY(-50%) rotate(45deg)',
-              zIndex: 0,
-              borderTop: '1px solid rgba(255, 255, 255, 0.8)',
-              borderLeft: '1px solid rgba(255, 255, 255, 0.8)',
+              border: '1px solid rgba(255, 255, 255, 0.8)',
+              boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)',
+              p: 1,
+              '&:before': {
+                content: '""',
+                display: 'block',
+                position: 'absolute',
+                top: 0,
+                right: 14,
+                width: 12,
+                height: 12,
+                bgcolor: 'rgba(255, 255, 255, 0.9)',
+                backdropFilter: 'blur(20px)',
+                transform: 'translateY(-50%) rotate(45deg)',
+                zIndex: 0,
+                borderTop: '1px solid rgba(255, 255, 255, 0.8)',
+                borderLeft: '1px solid rgba(255, 255, 255, 0.8)',
+              },
             },
-          },
-        }}
-      >
-        <Box sx={{ px: 2, py: 1 }}>
-          <Typography variant="subtitle2" fontWeight={600}>
-            Anuj Prajapati
-          </Typography>
-          <Typography variant="caption" color="text.secondary">
-            SDE Developer
-          </Typography>
-        </Box>
-        
-        <Divider sx={{ my: 1 }} />
-        
-        <MenuItem 
-          onClick={handleUserMenuClose}
-          sx={{ 
-            borderRadius: '8px',
-            my: 0.5,
           }}
         >
-          <ListItemIcon>
-            <PersonIcon fontSize="small" color="primary" />
-          </ListItemIcon>
-          <ListItemText>Profile</ListItemText>
-        </MenuItem>
-        
-        <MenuItem 
-          onClick={handleUserMenuClose}
-          sx={{ 
-            borderRadius: '8px',
-            my: 0.5,
-          }}
-        >
-          <ListItemIcon>
-            <NotificationsIcon fontSize="small" color="primary" />
-          </ListItemIcon>
-          <ListItemText>Notifications</ListItemText>
-        </MenuItem>
-        
-        <Divider sx={{ my: 1 }} />
-        
-        <MenuItem 
-          onClick={handleUserMenuClose}
-          sx={{ 
-            borderRadius: '8px',
-            my: 0.5,
-            color: '#ef4444',
-          }}
-        >
-          <ListItemIcon>
-            <Box 
-              sx={{ 
-                color: '#ef4444', 
-                display: 'flex' 
-              }}
-            >
-              <CloseIcon fontSize="small" />
-            </Box>
-          </ListItemIcon>
-          <ListItemText>Logout</ListItemText>
-        </MenuItem>
-      </Menu>
+          <Box sx={{ px: 2, py: 1 }}>
+            <Typography variant="subtitle2" fontWeight={600}>
+              {user?.name?.split('-').join(' ') || 'User'}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              {user?.email}
+            </Typography>
+          </Box>
+          
+          <Divider sx={{ my: 1 }} />
+          
+          <MenuItem 
+            onClick={handleUserMenuClose}
+            sx={{ 
+              borderRadius: '8px',
+              my: 0.5,
+            }}
+          >
+            <ListItemIcon>
+              <PersonIcon fontSize="small" color="primary" />
+            </ListItemIcon>
+            <ListItemText>Profile</ListItemText>
+          </MenuItem>
+          
+          <MenuItem 
+            onClick={handleUserMenuClose}
+            sx={{ 
+              borderRadius: '8px',
+              my: 0.5,
+            }}
+          >
+            <ListItemIcon>
+              <NotificationsIcon fontSize="small" color="primary" />
+            </ListItemIcon>
+            <ListItemText>Notifications</ListItemText>
+          </MenuItem>
+          
+          <Divider sx={{ my: 1 }} />
+          
+          <MenuItem 
+            onClick={handleLogout}
+            sx={{ 
+              borderRadius: '8px',
+              my: 0.5,
+              color: '#ef4444',
+            }}
+          >
+            <ListItemIcon>
+              <Box 
+                sx={{ 
+                  color: '#ef4444', 
+                  display: 'flex' 
+                }}
+              >
+                <LogoutIcon fontSize="small" />
+              </Box>
+            </ListItemIcon>
+            <ListItemText>Logout</ListItemText>
+          </MenuItem>
+        </Menu>
+      )}
 
       {/* Mobile drawer */}
       <Drawer
@@ -778,50 +833,52 @@ const Header = () => {
           </IconButton>
         </Box>
         
-        {/* User info in drawer */}
-        <Box
-          component={motion.div}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          sx={{
-            py: 2,
-            px: 2,
-            mt: 1,
-            mb: 2,
-            borderRadius: '16px',
-            backdropFilter: 'blur(8px)',
-            backgroundColor: 'rgba(255, 255, 255, 0.15)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 2,
-          }}
-        >
-          <Avatar
+        {/* User info in drawer - only show when authenticated */}
+        {isAuthenticated && (
+          <Box
+            component={motion.div}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
             sx={{
-              width: 48,
-              height: 48,
-              backgroundColor: 'white',
-              color: '#6366f1',
-              fontWeight: 600,
-              fontSize: '1rem',
-              boxShadow: '0 0 0 2px rgba(255, 255, 255, 0.3)',
+              py: 2,
+              px: 2,
+              mt: 1,
+              mb: 2,
+              borderRadius: '16px',
+              backdropFilter: 'blur(8px)',
+              backgroundColor: 'rgba(255, 255, 255, 0.15)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 2,
             }}
           >
-            {getUserInitials('Anuj-prajapati-SDE')}
-          </Avatar>
-          <Box>
-            <Typography variant="subtitle2" fontWeight={600}>
-              Anuj-prajapati-SDE
-            </Typography>
-            <Typography 
-              variant="caption" 
-              sx={{ opacity: 0.8, fontSize: '0.75rem' }}
+            <Avatar
+              sx={{
+                width: 48,
+                height: 48,
+                backgroundColor: 'white',
+                color: '#6366f1',
+                fontWeight: 600,
+                fontSize: '1rem',
+                boxShadow: '0 0 0 2px rgba(255, 255, 255, 0.3)',
+              }}
             >
-              {formattedDateTime}
-            </Typography>
+              {getUserInitials(user?.name)}
+            </Avatar>
+            <Box>
+              <Typography variant="subtitle2" fontWeight={600}>
+                {user?.name}
+              </Typography>
+              <Typography 
+                variant="caption" 
+                sx={{ opacity: 0.8, fontSize: '0.75rem' }}
+              >
+                {user?.email}
+              </Typography>
+            </Box>
           </Box>
-        </Box>
+        )}
 
         <Divider sx={{ borderColor: 'rgba(255,255,255,0.15)', my: 1 }} />
 
@@ -988,54 +1045,140 @@ const Header = () => {
           }}
         >
           <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <Button
-                fullWidth
-                variant="contained"
-                component={RouterLink}
-                to="/signup"
-                onClick={toggleMobileDrawer}
-                sx={{
-                  backgroundColor: 'white',
-                  color: '#6366f1',
-                  borderRadius: '10px',
-                  py: 1.2,
-                  textTransform: 'none',
-                  fontWeight: 600,
-                  boxShadow: '0 10px 20px -5px rgba(0, 0, 0, 0.1)',
-                  '&:hover': {
-                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                    boxShadow: '0 15px 25px -5px rgba(0, 0, 0, 0.2)',
-                  },
-                }}
-              >
-                Get Started
-              </Button>
-            </Grid>
-            <Grid item xs={12}>
-              <Button
-                fullWidth
-                variant="outlined"
-                component={RouterLink}
-                to="/login"
-                onClick={toggleMobileDrawer}
-                sx={{
-                  borderColor: 'white',
-                  color: 'white',
-                  borderRadius: '10px',
-                  py: 1.2,
-                  textTransform: 'none',
-                  fontWeight: 600,
-                  borderWidth: 2,
-                  '&:hover': {
-                    borderColor: 'white',
-                    backgroundColor: 'rgba(235, 235, 235, 0)',
-                  },
-                }}
-              >
-                Sign In
-              </Button>
-            </Grid>
+            {isAuthenticated ? (
+              <>
+                <Grid item xs={12}>
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    onClick={() => {
+                      toggleMobileDrawer();
+                      // Add profile functionality here
+                    }}
+                    startIcon={<PersonIcon />}
+                    sx={{
+                      borderColor: 'white',
+                      color: 'white',
+                      borderRadius: '10px',
+                      py: 1.2,
+                      textTransform: 'none',
+                      fontWeight: 600,
+                      borderWidth: 2,
+                      '&:hover': {
+                        borderColor: 'white',
+                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                      },
+                    }}
+                  >
+                    Profile
+                  </Button>
+                </Grid>
+                <Grid item xs={12}>
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    onClick={() => {
+                      toggleMobileDrawer();
+                      // Add notifications functionality here
+                    }}
+                    startIcon={<NotificationsIcon />}
+                    sx={{
+                      borderColor: 'white',
+                      color: 'white',
+                      borderRadius: '10px',
+                      py: 1.2,
+                      textTransform: 'none',
+                      fontWeight: 600,
+                      borderWidth: 2,
+                      '&:hover': {
+                        borderColor: 'white',
+                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                      },
+                    }}
+                  >
+                    Notifications
+                  </Button>
+                </Grid>
+                <Grid item xs={12}>
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    onClick={() => {
+                      handleLogout();
+                      toggleMobileDrawer();
+                    }}
+                    startIcon={<LogoutIcon />}
+                    sx={{
+                      backgroundColor: 'rgba(239, 68, 68, 0.9)',
+                      color: 'white',
+                      borderRadius: '10px',
+                      py: 1.2,
+                      textTransform: 'none',
+                      fontWeight: 600,
+                      boxShadow: '0 10px 20px -5px rgba(239, 68, 68, 0.3)',
+                      '&:hover': {
+                        backgroundColor: 'rgba(239, 68, 68, 1)',
+                        boxShadow: '0 15px 25px -5px rgba(239, 68, 68, 0.4)',
+                      },
+                    }}
+                  >
+                    Logout
+                  </Button>
+                </Grid>
+              </>
+            ) : (
+              <>
+                <Grid item xs={12}>
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    component={RouterLink}
+                    to="/signup"
+                    onClick={toggleMobileDrawer}
+                    sx={{
+                      backgroundColor: 'white',
+                      color: '#6366f1',
+                      borderRadius: '10px',
+                      py: 1.2,
+                      textTransform: 'none',
+                      fontWeight: 600,
+                      boxShadow: '0 10px 20px -5px rgba(0, 0, 0, 0.1)',
+                      '&:hover': {
+                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                        boxShadow: '0 15px 25px -5px rgba(0, 0, 0, 0.2)',
+                      },
+                    }}
+                  >
+                    Get Started
+                  </Button>
+                </Grid>
+                <Grid item xs={12}>
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    component={RouterLink}
+                    to="/login"
+                    onClick={toggleMobileDrawer}
+                    startIcon={<LoginIcon />}
+                    sx={{
+                      borderColor: 'white',
+                      color: 'white',
+                      borderRadius: '10px',
+                      py: 1.2,
+                      textTransform: 'none',
+                      fontWeight: 600,
+                      borderWidth: 2,
+                      '&:hover': {
+                        borderColor: 'white',
+                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                      },
+                    }}
+                  >
+                    Sign In
+                  </Button>
+                </Grid>
+              </>
+            )}
           </Grid>
         </Box>
       </Drawer>

@@ -29,7 +29,10 @@ import {
   LockOpen,
   Security
 } from '@mui/icons-material';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import OTPVerification from '../Components/common/OTPVerification';
+import toast from 'react-hot-toast';
 
 // Custom styled components
 const GradientButton = styled(Button)(({ theme }) => ({
@@ -99,8 +102,103 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentStep, setCurrentStep] = useState('login'); // 'login' or 'otp'
+  const [otpData, setOtpData] = useState(null);
+  
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    
+    if (!email || !password) {
+      toast.error('Please fill in all fields');
+      return;
+    }
+
+    setIsLoading(true);
+    
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        if (data.data?.requiresOTP) {
+          // OTP verification required
+          toast.success(data.message);
+          setOtpData({
+            sessionId: data.data.sessionId,
+            email: data.data.email
+          });
+          setCurrentStep('otp');
+        } else {
+          // Direct login without OTP
+          localStorage.setItem('token', data.token);
+          login(data.user);
+          toast.success('Welcome back!');
+          navigate('/');
+        }
+      } else {
+        toast.error(data.message || 'Login failed');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      toast.error('Network error. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle OTP verification success
+  const handleOTPSuccess = (data) => {
+    // Store token and user data
+    localStorage.setItem('token', data.token);
+    login(data.user);
+    
+    // Navigate to dashboard or home
+    navigate('/');
+  };
+
+  // Handle back to login form
+  const handleBackToLogin = () => {
+    setCurrentStep('login');
+    setOtpData(null);
+  };
+
+  // Handle OTP resend
+  const handleResendOTP = (newSessionId) => {
+    setOtpData(prev => ({
+      ...prev,
+      sessionId: newSessionId
+    }));
+  };
+
+  // If we're in OTP verification step, show OTP component
+  if (currentStep === 'otp' && otpData) {
+    return (
+      <OTPVerification
+        email={otpData.email}
+        sessionId={otpData.sessionId}
+        purpose="login"
+        onSuccess={handleOTPSuccess}
+        onBack={handleBackToLogin}
+        onResendOTP={handleResendOTP}
+        isLoading={isLoading}
+      />
+    );
+  }
 
   return (
     <Box
@@ -196,13 +294,15 @@ const LoginPage = () => {
             </div>
 
             <div>
-              <Box component="form" sx={{ mb: 3 }}>
+              <Box component="form" onSubmit={handleLogin} sx={{ mb: 3 }}>
                 <StyledTextField
                   fullWidth
                   label="Email Address"
-                  
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   variant="outlined"
                   type="email"
+                  required
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start" sx={{ color: 'rgba(255,255,255,0.5)' }}>
@@ -216,8 +316,11 @@ const LoginPage = () => {
                 <StyledTextField
                   fullWidth
                   label="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   variant="outlined"
                   type={showPassword ? 'text' : 'password'}
+                  required
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start" sx={{ color: 'rgba(255,255,255,0.5)' }}>
@@ -276,6 +379,8 @@ const LoginPage = () => {
                     fullWidth
                     variant="contained"
                     size="large"
+                    type="submit"
+                    disabled={isLoading}
                     sx={{ py: 1.5 }}
                     endIcon={
                       <div>
@@ -283,7 +388,7 @@ const LoginPage = () => {
                       </div>
                     }
                   >
-                    Sign In
+                    {isLoading ? 'Signing In...' : 'Sign In'}
                   </GradientButton>
                 </div>
               </Box>

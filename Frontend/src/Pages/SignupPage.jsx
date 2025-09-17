@@ -27,7 +27,10 @@ import {
   Apple,
   CheckCircle
 } from '@mui/icons-material';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import OTPVerification from '../Components/common/OTPVerification';
+import toast from 'react-hot-toast';
 
 // Custom styled components
 const GradientButton = styled(Button)(({ theme }) => ({
@@ -96,11 +99,127 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
 const SignupPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [agreeToTerms, setAgreeToTerms] = useState(false);
+  const [currentStep, setCurrentStep] = useState('signup'); // 'signup' or 'otp'
+  const [otpData, setOtpData] = useState(null);
+  
   const isLargeScreen = useMediaQuery('(min-width:1200px)');
   const isMediumScreen = useMediaQuery('(min-width:900px)');
+  
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleClickShowConfirmPassword = () => setShowConfirmPassword((show) => !show);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSignup = async (e) => {
+    e.preventDefault();
+    
+    if (!formData.firstName || !formData.lastName || !formData.email || !formData.password || !formData.confirmPassword) {
+      toast.error('Please fill in all fields');
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      toast.error('Passwords do not match');
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      toast.error('Password must be at least 6 characters long');
+      return;
+    }
+
+    if (!agreeToTerms) {
+      toast.error('Please agree to the Terms of Service and Privacy Policy');
+      return;
+    }
+ 
+    setIsLoading(true);
+    
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success(data.message);
+        setOtpData({ 
+          sessionId: data.data.sessionId,
+          email: data.data.email
+        });
+        setCurrentStep('otp');
+      } else {
+        toast.error(data.message || 'Registration failed');
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+      toast.error('Network error. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle OTP verification success
+  const handleOTPSuccess = (data) => {
+    // Store token and user data
+    localStorage.setItem('token', data.token);
+    login(data.user);
+    
+    // Navigate to dashboard or home
+    navigate('/');
+  };
+
+  // Handle back to signup form
+  const handleBackToSignup = () => {
+    setCurrentStep('signup');
+    setOtpData(null);
+  };
+
+  // Handle OTP resend
+  const handleResendOTP = (newSessionId) => {
+    setOtpData(prev => ({
+      ...prev,
+      sessionId: newSessionId
+    }));
+  };
+
+  // If we're in OTP verification step, show OTP component
+  if (currentStep === 'otp' && otpData) {
+    return (
+      <OTPVerification
+        email={otpData.email}
+        sessionId={otpData.sessionId}
+        purpose="signup"
+        onSuccess={handleOTPSuccess}
+        onBack={handleBackToSignup}
+        onResendOTP={handleResendOTP}
+        isLoading={isLoading}
+      />
+    );
+  }
 
   return (
     <Box
@@ -183,12 +302,16 @@ const SignupPage = () => {
             </div>
 
             <div>
-              <Box component="form" sx={{ mb: 3 }}>
+              <Box component="form" onSubmit={handleSignup} sx={{ mb: 3 }}>
               
                     <StyledTextField
                       fullWidth
                       label="First Name"
+                      name="firstName"
+                      value={formData.firstName}
+                      onChange={handleInputChange}
                       variant="outlined"
+                      required
                       InputProps={{
                         startAdornment: (
                           <InputAdornment position="start" sx={{ color: 'rgba(255,255,255,0.5)' }}>
@@ -201,7 +324,11 @@ const SignupPage = () => {
                     <StyledTextField
                       fullWidth
                       label="Last Name"
+                      name="lastName"
+                      value={formData.lastName}
+                      onChange={handleInputChange}
                       variant="outlined"
+                      required
                       InputProps={{
                         startAdornment: (
                           <InputAdornment position="start" sx={{ color: 'rgba(255,255,255,0.5)' }}>
@@ -217,8 +344,12 @@ const SignupPage = () => {
                 <StyledTextField
                   fullWidth
                   label="Email Address"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
                   variant="outlined"
                   type="email"
+                  required
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start" sx={{ color: 'rgba(255,255,255,0.5)' }}>
@@ -232,8 +363,12 @@ const SignupPage = () => {
                 <StyledTextField
                   fullWidth
                   label="Password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleInputChange}
                   variant="outlined"
                   type={showPassword ? 'text' : 'password'}
+                  required
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start" sx={{ color: 'rgba(255,255,255,0.5)' }}>
@@ -259,8 +394,12 @@ const SignupPage = () => {
                 <StyledTextField
                   fullWidth
                   label="Confirm Password"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleInputChange}
                   variant="outlined"
                   type={showConfirmPassword ? 'text' : 'password'}
+                  required
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start" sx={{ color: 'rgba(255,255,255,0.5)' }}>
@@ -277,7 +416,7 @@ const SignupPage = () => {
                         >
                           {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
                         </IconButton>
-                      </InputAdornment>
+                      </InputAdornment> 
                     ),
                   }}
                   sx={{ mb: 3 }}
@@ -286,7 +425,8 @@ const SignupPage = () => {
                 <FormControlLabel
                   control={
                     <Checkbox 
-                      defaultChecked 
+                      checked={agreeToTerms}
+                      onChange={(e) => setAgreeToTerms(e.target.checked)}
                       sx={{
                         color: 'rgba(255,255,255,0.5)',
                         '&.Mui-checked': {
@@ -308,6 +448,8 @@ const SignupPage = () => {
                     fullWidth
                     variant="contained"
                     size="large"
+                    type="submit"
+                    disabled={isLoading}
                     sx={{ py: 1.5 }}
                     endIcon={
                       <div>
@@ -315,7 +457,7 @@ const SignupPage = () => {
                       </div>
                     }
                   >
-                    Create Account
+                    {isLoading ? 'Creating Account...' : 'Create Account'}
                   </GradientButton>
                 </div>
               </Box>

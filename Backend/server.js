@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const testRoutes = require('./routes/testRoutes');
+const pdfRoutes = require('./routes/pdfRoutes');
 require('dotenv').config();
 
 // Initialize Express app
@@ -26,6 +27,7 @@ app.use(cors({
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/test', testRoutes);
+app.use('/api/pdf', pdfRoutes);
 
 // Root route
 app.get('/', (req, res) => {

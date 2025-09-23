@@ -46,6 +46,7 @@ import {
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { PentagonOutlined } from '@mui/icons-material';
+import { pdfService } from '../../services';
 
 const CreatePDFPage = () => {
   const theme = useTheme();
@@ -116,21 +117,34 @@ const CreatePDFPage = () => {
     setIsProcessing(true);
     
     try {
-      // Simulate processing time
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Get all files from images array
+      const imageFiles = images.map(img => img.file);
       
-      // In real app, this would call an API to generate the PDF
-      // For now, we'll simulate success
-      setProcessedFile({
-        url: '#', // Mock URL - in a real app, this would be the download URL
-        name: 'document.pdf',
-        size: Math.floor(Math.random() * 1000000) + 100000, // Random size between 100KB-1.1MB
-      });
+      // Set options
+      const options = {
+        pageSize,
+        imagesPerPage,
+        preserveAspectRatio,
+      };
       
-      toast.success('PDF created successfully!');
+      // Call API to create PDF
+      const response = await pdfService.createPDFFromImages(imageFiles, options);
+      
+      if (response.success) {
+        // Set processed file with data from API
+        setProcessedFile({
+          url: pdfService.getPDFDownloadUrl(response.data.filename),
+          name: response.data.filename,
+          size: response.data.size,
+        });
+        
+        toast.success('PDF created successfully!');
+      } else {
+        throw new Error(response.message || 'Failed to create PDF');
+      }
     } catch (err) {
       console.error('Error creating PDF:', err);
-      setError('An unexpected error occurred. Please try again.');
+      setError(err.message || 'An unexpected error occurred. Please try again.');
       toast.error('Failed to create PDF');
     } finally {
       setIsProcessing(false);
@@ -138,8 +152,11 @@ const CreatePDFPage = () => {
   };
 
   const handleDownload = () => {
-    toast.success('Downloading your PDF');
-    // In a real app, this would initiate the download
+    if (processedFile && processedFile.url) {
+      // Open the download URL in a new tab
+      window.open(processedFile.url, '_blank');
+      toast.success('Downloading your PDF');
+    }
   };
 
   const handleReset = () => {

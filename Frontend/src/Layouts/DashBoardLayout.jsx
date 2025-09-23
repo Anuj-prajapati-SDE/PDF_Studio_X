@@ -63,7 +63,7 @@ import Sidebar from './Sidebar';
 
 const drawerWidth = 280;
 
-const DashboardLayout = () => { 
+const DashBoardLayout = () => { 
   const [mobileOpen, setMobileOpen] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('lg'));
@@ -650,4 +650,4 @@ const DashboardLayout = () => {
   );
 };
 
-export default DashboardLayout;
+export default DashBoardLayout;

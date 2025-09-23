@@ -2,9 +2,6 @@ import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, CssBaseline, GlobalStyles } from '@mui/material';
 import { Toaster } from 'react-hot-toast';
-
-import AOS from 'aos';
-import 'aos/dist/aos.css';
 import 'swiper/css';
 import 'swiper/css/effect-coverflow';
 import 'swiper/css/pagination';
@@ -17,39 +14,39 @@ import { AuthProvider } from './context/AuthContext';
 
 // Layouts
 import MainLayout from './Layouts/MainLayout';
-// import DashboardLayout from './Layouts/DashBoardLayout.jsx';
 
 // Pages
 import HomePage from './Pages/Home/HomePage';
-// import MergePDFPage from './Pages/UserDashboard/MergePDFPage';
-// import SplitPDFPage from './Pages/UserDashboard/SplitPDFPage';
-// import ConvertPDFPage from './Pages/UserDashboard/ConvertPDFPage';
-// import CreatePDFPage from './Pages/UserDashboard/CreatePDFPage';
-// import ProtectPDFPage from './Pages/UserDashboard/ProtectedPDFPage';
+import MergePDFPage from './Pages/UserDashboard/MergePDFPage';
+import SplitPDFPage from './Pages/UserDashboard/SplitPDFPage';
+import ConvertPDFPage from './Pages/UserDashboard/ConvertPDFPage';
+import CreatePDFPage from './Pages/UserDashboard/CreatePDFPage';
+import ProtectPDFPage from './Pages/UserDashboard/ProtectedPDFPage';
 import AboutPage from './Pages/AboutPage';
 import ContactPage from './Pages/ContactPage.jsx';
 import PricingPage from './Pages/PricingPage';
 import NotFoundPage from './Pages/NotFoundPage';
-// import CompressPDFPage from './Pages/UserDashboard/CompressPDFpage';
-// import PDFToWordPage from './Pages/UserDashboard/PDFToWordPage';
-// import PDFToPowerPointPage from './Pages/UserDashboard/PDFToPowerPointPage';
-// import PDFToExcelPage from './Pages/UserDashboard/PDFToExcelPage';
-// import WordToPDFPage from './Pages/UserDashboard/WordToPDFPage';
-// import PowerPointToPDFPage from './Pages/UserDashboard/PowerPointToPDFPage';
-// import ExcelToPDFPage from './Pages/UserDashboard/ExcelToPDFPage';
-// import ImageCompressionPage from './Pages/UserDashboard/ImageCompressionPage';
-// import PDFToJPGPage from './Pages/UserDashboard/PDFToJPGPage';
-// import WatermarkPDFPage from './Pages/UserDashboard/WaterMarkPDFPage';
-// import UnlockPDFPage from './Pages/UserDashboard/UnlockPDFPage';
-// import CropPDFPage from './Pages/UserDashboard/CropPDFPage';
-// import EditPDFPage from './Pages/UserDashboard/EditPDFPage';
+import CompressPDFPage from './Pages/UserDashboard/CompressPDFpage';
+import PDFToWordPage from './Pages/UserDashboard/PDFToWordPage';
+import PDFToPowerPointPage from './Pages/UserDashboard/PDFToPowerPointPage';
+import PDFToExcelPage from './Pages/UserDashboard/PDFToExcelPage';
+import WordToPDFPage from './Pages/UserDashboard/WordToPDFPage';
+import PowerPointToPDFPage from './Pages/UserDashboard/PowerPointToPDFPage';
+import ExcelToPDFPage from './Pages/UserDashboard/ExcelToPDFPage';
+import ImageCompressionPage from './Pages/UserDashboard/ImageCompressionPage';
+import PDFToJPGPage from './Pages/UserDashboard/PDFToJPGPage';
+import WatermarkPDFPage from './Pages/UserDashboard/WaterMarkPDFPage';
+import UnlockPDFPage from './Pages/UserDashboard/UnlockPDFPage';
+import CropPDFPage from './Pages/UserDashboard/CropPDFPage';
+import EditPDFPage from './Pages/UserDashboard/EditPDFPage';
 import SignupPage from './Pages/Auth/SignupPage';
 import LoginPage from './Pages/Auth/LoginPage';
 import OTPVerification from './Pages/Auth/OTPVerification';
 import ForgotPasswordPage from './Pages/Auth/ForgotPasswordPage';
 import ResetPasswordPage from './Pages/Auth/ResetPasswordPage';
-// import DashboardPage from './Pages/UserDashboard/DashboardPage';
+import DashboardPage from './Pages/UserDashboard/DashboardPage';
 // import JPGToPDFPage from './Pages/JPGToPDF.JSX';
+import DashBoardLayout from './Layouts/DashBoardLayout.jsx';
 
 // Global styles
 const globalStyles = {
@@ -122,14 +119,6 @@ const globalStyles = {
 };
 
 function App() {
-  useEffect(() => {
-    AOS.init({
-      duration: 800,
-      once: false,
-      easing: 'ease-in-out',
-    });
-  }, []);
-
   return (
     <AuthProvider>
       <ThemeProvider theme={theme}>
@@ -159,10 +148,10 @@ function App() {
               <Route path="login" element={<LoginPage />} />
               <Route path="forgot-password" element={<ForgotPasswordPage />} />
               <Route path="reset-password" element={<ResetPasswordPage />} />
-              <Route path="otp-verification" element={<OTPVerification />} />
-            
+              <Route path="otp-verification" element={<OTPVerification />} />  
             </Route>
-            {/* <Route path="/tools" element={<DashboardLayout />}>
+
+            <Route path="/tools" element={<DashBoardLayout/>}>
               <Route index path="dashboard" element={<DashboardPage/>} />
               <Route path="merge-pdf" element={<MergePDFPage />} />
               <Route path="split-pdf" element={<SplitPDFPage />} />
@@ -178,14 +167,14 @@ function App() {
               <Route path="excel-to-pdf" element={<ExcelToPDFPage/>} />
               <Route path="image-compression" element={<ImageCompressionPage/>} />
               <Route path="pdf-to-jpg" element={<PDFToJPGPage/>} />
-              <Route path="jpg-to-pdf" element={<JPGToPDFPage/>} />
-              <Route path="add-sign" element={<SignPDFPage/>} />
+              {/* <Route path="jpg-to-pdf" element={<JPGToPDFPage/>} /> */}
+              <Route path="add-sign" element={<SignupPage/>} />
               <Route path="watermark-pdf" element={<WatermarkPDFPage/>} />
               <Route path="unlock-pdf" element={<UnlockPDFPage/>} />
               <Route path="crop-pdf" element={<CropPDFPage/>} />  
               <Route path="edit-pdf" element={<EditPDFPage/>} />
             
-            </Route> */}
+            </Route>
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </BrowserRouter>

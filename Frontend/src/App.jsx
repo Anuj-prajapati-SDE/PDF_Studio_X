@@ -162,7 +162,7 @@ function App() {
               <Route path="otp-verification" element={<OTPVerification />} />
             
             </Route>
-            <Route path="/tools" element={<DashboardLayout />}>
+            {/* <Route path="/tools" element={<DashboardLayout />}>
               <Route index path="dashboard" element={<DashboardPage/>} />
               <Route path="merge-pdf" element={<MergePDFPage />} />
               <Route path="split-pdf" element={<SplitPDFPage />} />
@@ -178,14 +178,14 @@ function App() {
               <Route path="excel-to-pdf" element={<ExcelToPDFPage/>} />
               <Route path="image-compression" element={<ImageCompressionPage/>} />
               <Route path="pdf-to-jpg" element={<PDFToJPGPage/>} />
-              {/* <Route path="jpg-to-pdf" element={<JPGToPDFPage/>} /> */}
-              {/* <Route path="add-sign" element={<SignPDFPage/>} /> */}
+              <Route path="jpg-to-pdf" element={<JPGToPDFPage/>} />
+              <Route path="add-sign" element={<SignPDFPage/>} />
               <Route path="watermark-pdf" element={<WatermarkPDFPage/>} />
               <Route path="unlock-pdf" element={<UnlockPDFPage/>} />
               <Route path="crop-pdf" element={<CropPDFPage/>} />  
               <Route path="edit-pdf" element={<EditPDFPage/>} />
             
-            </Route>
+            </Route> */}
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </BrowserRouter>

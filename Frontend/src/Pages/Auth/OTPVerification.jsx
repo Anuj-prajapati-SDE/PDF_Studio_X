@@ -21,6 +21,7 @@ import {
 } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
+import { getApiUrl } from '../../utils/api';
 
 // Styled components
 const OTPInput = styled('input')(({ theme, error }) => ({
@@ -181,16 +182,16 @@ const OTPVerification = ({
       
       // Determine the endpoint based on purpose
       if (purpose === 'signup') {
-        endpoint = '/api/auth/verify-signup-otp';
+        endpoint = '/auth/verify-signup-otp';
       } else if (purpose === 'login') {
-        endpoint = '/api/auth/verify-login-otp';
+        endpoint = '/auth/verify-login-otp';
       } else if (purpose === 'reset-password') {
-        endpoint = '/api/auth/verify-reset-otp';
+        endpoint = '/auth/verify-reset-otp';
       } else {
-        endpoint = '/api/auth/verify-login-otp'; // Default fallback
+        endpoint = '/auth/verify-login-otp'; // Default fallback
       }
 
-      const response = await fetch(`http://localhost:5000${endpoint}`, {
+      const response = await fetch(getApiUrl(endpoint), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -233,7 +234,7 @@ const OTPVerification = ({
     if (!canResend || resendCooldown > 0) return;
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/resend-otp', {
+      const response = await fetch(getApiUrl('/auth/resend-otp'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

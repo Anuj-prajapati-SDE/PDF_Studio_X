@@ -8,6 +8,7 @@ import MergeIcon from '@mui/icons-material/Merge';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import toast from 'react-hot-toast';
 import axios from 'axios';
+import { getApiUrl } from '../../utils/api';
 // import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 // Mock implementation - replace with actual API call in production
@@ -21,7 +22,7 @@ const mergePDFs = async (files) => {
 
   try {
     // Replace with your actual API endpoint
-    const response = await axios.post('http://localhost:5000/api/pdf/merge', formData, {
+    const response = await axios.post(getApiUrl('/pdf/merge'), formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       },

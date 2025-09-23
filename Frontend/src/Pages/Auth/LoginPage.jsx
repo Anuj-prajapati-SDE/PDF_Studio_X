@@ -33,6 +33,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import OTPVerification from './OTPVerification';
 import toast from 'react-hot-toast';
+import { getApiUrl } from '../../utils/api';
 
 // Custom styled components
 const GradientButton = styled(Button)(({ theme }) => ({
@@ -124,7 +125,7 @@ const LoginPage = () => {
     setIsLoading(true);
     
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+      const response = await fetch(getApiUrl('/auth/login'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

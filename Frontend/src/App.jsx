@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, CssBaseline, GlobalStyles } from '@mui/material';
 import { Toaster } from 'react-hot-toast';
-import { AnimatePresence } from 'framer-motion';
+
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import 'swiper/css';
@@ -17,7 +17,7 @@ import { AuthProvider } from './context/AuthContext';
 
 // Layouts
 import MainLayout from './Layouts/MainLayout';
-import DashboardLayout from './layouts/DashboardLayout';
+import DashboardLayout from './Layouts/DashBoardLayout.jsx';
 
 // Pages
 import HomePage from './Pages/Home/HomePage';
@@ -163,6 +163,7 @@ function App() {
             
             </Route>
             <Route path="/tools" element={<DashboardLayout />}>
+              <Route index path="dashboard" element={<DashboardPage/>} />
               <Route path="merge-pdf" element={<MergePDFPage />} />
               <Route path="split-pdf" element={<SplitPDFPage />} />
               <Route path="convert-pdf" element={<ConvertPDFPage />} />
@@ -183,7 +184,7 @@ function App() {
               <Route path="unlock-pdf" element={<UnlockPDFPage/>} />
               <Route path="crop-pdf" element={<CropPDFPage/>} />  
               <Route path="edit-pdf" element={<EditPDFPage/>} />
-              <Route path="dashboard" element={<DashboardPage/>} />
+            
             </Route>
             <Route path="*" element={<NotFoundPage />} />
           </Routes>

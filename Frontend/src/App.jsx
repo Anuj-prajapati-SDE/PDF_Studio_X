@@ -16,7 +16,7 @@ import theme from './theme';
 import { AuthProvider } from './context/AuthContext';
 
 // Layouts
-import MainLayout from './layouts/MainLayout';
+import MainLayout from './Layouts/MainLayout';
 import DashboardLayout from './layouts/DashboardLayout';
 
 // Pages

@@ -17,38 +17,38 @@ import { AuthProvider } from './context/AuthContext';
 
 // Layouts
 import MainLayout from './Layouts/MainLayout';
-import DashboardLayout from './Layouts/DashBoardLayout.jsx';
+// import DashboardLayout from './Layouts/DashBoardLayout.jsx';
 
 // Pages
 import HomePage from './Pages/Home/HomePage';
-import MergePDFPage from './Pages/UserDashboard/MergePDFPage';
-import SplitPDFPage from './Pages/UserDashboard/SplitPDFPage';
-import ConvertPDFPage from './Pages/UserDashboard/ConvertPDFPage';
-import CreatePDFPage from './Pages/UserDashboard/CreatePDFPage';
-import ProtectPDFPage from './Pages/UserDashboard/ProtectedPDFPage';
-import AboutPage from './pages/AboutPage';
-import ContactPage from './pages/ContactPage';
+// import MergePDFPage from './Pages/UserDashboard/MergePDFPage';
+// import SplitPDFPage from './Pages/UserDashboard/SplitPDFPage';
+// import ConvertPDFPage from './Pages/UserDashboard/ConvertPDFPage';
+// import CreatePDFPage from './Pages/UserDashboard/CreatePDFPage';
+// import ProtectPDFPage from './Pages/UserDashboard/ProtectedPDFPage';
+import AboutPage from './Pages/AboutPage';
+import ContactPage from './Pages/ContactPage.jsx';
 import PricingPage from './Pages/PricingPage';
-import NotFoundPage from './pages/NotFoundPage';
-import CompressPDFPage from './Pages/UserDashboard/CompressPDFpage';
-import PDFToWordPage from './Pages/UserDashboard/PDFToWordPage';
-import PDFToPowerPointPage from './Pages/UserDashboard/PDFToPowerPointPage';
-import PDFToExcelPage from './Pages/UserDashboard/PDFToExcelPage';
-import WordToPDFPage from './Pages/UserDashboard/WordToPDFPage';
-import PowerPointToPDFPage from './Pages/UserDashboard/PowerPointToPDFPage';
-import ExcelToPDFPage from './Pages/UserDashboard/ExcelToPDFPage';
-import ImageCompressionPage from './Pages/UserDashboard/ImageCompressionPage';
-import PDFToJPGPage from './Pages/UserDashboard/PDFToJPGPage';
-import WatermarkPDFPage from './Pages/UserDashboard/WaterMarkPDFPage';
-import UnlockPDFPage from './Pages/UserDashboard/UnlockPDFPage';
-import CropPDFPage from './Pages/UserDashboard/CropPDFPage';
-import EditPDFPage from './Pages/UserDashboard/EditPDFPage';
+import NotFoundPage from './Pages/NotFoundPage';
+// import CompressPDFPage from './Pages/UserDashboard/CompressPDFpage';
+// import PDFToWordPage from './Pages/UserDashboard/PDFToWordPage';
+// import PDFToPowerPointPage from './Pages/UserDashboard/PDFToPowerPointPage';
+// import PDFToExcelPage from './Pages/UserDashboard/PDFToExcelPage';
+// import WordToPDFPage from './Pages/UserDashboard/WordToPDFPage';
+// import PowerPointToPDFPage from './Pages/UserDashboard/PowerPointToPDFPage';
+// import ExcelToPDFPage from './Pages/UserDashboard/ExcelToPDFPage';
+// import ImageCompressionPage from './Pages/UserDashboard/ImageCompressionPage';
+// import PDFToJPGPage from './Pages/UserDashboard/PDFToJPGPage';
+// import WatermarkPDFPage from './Pages/UserDashboard/WaterMarkPDFPage';
+// import UnlockPDFPage from './Pages/UserDashboard/UnlockPDFPage';
+// import CropPDFPage from './Pages/UserDashboard/CropPDFPage';
+// import EditPDFPage from './Pages/UserDashboard/EditPDFPage';
 import SignupPage from './Pages/Auth/SignupPage';
 import LoginPage from './Pages/Auth/LoginPage';
 import OTPVerification from './Pages/Auth/OTPVerification';
 import ForgotPasswordPage from './Pages/Auth/ForgotPasswordPage';
 import ResetPasswordPage from './Pages/Auth/ResetPasswordPage';
-import DashboardPage from './Pages/UserDashboard/DashboardPage';
+// import DashboardPage from './Pages/UserDashboard/DashboardPage';
 // import JPGToPDFPage from './Pages/JPGToPDF.JSX';
 
 // Global styles

@@ -5,8 +5,16 @@ require('dotenv').config();
 // Middleware to protect routes
 const auth = async (req, res, next) => {
   try {
-    // Get token from header
-    const token = req.header('Authorization')?.replace('Bearer ', '');
+    let token;
+    
+    // Check for token in cookies first (more secure)
+    if (req.cookies && req.cookies.auth_token) {
+      token = req.cookies.auth_token;
+    } 
+    // Fallback to Authorization header
+    else {
+      token = req.header('Authorization')?.replace('Bearer ', '');
+    }
     
     // Check if token exists
     if (!token) {
@@ -40,6 +48,9 @@ const auth = async (req, res, next) => {
     
     // Add user to request object
     req.user = user;
+    
+    // Add token to request for potential refresh
+    req.token = token;
     
     next();
   } catch (error) {

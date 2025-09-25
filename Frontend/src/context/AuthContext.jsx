@@ -14,34 +14,55 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [authStatus, setAuthStatus] = useState(false);
 
   // Function to check if user is authenticated and get user data
   const checkAuth = async () => {
+    // Check both cookies and localStorage for auth status
     const token = localStorage.getItem('token');
-    if (!token) {
+    // auth_status cookie is set as a non-HTTP-only cookie to check if user is authenticated
+    const cookieAuth = document.cookie.split(';').some(item => item.trim().startsWith('auth_status='));
+    
+    if (!token && !cookieAuth) {
       setIsLoading(false);
+      setAuthStatus(false);
       return;
     }
 
+    // Set auth status to true if either token or cookie exists
+    setAuthStatus(true);
+
     try {
-      const response = await makeAuthenticatedRequest(getApiUrl('/auth/me'));
+      // This will use HTTP-only cookie if available, falling back to localStorage token
+      const response = await makeAuthenticatedRequest(getApiUrl('/auth/me'), {
+        credentials: 'include' // Important: This tells fetch to include cookies
+      });
 
       const data = await response.json();
 
       if (data.success) {
         setUser(data.user);
       } else {
-        // Token is invalid, remove it
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        // Auth is invalid, clear everything
+        clearAuth();
       }
     } catch (error) {
       console.error('Auth check failed:', error);
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
+      clearAuth();
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Helper function to clear all auth data
+  const clearAuth = () => {
+    setUser(null);
+    setAuthStatus(false);
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    // We can't clear HTTP-only cookies from frontend directly, 
+    // but we set a flag to know auth status is false
+    document.cookie = 'auth_status=; max-age=0; path=/;';
   };
 
   useEffect(() => {
@@ -50,27 +71,30 @@ export const AuthProvider = ({ children }) => {
 
   const login = (userData) => {
     setUser(userData);
+    setAuthStatus(true);
     localStorage.setItem('user', JSON.stringify(userData));
   };
 
   const logout = async () => {
-    const token = localStorage.getItem('token');
-    
     try {
-      // Call logout endpoint if token exists
-      if (token) {
+      // Call logout endpoint if authenticated
+      if (isAuthenticated()) {
         await makeAuthenticatedRequest(getApiUrl('/auth/logout'), {
           method: 'POST',
+          credentials: 'include' // Include cookies in request
         });
       }
     } catch (error) {
       console.error('Logout request failed:', error);
     }
     
-    // Clear local storage and state
-    setUser(null);
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
+    // Clear all auth data
+    clearAuth();
+  };
+  
+  // Helper to check if user is authenticated
+  const isAuthenticated = () => {
+    return authStatus && !!user;
   };
 
   // Register with OTP verification
@@ -82,6 +106,7 @@ export const AuthProvider = ({ children }) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(userData),
+        credentials: 'include' // Include cookies in request/response
       });
 
       const data = await response.json();
@@ -104,14 +129,16 @@ export const AuthProvider = ({ children }) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ sessionId, otp }),
+        credentials: 'include' // Include cookies in request/response
       });
 
       const data = await response.json();
       
       if (data.success) {
-        // Store token and user data
+        // Store token in localStorage (the HTTP-only cookie is automatically set by the backend)
         localStorage.setItem('token', data.token);
         setUser(data.user);
+        setAuthStatus(true);
         localStorage.setItem('user', JSON.stringify(data.user));
       }
       
@@ -134,6 +161,7 @@ export const AuthProvider = ({ children }) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email, password }),
+        credentials: 'include' // Include cookies in request/response
       });
 
       const data = await response.json();
@@ -142,6 +170,7 @@ export const AuthProvider = ({ children }) => {
         // Direct login without OTP
         localStorage.setItem('token', data.token);
         setUser(data.user);
+        setAuthStatus(true);
         localStorage.setItem('user', JSON.stringify(data.user));
       }
       
@@ -164,14 +193,16 @@ export const AuthProvider = ({ children }) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ sessionId, otp }),
+        credentials: 'include' // Include cookies in request/response
       });
 
       const data = await response.json();
       
       if (data.success) {
-        // Store token and user data
+        // Store token in localStorage (the HTTP-only cookie is automatically set by the backend)
         localStorage.setItem('token', data.token);
         setUser(data.user);
+        setAuthStatus(true);
         localStorage.setItem('user', JSON.stringify(data.user));
       }
       
@@ -194,6 +225,7 @@ export const AuthProvider = ({ children }) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ sessionId }),
+        credentials: 'include' // Include cookies in request/response
       });
 
       const data = await response.json();
@@ -216,6 +248,7 @@ export const AuthProvider = ({ children }) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email }),
+        credentials: 'include' // Include cookies in request/response
       });
 
       const data = await response.json();
@@ -238,6 +271,7 @@ export const AuthProvider = ({ children }) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ token, newPassword }),
+        credentials: 'include' // Include cookies in request/response
       });
 
       const data = await response.json();
@@ -260,6 +294,7 @@ export const AuthProvider = ({ children }) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ token }),
+        credentials: 'include' // Include cookies in request/response
       });
 
       const data = await response.json();
@@ -279,24 +314,32 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('user', JSON.stringify({ ...user, ...updatedUserData }));
   };
 
-  // Check if token is valid
+  // Check if token is valid - now checks both localStorage and cookies
   const isTokenValid = () => {
-    const token = localStorage.getItem('token');
-    if (!token) return false;
+    // Check for auth_status cookie which indicates valid authentication
+    const cookieAuth = document.cookie.split(';').some(item => item.trim().startsWith('auth_status='));
     
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      return payload.exp * 1000 > Date.now();
-    } catch {
-      return false;
+    // Also check localStorage token if it exists
+    const token = localStorage.getItem('token');
+    if (!token && !cookieAuth) return false;
+    
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return payload.exp * 1000 > Date.now();
+      } catch {
+        return cookieAuth; // Fallback to cookie auth if token parsing fails
+      }
     }
+    
+    return cookieAuth;
   };
 
   const value = {
     user,
     login,
     logout,
-    isAuthenticated: !!user,
+    isAuthenticated: isAuthenticated(),
     isLoading,
     // OTP-related methods
     registerWithOTP,

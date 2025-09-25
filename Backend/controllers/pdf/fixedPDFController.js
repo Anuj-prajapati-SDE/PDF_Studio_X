@@ -3,7 +3,6 @@ const path = require('path');
 const PDFDocument = require('pdfkit');
 const { v4: uuidv4 } = require('uuid');
 const multer = require('multer');
-const sharp = require('sharp');
 
 // Set up storage for file uploads
 const storage = multer.diskStorage({
@@ -77,6 +76,7 @@ const handleMulterUpload = (req, res) => {
 // Controller for creating PDF from images
 exports.createPDFFromImages = async (req, res) => {
   try {
+    console.log('Starting PDF creation process');
     // Handle file uploads
     const files = await handleMulterUpload(req, res);
     
@@ -86,6 +86,8 @@ exports.createPDFFromImages = async (req, res) => {
         message: 'Please upload at least one image'
       });
     }
+
+    console.log(`Received ${files.length} images`);
 
     // Get options from request body
     const {
@@ -98,158 +100,34 @@ exports.createPDFFromImages = async (req, res) => {
     const pdfFilename = `${uuidv4()}.pdf`;
     const pdfPath = path.join(__dirname, '../../uploads/temp', pdfFilename);
     
+    console.log(`Creating PDF: ${pdfPath}`);
+    
     // Create a new PDF document
     const { width, height } = pageSizes[pageSize] || pageSizes['A4'];
-    const doc = new PDFDocument({ size: [width, height] });
+    const doc = new PDFDocument({ 
+      size: [width, height],
+      info: {
+        Title: 'PDF Studio X Generated Document',
+        Author: 'PDF Studio X'
+      },
+      compress: false // Disable compression to avoid potential issues
+    });
     
     // Pipe to output file
     const outputStream = fs.createWriteStream(pdfPath);
     doc.pipe(outputStream);
     
-    // Process images and add to PDF
-    const processImage = async (file, pageIndex, imageIndex) => {
-      try {
-        // First check if the file is readable and is a valid image
-        try {
-          await sharp(file.path).metadata();
-        } catch (err) {
-          console.error(`Invalid image file at ${file.path}:`, err);
-          return false;
-        }
-        
-        // Calculate image position and size based on imagesPerPage
-        let imagesPerRow, rowCount;
-        
-        switch (parseInt(imagesPerPage)) {
-          case 1:
-            imagesPerRow = 1;
-            rowCount = 1;
-            break;
-          case 2:
-            imagesPerRow = 1;
-            rowCount = 2;
-            break;
-          case 4:
-            imagesPerRow = 2;
-            rowCount = 2;
-            break;
-          case 6:
-            imagesPerRow = 2;
-            rowCount = 3;
-            break;
-          default:
-            imagesPerRow = 1;
-            rowCount = 1;
-        }
-        
-        // Calculate image width and height
-        const margin = 50;
-        const availableWidth = width - (margin * 2);
-        const availableHeight = height - (margin * 2);
-        
-        const imgWidth = availableWidth / imagesPerRow;
-        const imgHeight = availableHeight / rowCount;
-        
-        // Calculate position (which cell in the grid)
-        const row = Math.floor(imageIndex / imagesPerRow);
-        const col = imageIndex % imagesPerRow;
-        
-        const xPos = margin + (col * imgWidth);
-        const yPos = margin + (row * imgHeight);
-        
-        // Resize and process image with sharp
-        const metadata = await sharp(file.path).metadata();
-        
-        let resizeOptions = {};
-        
-        if (preserveAspectRatio) {
-          // Maintain aspect ratio by fitting within the cell
-          resizeOptions = {
-            fit: sharp.fit.inside,
-            width: imgWidth - 10, // Subtract some padding
-            height: imgHeight - 10, // Subtract some padding
-          };
-        } else {
-          // Fill the cell completely
-          resizeOptions = {
-            fit: sharp.fit.fill,
-            width: imgWidth - 10,
-            height: imgHeight - 10,
-          };
-        }
-        
-        // Process and save the image temporarily
-        const processedImagePath = path.join(
-          path.dirname(file.path),
-          `processed_${path.basename(file.path)}`
-        );
-        
-        // Determine original image format and maintain color profile
-        const imageFormat = path.extname(file.path).toLowerCase();
-        let sharpInstance = sharp(file.path)
-          .resize(resizeOptions);
-        
-        // Ensure color profile is preserved and processing is appropriate for the image format
-        if (imageFormat === '.jpg' || imageFormat === '.jpeg') {
-          // For JPEGs, preserve color profile and use high quality
-          sharpInstance = sharpInstance.jpeg({ quality: 100, mozjpeg: true });
-        } else if (imageFormat === '.png') {
-          // For PNGs, ensure alpha channel is preserved
-          sharpInstance = sharpInstance.png({ compressionLevel: 0 });
-        } else {
-          // For other formats, convert to PNG with max quality
-          sharpInstance = sharpInstance.png({ compressionLevel: 0 });
-        }
-        
-        // Ensure we're maintaining all color information
-        await sharpInstance
-          .withMetadata() // Preserve metadata including color profiles
-          .toFile(processedImagePath);
-        
-        // Calculate centering within the cell
-        const processedMetadata = await sharp(processedImagePath).metadata();
-        
-        const xOffset = (imgWidth - processedMetadata.width) / 2;
-        const yOffset = (imgHeight - processedMetadata.height) / 2;
-        
-        // Add the image to the PDF with explicit rendering options
-        doc.image(
-          processedImagePath,
-          xPos + xOffset,
-          yPos + yOffset,
-          {
-            width: processedMetadata.width,
-            height: processedMetadata.height,
-            align: 'center',
-            valign: 'center',
-            // Force the color space to RGB which helps with proper color rendering
-            // Skip the image format sniffing
-            format: 'png'
-          }
-        );
-        
-        // Remove the processed image after a small delay to ensure PDFKit has finished with it
-        setTimeout(() => {
-          fs.unlink(processedImagePath, (err) => {
-            if (err) console.error('Error removing processed image:', err);
-          });
-        }, 100);
-        
-        return true;
-      } catch (error) {
-        console.error('Error processing image:', error);
-        return false;
-      }
-    };
-    
     // Calculate how many images to place per page
     const imagesPerPageCount = parseInt(imagesPerPage);
     const totalPages = Math.ceil(files.length / imagesPerPageCount);
     
-    // Process images page by page
-    let processingErrors = [];
+    console.log(`Using page size: ${pageSize}, ${width}x${height}`);
+    console.log(`Images per page: ${imagesPerPageCount}, Total pages: ${totalPages}`);
     
+    // Process images page by page
     for (let page = 0; page < totalPages; page++) {
+      console.log(`Processing page ${page + 1}`);
+      
       if (page > 0) {
         doc.addPage({ size: [width, height] });
       }
@@ -257,35 +135,87 @@ exports.createPDFFromImages = async (req, res) => {
       const startIdx = page * imagesPerPageCount;
       const endIdx = Math.min(startIdx + imagesPerPageCount, files.length);
       
+      // Calculate the grid layout
+      let imagesPerRow, rowCount;
+      switch (parseInt(imagesPerPage)) {
+        case 2:
+          imagesPerRow = 1;
+          rowCount = 2;
+          break;
+        case 4:
+          imagesPerRow = 2;
+          rowCount = 2;
+          break;
+        case 6:
+          imagesPerRow = 2;
+          rowCount = 3;
+          break;
+        default:
+          imagesPerRow = 1;
+          rowCount = 1;
+      }
+      
+      // Calculate image placement parameters
+      const margin = 50;
+      const availableWidth = width - (margin * 2);
+      const availableHeight = height - (margin * 2);
+      
+      const cellWidth = availableWidth / imagesPerRow;
+      const cellHeight = availableHeight / rowCount;
+      
       // Process images for this page
       for (let i = startIdx; i < endIdx; i++) {
         const imageIndexOnPage = i - startIdx;
-        const success = await processImage(files[i], page, imageIndexOnPage);
+        const file = files[i];
         
-        if (!success) {
-          processingErrors.push({
-            index: i,
-            filename: files[i].originalname || `Image ${i+1}`
-          });
+        try {
+          console.log(`Processing image ${i + 1}: ${file.originalname}`);
           
-          // Add a text notice in the PDF where the image should be
-          const rowCount = Math.ceil(imagesPerPageCount / (imagesPerPageCount > 1 ? 2 : 1));
-          const imagesPerRow = imagesPerPageCount > 1 ? 2 : 1;
-          
+          // Calculate position (which cell in the grid)
           const row = Math.floor(imageIndexOnPage / imagesPerRow);
           const col = imageIndexOnPage % imagesPerRow;
           
-          const margin = 50;
-          const availableWidth = width - (margin * 2);
-          const availableHeight = height - (margin * 2);
+          const xPos = margin + (col * cellWidth);
+          const yPos = margin + (row * cellHeight);
           
-          const cellWidth = availableWidth / imagesPerRow;
-          const cellHeight = availableHeight / rowCount;
+          // Calculate the size and position of the image within its cell
+          const maxImageWidth = cellWidth - 10;
+          const maxImageHeight = cellHeight - 10;
+          
+          // Define image options
+          let imageOptions = {};
+          
+          if (preserveAspectRatio) {
+            // We'll set only the max width/height and let PDFKit handle the aspect ratio
+            if (maxImageWidth < maxImageHeight) {
+              imageOptions.width = maxImageWidth;
+            } else {
+              imageOptions.height = maxImageHeight;
+            }
+          } else {
+            // Force exact dimensions
+            imageOptions.width = maxImageWidth;
+            imageOptions.height = maxImageHeight;
+          }
+          
+          // Calculate the centered position
+          const imageX = xPos + 5;
+          const imageY = yPos + 5;
+          
+          // Add the image directly to the PDF
+          console.log(`Adding image at position (${imageX}, ${imageY})`);
+          doc.image(file.path, imageX, imageY, imageOptions);
+          
+        } catch (error) {
+          console.error(`Error processing image ${i}:`, error);
+          
+          // Add error text to the PDF if image processing fails
+          const row = Math.floor(imageIndexOnPage / imagesPerRow);
+          const col = imageIndexOnPage % imagesPerRow;
           
           const xPos = margin + (col * cellWidth) + (cellWidth / 2);
           const yPos = margin + (row * cellHeight) + (cellHeight / 2);
           
-          // Add error text
           doc.fontSize(12)
              .fillColor('red')
              .text('Image processing error', 
@@ -296,19 +226,17 @@ exports.createPDFFromImages = async (req, res) => {
       }
     }
     
-    // Log any processing errors
-    if (processingErrors.length > 0) {
-      console.warn(`${processingErrors.length} images had processing errors:`, processingErrors);
-    }
-    
     // Finalize the PDF
     doc.end();
+    console.log('PDF document finalized');
     
     // Wait for the PDF to be written
     outputStream.on('finish', () => {
       // Calculate file size
       const stats = fs.statSync(pdfPath);
       const fileSizeInBytes = stats.size;
+      
+      console.log(`PDF created successfully: ${pdfFilename}, size: ${fileSizeInBytes} bytes`);
       
       // Send response with file details
       res.status(200).json({

@@ -21,6 +21,7 @@ export const makeAuthenticatedRequest = async (url, options = {}) => {
       ...defaultHeaders,
       ...options.headers,
     },
+    credentials: 'include', // Always include cookies in authenticated requests
   };
 
   return fetch(url, config);

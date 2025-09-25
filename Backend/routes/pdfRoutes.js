@@ -4,7 +4,7 @@ const auth = require('../middleware/auth');
 const { 
   createPDFFromImages, 
   downloadPDF 
-} = require('../controllers/pdf/createPDFController');
+} = require('../controllers/pdf/fixedPDFController'); // Using the fixed controller
 
 // Routes
 // Create PDF from images - requires authentication

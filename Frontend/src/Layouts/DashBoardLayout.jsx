@@ -3,13 +3,13 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
   Box, 
   Drawer, 
+  SwipeableDrawer,
   AppBar, 
   Toolbar, 
   IconButton, 
   Typography, 
   Breadcrumbs,
   Link as MuiLink,
-
   useMediaQuery,
   useTheme,
   Avatar,
@@ -29,7 +29,8 @@ import {
   CardContent,
   Grid,
   InputBase,
-  Fade
+  Fade,
+  LinearProgress
 } from '@mui/material';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -56,8 +57,7 @@ import {
   Shield as ShieldIcon,
   FilePlus as FilePlusIcon,
   Layers as LayersIcon,
-  ZapOff,
-  FilePlus
+  ZapOff
 } from 'react-feather';
 import Sidebar from './Sidebar';
 
@@ -72,11 +72,30 @@ const DashBoardLayout = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [notificationAnchorEl, setNotificationAnchorEl] = useState(null);
   const [searchFocused, setSearchFocused] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   
-  // Use current date and time as provided in the request
-  const currentDate = "2025-05-03";
-  const currentTime = "18:15:16";
+  // Check for authentication on component mount
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login');
+    } else {
+      setIsLoading(false);
+    }
+  }, [navigate]);
+  
+  // Dynamic date and time functionality
+  const [currentDateTime, setCurrentDateTime] = useState(new Date());
   const username = "Anuj-prajapati-SDE";
+  
+  // Update date and time every minute
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentDateTime(new Date());
+    }, 60000);
+    
+    return () => clearInterval(timer);
+  }, []);
   
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -96,6 +115,18 @@ const DashBoardLayout = () => {
 
   const handleNotificationMenuClose = () => {
     setNotificationAnchorEl(null);
+  };
+  
+  const handleSignOut = () => {
+    // Close menu first
+    handleMenuClose();
+    
+    // Clear authentication data (localStorage, cookies, etc.)
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    
+    // Redirect to login page
+    navigate('/login');
   };
 
 
@@ -129,11 +160,30 @@ const DashBoardLayout = () => {
   const getPageTitle = () => {
     const path = location.pathname.split('/').pop();
     const pathMap = {
+      'dashboard': 'Dashboard',
+      'create-pdf': 'Create PDF',
       'merge-pdf': 'Merge PDF',
       'split-pdf': 'Split PDF',
       'convert-pdf': 'Convert PDF',
-      'create-pdf': 'Create PDF',
       'protect-pdf': 'Protect PDF',
+      'sign-pdf': 'Sign PDF',
+      'watermark-pdf': 'Add Watermark',
+      'unlock-pdf': 'Unlock PDF',
+      'crop-pdf': 'Crop PDF',
+      'word-to-pdf': 'Word to PDF',
+      'pdf-to-word': 'PDF to Word',
+      'jpg-to-pdf': 'JPG to PDF',
+      'pdf-to-jpg': 'PDF to JPG',
+      'excel-to-pdf': 'Excel to PDF',
+      'pdf-to-excel': 'PDF to Excel',
+      'powerpoint-to-pdf': 'PowerPoint to PDF',
+      'pdf-to-powerpoint': 'PDF to PowerPoint',
+      'image-compression': 'Image Compression',
+      'edit-pdf': 'Edit PDF',
+      'compress-pdf': 'Compress PDF',
+      'profile': 'My Profile',
+      'settings': 'Settings',
+      'help': 'Help & Support',
     };
     return pathMap[path] || 'Dashboard';
   };
@@ -160,6 +210,62 @@ const DashBoardLayout = () => {
       },
     },
   };
+
+  // Show loading or error state
+  if (isLoading) {
+    return (
+      <Box 
+        sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center', 
+          minHeight: '100vh',
+          bgcolor: '#030018',
+          color: 'white'
+        }}
+      >
+        <Box 
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 3
+          }}
+        >
+          {/* Logo */}
+          <Box 
+            sx={{ 
+              width: 64,
+              height: 64,
+              borderRadius: 2,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%)',
+              boxShadow: '0 4px 10px rgba(67, 97, 238, 0.3)',
+              mb: 2
+            }}
+          >
+            <Typography variant="h4" sx={{ color: 'white', fontWeight: 800 }}>PDF</Typography>
+          </Box>
+          <Typography variant="h6" sx={{ color: 'white' }}>Loading Dashboard...</Typography>
+          <Box sx={{ width: 200 }}>
+            <LinearProgress 
+              sx={{
+                height: 6, 
+                borderRadius: 3,
+                bgcolor: 'rgba(104, 54, 230, 0.2)',
+                '& .MuiLinearProgress-bar': {
+                  borderRadius: 3,
+                  background: 'linear-gradient(90deg, #7df9ff, #4361ee)',
+                }
+              }}
+            />
+          </Box>
+        </Box>
+      </Box>
+    );
+  }
 
   return (
         <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#030018', color: 'white' }}>
@@ -188,43 +294,28 @@ const DashBoardLayout = () => {
             <MenuIcon />
           </IconButton>
 
-          {/* Search Bar */}
-          <Fade in={!isMobile || searchFocused}>
-            <Paper
-              component="form"
-              elevation={0}
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                width: { xs: searchFocused ? '100%' : 'auto', sm: 'auto', md: 300 },
-                position: searchFocused && isMobile ? 'absolute' : 'relative',
-                left: searchFocused && isMobile ? 0 : 'auto',
-                background: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid',
-                borderColor: searchFocused ? '#7df9ff' : 'rgba(255, 255, 255, 0.2)',
-                borderRadius: 8,
-                px: 2,
-                py: 0.5,
-                mr: 2,
-                maxHeight: 42,
-                zIndex: searchFocused && isMobile ? 1200 : 'auto',
-                transition: 'all 0.3s ease',
-              }}
-            >
-              <SearchIcon sx={{ color: 'rgba(255, 255, 255, 0.7)', mr: 1 }} />
-              <InputBase
-                placeholder="Search tools, documents..."
-                onFocus={() => setSearchFocused(true)}
-                onBlur={() => setSearchFocused(false)}
-                sx={{ flex: 1, fontSize: '0.875rem', color: 'white' }}
-              />
-              {searchFocused && isMobile && (
-                <Button size="small" onClick={() => setSearchFocused(false)}>
-                  Cancel
-                </Button>
-              )}
-            </Paper>
-          </Fade>
+          {/* Date & Time - Only visible on larger screens */}
+          <Box sx={{ 
+            display: { xs: 'none', md: 'flex' }, 
+            alignItems: 'center', 
+            mr: 3,
+            bgcolor: 'rgba(255, 255, 255, 0.05)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            borderRadius: 2,
+            py: 0.75,
+            px: 1.5
+          }}>
+            <CalendarIcon size={16} style={{ marginRight: 8, opacity: 0.7 }} />
+            <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.8)' }}>
+              {currentDateTime.toLocaleDateString('en-US', { 
+                weekday: 'short', 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+              })}
+            </Typography>
+          </Box>
+       
 
           {/* Breadcrumbs - Hide on mobile if search is focused */}
           <Box 
@@ -265,10 +356,11 @@ const DashBoardLayout = () => {
                 <HomeIcon sx={{ mr: 0.5, fontSize: 18 }} />
                 Home
               </MuiLink>
-              {location.pathname.includes('/tools') && (
+              
+              {location.pathname.includes('/dashboard') && (
                 <MuiLink
                   component={Link}
-                  to="/tools"
+                  to="/dashboard"
                   color="inherit"
                   sx={{ 
                     fontWeight: 500,
@@ -279,55 +371,64 @@ const DashBoardLayout = () => {
                     }
                   }}
                 >
-                  Tools
+                  Dashboard
                 </MuiLink>
               )}
-              <Typography 
-               
-                sx={{ 
-                  color: '#7df9ff',
-                  fontWeight: 600,
-                }}
-              >
-                {getPageTitle()}
-              </Typography>
+              
+              {/* Only show the page title as a breadcrumb if we're not at the dashboard root */}
+              {location.pathname !== '/dashboard' && (
+                <Typography 
+                  sx={{ 
+                    color: '#7df9ff',
+                    fontWeight: 600,
+                  }}
+                >
+                  {getPageTitle()}
+                </Typography>
+              )}
+              
             </Breadcrumbs>
           </Box>
 
           {/* Right Section with User Info */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {/* Date & Time Info */}
-            <Box sx={{ 
-              mr: 2, 
-              display: { xs: 'none', md: 'flex' }, 
-              alignItems: 'center', 
-              gap: 2 
-            }}>
-              <Chip
-                icon={<CalendarIcon size={14} />}
-                label={currentDate}
-                variant="outlined"
-                size="small"
-                sx={{ 
-                  borderRadius: 2,
-                  bgcolor: alpha(theme.palette.primary.main, 0.05),
-                  borderColor: alpha(theme.palette.primary.main, 0.2),
-                  '& .MuiChip-icon': { color: theme.palette.primary.main },
-                }}
+   {/* Search Bar */}
+          <Fade in={!isMobile || searchFocused}>
+            <Paper
+              component="form"
+              elevation={0}
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                width: { xs: searchFocused ? '100%' : 'auto', sm: 'auto', md: 300 },
+                position: searchFocused && isMobile ? 'absolute' : 'relative',
+                left: searchFocused && isMobile ? 0 : 'auto',
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid',
+                borderColor: searchFocused ? '#7df9ff' : 'rgba(255, 255, 255, 0.2)',
+                borderRadius: 8,
+                px: 2,
+                py: 0.5,
+                mr: 2,
+                maxHeight: 42,
+                zIndex: searchFocused && isMobile ? 1200 : 'auto',
+                transition: 'all 0.3s ease',
+              }}
+            >
+              <SearchIcon sx={{ color: 'rgba(255, 255, 255, 0.7)', mr: 1 }} />
+              <InputBase
+                placeholder="Search tools, documents..."
+                onFocus={() => setSearchFocused(true)}
+                onBlur={() => setSearchFocused(false)}
+                sx={{ flex: 1, fontSize: '0.875rem', color: 'white' }}
               />
-              <Chip
-                icon={<ClockIcon size={14} />}
-                label={`${currentTime} UTC`}
-                variant="outlined"
-                size="small"
-                sx={{ 
-                  borderRadius: 2,
-                  bgcolor: alpha(theme.palette.secondary.main, 0.05),
-                  borderColor: alpha(theme.palette.secondary.main, 0.2),
-                  '& .MuiChip-icon': { color: theme.palette.secondary.main },
-                }}
-              />
-            </Box>
+              {searchFocused && isMobile && (
+                <Button size="small" onClick={() => setSearchFocused(false)}>
+                  Cancel
+                </Button>
+              )}
+            </Paper>
+          </Fade>
             
             {/* Notifications */}
             <Tooltip title="Notifications">
@@ -513,7 +614,7 @@ const DashBoardLayout = () => {
                 <ListItemText primary="Help & Support" />
               </MenuItem>
               <Divider />
-              <MenuItem onClick={handleMenuClose} sx={{ px: 2.5, py: 1.5 }}>
+              <MenuItem onClick={handleSignOut} sx={{ px: 2.5, py: 1.5 }}>
                 <ListItemIcon>
                   <LogoutIcon fontSize="small" />
                 </ListItemIcon>
@@ -531,14 +632,18 @@ const DashBoardLayout = () => {
       >
         {/* Mobile drawer */}
      
-          <Drawer
+          <SwipeableDrawer
             variant="temporary"
             open={mobileOpen}
             onClose={handleDrawerToggle}
+            onOpen={() => setMobileOpen(true)}
+            swipeAreaWidth={30}
+            disableSwipeToOpen={false}
             ModalProps={{
               keepMounted: true, // Better mobile performance
             }}
             sx={{
+              display: { lg: 'none' },
               '& .MuiDrawer-paper': { 
                 width: drawerWidth,
                 boxSizing: 'border-box',
@@ -548,7 +653,7 @@ const DashBoardLayout = () => {
             }}
           >
             <Sidebar onClose={handleDrawerToggle} />
-          </Drawer>
+          </SwipeableDrawer>
     
         
         {/* Desktop drawer */}
@@ -557,6 +662,7 @@ const DashBoardLayout = () => {
             variant="permanent"
             open
             sx={{
+              display: { xs: 'none', lg: 'block' },
               '& .MuiDrawer-paper': {
                 width: drawerWidth,
                 boxSizing: 'border-box',

@@ -1,7 +1,7 @@
 const User = require('../../models/User');
 const OTPSession = require('../../models/OTPSession');
 const { verifyOTP } = require('../../utils/otpService');
-const { generateToken, sanitizeUser } = require('../../utils/authUtils');
+const { generateToken, setTokenCookies, sanitizeUser } = require('../../utils/authUtils');
 
 // Verify signup OTP
 exports.verifySignupOTP = async (req, res) => {
@@ -42,11 +42,14 @@ exports.verifySignupOTP = async (req, res) => {
     // Clean up OTP session
     await OTPSession.deleteOne({ _id: otpSession._id });
     
+    // Set token in HTTP-only cookie and prepare response data
+    const authData = setTokenCookies(res, token, user);
+    
     res.status(200).json({
       success: true,
       message: 'Email verified successfully',
-      token,
-      user: sanitizeUser(user)
+      token: authData.token, // For localStorage storage on frontend
+      user: authData.user
     });
   } catch (error) {
     console.error('OTP verification error:', error);

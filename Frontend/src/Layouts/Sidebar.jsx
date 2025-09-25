@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Box, 
   List, 
@@ -16,7 +16,10 @@ import {
   useTheme,
   Tooltip,
   LinearProgress,
-  Chip
+  Chip,
+  IconButton,
+  useMediaQuery,
+  SwipeableDrawer
 } from '@mui/material';
 import { 
   ChevronRight as ChevronRightIcon,
@@ -36,17 +39,35 @@ import {
   User as UserIcon,
   Database as DatabaseIcon,
   Award as AwardIcon,
-  Zap as ZapIcon
+  Zap as ZapIcon,
+  X as CloseIcon
 } from 'react-feather';
-import { Link as RouterLink, useLocation } from 'react-router-dom';
+import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 
 const Sidebar = ({ onClose }) => {
   const theme = useTheme();
   const location = useLocation();
+  const navigate = useNavigate();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [openSubMenu, setOpenSubMenu] = useState('pdf-tools');
+  
+  // Collapse all submenus on mobile initially
+  useEffect(() => {
+    if (isMobile) {
+      setOpenSubMenu(null);
+    }
+  }, [isMobile]);
   
   const handleSubMenuToggle = (menuId) => {
     setOpenSubMenu(openSubMenu === menuId ? null : menuId);
+  };
+  
+  const handleNavigation = (path) => {
+    navigate(path);
+    // Close the mobile drawer when a navigation item is clicked
+    if (isMobile) {
+      onClose?.();
+    }
   };
   
   const isActive = (path) => {
@@ -122,41 +143,105 @@ const Sidebar = ({ onClose }) => {
         color: 'white',
       }}
     >
-      {/* Logo & Branding */}
+      {/* Logo & Branding with Close button for mobile */}
       <Box 
         sx={{ 
           p: 3, 
           display: 'flex', 
           alignItems: 'center',
+          justifyContent: 'space-between',
           borderBottom: '1px solid',
           borderColor: 'rgba(255, 255, 255, 0.1)',
         }}
       >
-        <Box 
-          sx={{ 
-            mr: 1.5,
-            width: 38,
-            height: 38,
-            borderRadius: 2,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%)',
-            boxShadow: '0 4px 10px rgba(67, 97, 238, 0.3)',
-          }}
-        >
-          <Typography variant="h6" sx={{ color: 'white', fontWeight: 800 }}>PDF</Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Box 
+            sx={{ 
+              mr: 1.5,
+              width: 38,
+              height: 38,
+              borderRadius: 2,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%)',
+              boxShadow: '0 4px 10px rgba(67, 97, 238, 0.3)',
+            }}
+          >
+            <Typography variant="h6" sx={{ color: 'white', fontWeight: 800 }}>PDF</Typography>
+          </Box>
+          <Typography variant="h6" fontWeight={700} noWrap sx={{ color: 'white' }}>
+           Studio X
+          </Typography>
         </Box>
-        <Typography variant="h6" fontWeight={700} noWrap sx={{ color: 'white' }}>
-         Studio X
-        </Typography>
+        
+        {/* Close button - only visible on mobile */}
+        {isMobile && (
+          <IconButton 
+            onClick={onClose}
+            sx={{ 
+              color: 'rgba(255, 255, 255, 0.7)',
+              '&:hover': {
+                color: '#7df9ff',
+                bgcolor: 'rgba(125, 249, 255, 0.1)',
+              }
+            }}
+            aria-label="close sidebar"
+          >
+            <CloseIcon size={20} />
+          </IconButton>
+        )}
       </Box>
       
       
       <Divider sx={{ mb: 2, borderColor: 'rgba(255, 255, 255, 0.1)' }} />
       
+      {/* Skip to content link - only visible on mobile */}
+      {isMobile && (
+        <Box sx={{ px: 2, mb: 2 }}>
+          <Button
+            fullWidth
+            onClick={onClose}
+            variant="outlined"
+            sx={{
+              borderRadius: 2,
+              py: 1,
+              borderColor: 'rgba(255, 255, 255, 0.2)',
+              color: 'rgba(255, 255, 255, 0.7)',
+              '&:hover': {
+                borderColor: '#7df9ff',
+                bgcolor: 'rgba(125, 249, 255, 0.1)',
+                color: '#7df9ff',
+              }
+            }}
+          >
+            Skip to Content
+          </Button>
+        </Box>
+      )}
+      
       {/* Navigation Menu */}
-      <Box sx={{ flexGrow: 1, overflowY: 'auto', px: 2 }}>
+      <Box 
+        sx={{ 
+          flexGrow: 1, 
+          overflowY: 'auto', 
+          px: 2,
+          // Mobile optimizations
+          '&::-webkit-scrollbar': {
+            width: isMobile ? '4px' : '6px',
+          },
+          '&::-webkit-scrollbar-track': {
+            backgroundColor: 'rgba(255, 255, 255, 0.05)',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+            borderRadius: '10px',
+          },
+          scrollbarWidth: 'thin',
+          scrollbarColor: 'rgba(255, 255, 255, 0.2) rgba(255, 255, 255, 0.05)',
+          pb: isMobile ? 4 : 0, // Extra padding at bottom for mobile to ensure last items are visible
+        }}
+      >
         <List component="nav" disablePadding>
           {menuItems.map((item) => (
             <React.Fragment key={item.id}>
@@ -167,7 +252,7 @@ const Sidebar = ({ onClose }) => {
                       onClick={() => handleSubMenuToggle(item.id)}
                       sx={{
                         borderRadius: 2,
-                        minHeight: 48,
+                        minHeight: isMobile ? 56 : 48, // Increase height for mobile touch targets
                         px: 2.5,
                         position: 'relative',
                         bgcolor: openSubMenu === item.id ? 'rgba(104, 54, 230, 0.1)' : 'transparent',
@@ -201,12 +286,12 @@ const Sidebar = ({ onClose }) => {
                         primaryTypographyProps={{ 
                           fontWeight: openSubMenu === item.id ? 600 : 500,
                           color: openSubMenu === item.id ? '#7df9ff' : 'white',
-                          fontSize: '0.95rem',
+                          fontSize: isMobile ? '1rem' : '0.95rem', // Larger text for mobile
                         }}
                       />
                       {openSubMenu === item.id ? 
-                        <ChevronDownIcon size={18} color="#7df9ff" /> : 
-                        <ChevronRightIcon size={18} color="rgba(255, 255, 255, 0.5)" />
+                        <ChevronDownIcon size={isMobile ? 20 : 18} color="#7df9ff" /> : 
+                        <ChevronRightIcon size={isMobile ? 20 : 18} color="rgba(255, 255, 255, 0.5)" />
                       }
                     </ListItemButton>
                   </ListItem>
@@ -219,15 +304,13 @@ const Sidebar = ({ onClose }) => {
                         return (
                           <ListItem key={subItem.name} disablePadding sx={{ display: 'block' }}>
                             <ListItemButton
-                              component={RouterLink}
-                              to={subItem.path}
-                              onClick={onClose}
+                              onClick={() => handleNavigation(subItem.path)}
                               sx={{
                                 borderRadius: 2,
-                                minHeight: 40,
+                                minHeight: isMobile ? 48 : 40, // Larger touch target for mobile
                                 pl: 5.5,
                                 pr: 2.5,
-                                py: 0.75,
+                                py: isMobile ? 1 : 0.75, // More padding for mobile
                                 mb: 0.5,
                                 position: 'relative',
                                 bgcolor: active ? 'rgba(104, 54, 230, 0.15)' : 'transparent',
@@ -259,7 +342,7 @@ const Sidebar = ({ onClose }) => {
                               <ListItemText 
                                 primary={subItem.name}
                                 primaryTypographyProps={{ 
-                                  fontSize: '0.875rem',
+                                  fontSize: isMobile ? '0.925rem' : '0.875rem', // Slightly larger for mobile
                                   fontWeight: active ? 600 : 400,
                                   color: active ? '#7df9ff' : 'rgba(255, 255, 255, 0.8)'
                                 }}
@@ -274,12 +357,10 @@ const Sidebar = ({ onClose }) => {
               ) : (
                 <ListItem disablePadding sx={{ display: 'block', mb: 1 }}>
                   <ListItemButton
-                    component={RouterLink}
-                    to={item.path}
-                    onClick={onClose}
+                    onClick={() => handleNavigation(item.path)}
                     sx={{
                       borderRadius: 2,
-                      minHeight: 48,
+                      minHeight: isMobile ? 56 : 48, // Increase height for mobile touch targets
                       px: 2.5,
                       position: 'relative',
                       bgcolor: isActive(item.path) ? 'rgba(104, 54, 230, 0.15)' : 'transparent',
@@ -312,7 +393,7 @@ const Sidebar = ({ onClose }) => {
                       primary={item.title}
                       primaryTypographyProps={{ 
                         fontWeight: isActive(item.path) ? 600 : 500,
-                        fontSize: '0.95rem',
+                        fontSize: isMobile ? '1rem' : '0.95rem', // Larger text for mobile
                         color: isActive(item.path) ? '#7df9ff' : 'white',
                       }}
                     />
@@ -352,7 +433,7 @@ const Sidebar = ({ onClose }) => {
       </Box>
       
       {/* Storage Usage */}
-      <Box sx={{ p: 3, mt: 'auto' }}>
+      {/* <Box sx={{ p: 3, mt: 'auto' }}>
         <Box
           sx={{
             p: 2.5,
@@ -414,7 +495,7 @@ const Sidebar = ({ onClose }) => {
             Upgrade for more space
           </Button>
         </Box>
-      </Box>
+      </Box> */}
     </Box>
   );
 };

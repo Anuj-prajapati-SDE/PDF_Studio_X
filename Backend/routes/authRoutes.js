@@ -1,11 +1,14 @@
 const express = require('express');
 const router = express.Router();
+const auth = require('../middleware/auth');
 
 // Import controllers
 const { register } = require('../controllers/auth/registerController');
 const { verifySignupOTP } = require('../controllers/auth/verifySignupController');
 const { login } = require('../controllers/auth/loginController');
 const { verifyLoginOTP } = require('../controllers/auth/verifyLoginController');
+const { logout } = require('../controllers/auth/logoutController');
+const { getMe } = require('../controllers/auth/profileController');
 const { resendOTP } = require('../controllers/auth/resendOTPController');
 const { forgotPassword } = require('../controllers/auth/forgotPasswordController');
 const { 
@@ -19,6 +22,8 @@ router.post('/register', register);
 router.post('/verify-signup-otp', verifySignupOTP);
 router.post('/login', login);
 router.post('/verify-login-otp', verifyLoginOTP);
+router.post('/logout', auth, logout); // Protected route - requires authentication
+router.get('/me', auth, getMe); // Protected route - get current user
 router.post('/resend-otp', resendOTP);
 router.post('/forgot-password', forgotPassword);
 router.post('/verify-reset-token', verifyResetToken);

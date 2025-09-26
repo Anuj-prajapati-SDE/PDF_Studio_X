@@ -45,7 +45,7 @@ import OTPVerification from './Pages/Auth/OTPVerification';
 import ForgotPasswordPage from './Pages/Auth/ForgotPasswordPage';
 import ResetPasswordPage from './Pages/Auth/ResetPasswordPage';
 import DashboardPage from './Pages/UserDashboard/DashboardPage';
-// import JPGToPDFPage from './Pages/JPGToPDF.JSX';
+
 import DashBoardLayout from './Layouts/DashBoardLayout.jsx';
 
 // Global styles
@@ -167,7 +167,7 @@ function App() {
               <Route path="excel-to-pdf" element={<ExcelToPDFPage/>} />
               <Route path="image-compression" element={<ImageCompressionPage/>} />
               <Route path="pdf-to-jpg" element={<PDFToJPGPage/>} />
-              {/* <Route path="jpg-to-pdf" element={<JPGToPDFPage/>} /> */}
+            
               <Route path="add-sign" element={<SignupPage/>} />
               <Route path="watermark-pdf" element={<WatermarkPDFPage/>} />
               <Route path="unlock-pdf" element={<UnlockPDFPage/>} />

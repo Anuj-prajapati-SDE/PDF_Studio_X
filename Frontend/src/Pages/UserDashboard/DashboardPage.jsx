@@ -43,9 +43,7 @@ import {
 // import Sidebar from './Sidebar';
 function DashboardPage() {
      const theme = useTheme();
-       // Use current date and time as provided in the request
-  const currentDate = "2025-05-03";
-  const currentTime = "18:15:16";
+
   const username = "Anuj-prajapati-SDE";
     const  quickAccessTools= [
       {
@@ -128,6 +126,7 @@ function DashboardPage() {
         color: alpha(theme.palette.error.main, 0.1),
       }
     ];
+    const navigate = useNavigate();
   return (
     <>
       {/* User Info Dashboard Header */}
@@ -180,9 +179,10 @@ function DashboardPage() {
           </Typography>
           <Grid container spacing={2}>
             {quickAccessTools.map((tool, index) => (
+         
               <Grid item xs={6} sm={4} md={2.4} key={index}>
                 <Card
-                  onClick={() => navigate(tool.path)}
+                  onClick={() => navigate(tool.path) }
                   sx={{
                     height: '100%', 
                     display: 'flex',

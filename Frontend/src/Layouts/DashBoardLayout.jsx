@@ -357,10 +357,10 @@ const DashBoardLayout = () => {
                 Home
               </MuiLink>
               
-              {location.pathname.includes('/dashboard') && (
+              {location.pathname.includes('/tools') && (
                 <MuiLink
                   component={Link}
-                  to="/dashboard"
+                  to="/tools"
                   color="inherit"
                   sx={{ 
                     fontWeight: 500,
@@ -371,7 +371,7 @@ const DashBoardLayout = () => {
                     }
                   }}
                 >
-                  Dashboard
+                  Tools
                 </MuiLink>
               )}
               

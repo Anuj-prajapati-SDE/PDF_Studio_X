@@ -10,6 +10,7 @@ import {
   Card,
   CardContent,
   Grid,
+  Container,
   Divider,
   LinearProgress,
   Alert,
@@ -32,60 +33,69 @@ import {
   useTheme,
 } from '@mui/material';
 import {
-  // FilePdf as FilePdfIcon,
+  PictureAsPdf as FilePdfIcon,
   Image as ImageIcon,
-  FileText as WordIcon,
+  TextSnippet as WordIcon,
   Upload as UploadIcon,
   Download as DownloadIcon,
   Settings as SettingsIcon,
-  RefreshCw as RefreshIcon,
+  Refresh as RefreshIcon,
   Check as CheckIcon,
-  AlertCircle as AlertIcon,
-  X as CloseIcon,
-  Zap as ZapIcon,
-  FileText as TextIcon,
-  File as FileIcon,
-} from 'react-feather';
-import { motion } from 'framer-motion';
+  Warning as AlertIcon,
+  Close as CloseIcon,
+  Bolt as ZapIcon,
+  TextSnippet as TextIcon,
+  InsertDriveFile as FileIcon,
+  AutoAwesome as AutoAwesomeIcon,
+  CompareArrows as CompareArrowsIcon,
+  Security as SecurityIcon,
+  Star as StarIcon,
+} from '@mui/icons-material';
+import { motion, useAnimation } from 'framer-motion';
+import { useInView } from 'react-intersection-observer';
 import toast from 'react-hot-toast';
 
 // Conversion options based on conversion type
 const conversionTypes = {
   'pdf-to-image': {
     title: 'PDF to Image',
-    icon: <ImageIcon size={24} />,
+    icon: <ImageIcon sx={{ fontSize: 24, color: 'white' }} />,
     acceptedFiles: { 'application/pdf': ['.pdf'] },
     targetFormats: ['JPG', 'PNG', 'TIFF', 'GIF'],
     defaultFormat: 'JPG',
     description: 'Convert PDF pages to high-quality images',
-    color: '#10b981', // success.main
+    color: '#7df9ff', // Cyan theme color
+    gradient: 'linear-gradient(135deg, #7df9ff 0%, #60a5fa 100%)',
   },
   'image-to-pdf': {
     title: 'Image to PDF',
-    // icon: <FilePdfIcon size={24} />,
+    icon: <FilePdfIcon sx={{ fontSize: 24, color: 'white' }} />,
     acceptedFiles: { 'image/*': ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'] },
     targetFormats: ['PDF'],
     defaultFormat: 'PDF',
     description: 'Create PDF documents from your images',
-    color: '#ef4444', // error.main
+    color: '#6836e6', // Purple theme color
+    gradient: 'linear-gradient(135deg, #6836e6 0%, #8c5eff 100%)',
   },
   'pdf-to-word': {
     title: 'PDF to Word',
-    icon: <WordIcon size={24} />,
+    icon: <WordIcon sx={{ fontSize: 24, color: 'white' }} />,
     acceptedFiles: { 'application/pdf': ['.pdf'] },
     targetFormats: ['DOCX', 'DOC'],
     defaultFormat: 'DOCX',
     description: 'Convert PDF documents to editable Word files',
-    color: '#3b82f6', // primary.main
+    color: '#3b82f6', // Blue theme color
+    gradient: 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)',
   },
   'pdf-to-text': {
     title: 'PDF to Text',
-    icon: <TextIcon size={24} />,
+    icon: <TextIcon sx={{ fontSize: 24, color: 'white' }} />,
     acceptedFiles: { 'application/pdf': ['.pdf'] },
     targetFormats: ['TXT', 'RTF'],
     defaultFormat: 'TXT',
     description: 'Extract text content from PDF documents',
-    color: '#f59e0b', // warning.main
+    color: '#f59e0b', // Warning theme color
+    gradient: 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)',
   },
 };
 
@@ -101,6 +111,19 @@ const ConvertPDFPage = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [processedFiles, setProcessedFiles] = useState([]);
   const [error, setError] = useState(null);
+  
+  // Animation hooks
+  const controls = useAnimation();
+  const [ref, inView] = useInView({
+    threshold: 0.3,
+    triggerOnce: false,
+  });
+
+  useEffect(() => {
+    if (inView) {
+      controls.start('visible');
+    }
+  }, [controls, inView]);
   
   // Get conversion type from URL or default to pdf-to-image
   useEffect(() => {
@@ -215,649 +238,1078 @@ const ConvertPDFPage = () => {
   
   // Get current conversion options
   const currentConversionType = conversionTypes[conversionType];
-  
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        delayChildren: 0.3,
-        staggerChildren: 0.1
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: { duration: 0.4 }
-    }
-  };
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.6 }}
-    >
-      <Box sx={{ position: 'relative', minHeight: '100vh' }}>
-        <Box sx={{ mb: 5 }}>
-          <Typography variant="h4" component="h1" fontWeight={700} gutterBottom>
-            Convert PDF
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph>
-            Transform your documents between PDF and other formats with high precision.
-          </Typography>
-        </Box>
+    <Box sx={{ 
+      position: 'relative', 
+      overflow: 'hidden',
+      bgcolor: '#030018', // Deep dark theme background
+      color: 'white',
+      minHeight: '100vh',
+    }}>
+      {/* Premium animated background similar to HomePage */}
+      <Box
+        sx={{
+          position: 'absolute',
+          top: '-20%',
+          left: '-10%',
+          right: '-10%',
+          bottom: '-20%',
+          zIndex: 0,
+          overflow: 'hidden',
+        }}
+      >
+        {/* Animated particles */}
+        {[...Array(8)].map((_, i) => (
+          <Box
+            key={`particle-${i}`}
+            component={motion.div}
+            initial={{
+              x: Math.random() * 400 - 200,
+              y: Math.random() * 400 - 200,
+              opacity: Math.random() * 0.3 + 0.1,
+              scale: Math.random() * 0.5 + 0.3,
+            }}
+            animate={{
+              x: Math.random() * 600 - 300,
+              y: Math.random() * 600 - 300,
+              opacity: Math.random() * 0.3 + 0.1,
+              scale: Math.random() * 0.5 + 0.3,
+              rotate: 360,
+            }}
+            transition={{
+              repeat: Infinity,
+              repeatType: 'reverse',
+              duration: 20 + i * 5,
+              ease: 'linear',
+            }}
+            sx={{
+              position: 'absolute',
+              top: `${20 + i * 10}%`,
+              left: `${10 + i * 12}%`,
+              width: 60,
+              height: 60,
+              background: i % 3 === 0 
+                ? 'linear-gradient(135deg, rgba(125, 249, 255, 0.1) 0%, rgba(104, 54, 230, 0.1) 100%)'
+                : i % 3 === 1
+                ? 'linear-gradient(135deg, rgba(104, 54, 230, 0.1) 0%, rgba(230, 54, 189, 0.1) 100%)'
+                : 'linear-gradient(135deg, rgba(230, 54, 189, 0.1) 0%, rgba(255, 214, 10, 0.1) 100%)',
+              borderRadius: '50%',
+              filter: 'blur(20px)',
+            }}
+          />
+        ))}
+      </Box>
+
+      {/* Lens flare effect */}
+      <Box
+        component={motion.div}
+        animate={{
+          opacity: [0.2, 0.5, 0.2],
+          scale: [1, 1.3, 1],
+        }}
+        transition={{
+          duration: 8,
+          repeat: Infinity,
+          ease: 'easeInOut'
+        }}
+        sx={{
+          position: 'absolute',
+          top: '20%',
+          right: '10%',
+          width: '25rem',
+          height: '25rem',
+          background: 'radial-gradient(circle, rgba(125, 249, 255, 0.3) 0%, rgba(125, 249, 255, 0) 70%)',
+          filter: 'blur(80px)',
+          borderRadius: '50%',
+          mixBlendMode: 'screen',
+          zIndex: 0,
+        }}
+      />
+
+      <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 2, pt: { xs: 4, md: 6 }, pb: { xs: 6, md: 10 }, }} >
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+
+          // textAlign="center"
+        >
+          {/* Hero Header with theme styling */}
+          <Box sx={{ 
+            mb: { xs: 4, md: 6 },   
+            maxWidth: { xs: '100%', md: '100%' } ,
+             textAlign: { xs: 'center', md: 'center' }
+          }}>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.6 }}
+            >
+              <Typography 
+                variant="h2" 
+                component="h1" 
+                sx={{
+                  fontWeight: 900,
+                  fontSize: { xs: '2.5rem', sm: '3rem', md: '3.5rem' },
+                  lineHeight: { xs: 1.2, md: 1.1 },
+                  mb: { xs: 2, md: 3 },
+                  background: 'linear-gradient(90deg, #ffffff, #7df9ff)',
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  textShadow: '0 5px 30px rgba(125, 249, 255, 0.3)',
+                  position: 'relative',
+                }}
+              >
+                Convert Your
+                <Box component="span" sx={{
+                  display: { xs: 'block', sm: 'inline' },
+                  background: 'linear-gradient(90deg, #7df9ff, #6836e6)',
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  ml: { xs: 0, sm: 2 }
+                }}>
+                  PDF Files
+                </Box>
+              </Typography>
+            </motion.div>
+            
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4, duration: 0.6 }}
+            >
+              <Typography 
+                variant="h6" 
+                sx={{
+                  mb: { xs: 3, md: 4 },
+                  color: 'rgba(255, 255, 255, 0.8)',
+                  fontSize: { xs: '1.1rem', md: '1.3rem' },
+                  lineHeight: 1.6,
+           
+ maxWidth: { xs: '100%', md: '100%' } ,
+                  mx: { xs: 'auto', md: 0 }
+                }}
+              >
+                Transform your documents between PDF and other formats with 
+                <Box component="span" sx={{
+                  fontWeight: 600,
+                  background: 'linear-gradient(90deg, #ffffff, #7df9ff)',
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  mx: 0.5
+                }}>
+                  professional precision
+                </Box> 
+                and lightning-fast speed.
+              </Typography>
+            </motion.div>
+          </Box>
+        </motion.div>
         
-        <Grid container spacing={4}>
-          <Grid item xs={12} md={3}>
-            <Card sx={{ borderRadius: 4, mb: 3, position: 'sticky', top: '100px' }}>
-              <CardContent>
-                <Typography variant="h6" fontWeight={600} gutterBottom>
-                  Conversion Type
-                </Typography>
-                <FormControl fullWidth sx={{ mb: 3 }}>
-                  <InputLabel id="conversion-type-label">Select Conversion</InputLabel>
-                  <Select
-                    labelId="conversion-type-label"
-                    id="conversion-type"
-                    value={conversionType}
-                    onChange={handleConversionTypeChange}
-                    label="Select Conversion"
-                  >
-                    {Object.entries(conversionTypes).map(([key, option]) => (
-                      <MenuItem value={key} key={key}>
-                        <Stack direction="row" spacing={1.5} alignItems="center">
-                          <Avatar 
+        <Grid container spacing={{ xs: 3, md: 4 }}  >
+          {/* Sidebar - Conversion Settings */}
+          <Grid item xs={12} lg={4} xl={3} minWidth={"100%"}>
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.6, duration: 0.8 }}
+            >
+              <Card sx={{ 
+                borderRadius: '20px', 
+                mb: { xs: 3, lg: 4 }, 
+                position: { lg: 'sticky' }, 
+                top: '100px',
+                background: 'rgba(255, 255, 255, 0.05)',
+                backdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)',
+              }}>
+                <CardContent sx={{ p: { xs: 3, md: 4 } }}>
+                  <Typography variant="h6" sx={{ 
+                    fontWeight: 700, 
+                    mb: 3, 
+                    color: 'white',
+                    fontSize: { xs: '1.1rem', md: '1.2rem' }
+                  }}>
+                    Conversion Settings
+                  </Typography>
+                  
+                  <FormControl fullWidth sx={{ mb: 3 }}>
+                    <InputLabel 
+                      id="conversion-type-label" 
+                      sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
+                    >
+                      Select Conversion Type
+                    </InputLabel>
+                    <Select
+                      labelId="conversion-type-label"
+                      id="conversion-type"
+                      value={conversionType}
+                      onChange={handleConversionTypeChange}
+                      label="Select Conversion Type"
+                      sx={{
+                        color: 'white',
+                        borderRadius: '12px',
+                        '& .MuiOutlinedInput-notchedOutline': {
+                          borderColor: 'rgba(255, 255, 255, 0.2)',
+                        },
+                        '&:hover .MuiOutlinedInput-notchedOutline': {
+                          borderColor: 'rgba(125, 249, 255, 0.5)',
+                        },
+                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                          borderColor: '#7df9ff',
+                        },
+                        '& .MuiSvgIcon-root': {
+                          color: 'rgba(255, 255, 255, 0.7)',
+                        },
+                      }}
+                      MenuProps={{
+                        PaperProps: {
+                          sx: {
+                            bgcolor: '#1a1a2e',
+                            border: '1px solid rgba(255, 255, 255, 0.1)',
+                            borderRadius: '12px',
+                            mt: 1,
+                          }
+                        }
+                      }}
+                    >
+                      {Object.entries(conversionTypes).map(([key, option]) => (
+                        <MenuItem 
+                          value={key} 
+                          key={key}
+                          sx={{ 
+                            color: 'white',
+                            '&:hover': {
+                              bgcolor: 'rgba(125, 249, 255, 0.1)',
+                            }
+                          }}
+                        >
+                          <Stack direction="row" spacing={2} alignItems="center">
+                            <Avatar 
+                              sx={{ 
+                                width: 36, 
+                                height: 36, 
+                                background: option.gradient,
+                                boxShadow: `0 8px 25px ${alpha(option.color, 0.3)}`,
+                              }}
+                            >
+                              {option.icon}
+                            </Avatar>
+                            <Box>
+                              <Typography variant="body1" fontWeight={600} sx={{ color: 'white' }}>
+                                {option.title}
+                              </Typography>
+                              <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.6)' }}>
+                                {option.description}
+                              </Typography>
+                            </Box>
+                          </Stack>
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  
+                  {/* Output Format Selection */}
+                  {currentConversionType.targetFormats.length > 1 && (
+                    <FormControl fullWidth sx={{ mb: 3 }}>
+                      <InputLabel 
+                        id="output-format-label" 
+                        sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
+                      >
+                        Output Format
+                      </InputLabel>
+                      <Select
+                        labelId="output-format-label"
+                        id="output-format"
+                        value={outputFormat}
+                        onChange={(e) => setOutputFormat(e.target.value)}
+                        label="Output Format"
+                        sx={{
+                          color: 'white',
+                          borderRadius: '12px',
+                          '& .MuiOutlinedInput-notchedOutline': {
+                            borderColor: 'rgba(255, 255, 255, 0.2)',
+                          },
+                          '&:hover .MuiOutlinedInput-notchedOutline': {
+                            borderColor: 'rgba(125, 249, 255, 0.5)',
+                          },
+                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#7df9ff',
+                          },
+                          '& .MuiSvgIcon-root': {
+                            color: 'rgba(255, 255, 255, 0.7)',
+                          },
+                        }}
+                        MenuProps={{
+                          PaperProps: {
+                            sx: {
+                              bgcolor: '#1a1a2e',
+                              border: '1px solid rgba(255, 255, 255, 0.1)',
+                              borderRadius: '12px',
+                              mt: 1,
+                            }
+                          }
+                        }}
+                      >
+                        {currentConversionType.targetFormats.map((format) => (
+                          <MenuItem 
+                            value={format} 
+                            key={format}
                             sx={{ 
-                              width: 32, 
-                              height: 32, 
-                              bgcolor: alpha(option.color, 0.1),
-                              color: option.color,
+                              color: 'white',
+                              '&:hover': {
+                                bgcolor: 'rgba(125, 249, 255, 0.1)',
+                              }
                             }}
                           >
-                            {option.icon}
-                          </Avatar>
-                          <Typography variant="body2" fontWeight={500}>
-                            {option.title}
-                          </Typography>
-                        </Stack>
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-                
-                <Divider sx={{ my: 2 }} />
-                
-                <Typography variant="subtitle2" fontWeight={600} gutterBottom>
-                  Output Format
-                </Typography>
-                
-                <FormControl fullWidth size="small" sx={{ mb: 3 }}>
-                  <InputLabel id="output-format-label">Format</InputLabel>
-                  <Select
-                    labelId="output-format-label"
-                    id="output-format"
-                    value={outputFormat}
-                    onChange={(e) => setOutputFormat(e.target.value)}
-                    label="Format"
-                  >
-                    {currentConversionType.targetFormats.map((format) => (
-                      <MenuItem value={format} key={format}>
-                        {format}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-                
-                {(conversionType === 'pdf-to-image') && (
-                  <>
-                    <Typography variant="subtitle2" fontWeight={600} gutterBottom>
-                      Image Quality
+                            {format}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  )}
+                  
+                  {/* Quality Settings */}
+                  <Box sx={{ mb: 3 }}>
+                    <Typography 
+                      variant="subtitle2" 
+                      sx={{ 
+                        color: 'rgba(255, 255, 255, 0.7)', 
+                        mb: 2,
+                        fontWeight: 600 
+                      }}
+                    >
+                      Quality Settings
                     </Typography>
-                    
                     <ToggleButtonGroup
                       value={quality}
                       exclusive
-                      onChange={(e, newQuality) => {
+                      onChange={(event, newQuality) => {
                         if (newQuality !== null) {
                           setQuality(newQuality);
                         }
                       }}
+                      aria-label="quality settings"
                       size="small"
-                      fullWidth
-                      sx={{ mb: 3 }}
+                      sx={{
+                        width: '100%',
+                        '& .MuiToggleButton-root': {
+                          color: 'rgba(255, 255, 255, 0.7)',
+                          borderColor: 'rgba(255, 255, 255, 0.2)',
+                          borderRadius: '8px',
+                          textTransform: 'none',
+                          fontWeight: 500,
+                          flex: 1,
+                          '&.Mui-selected': {
+                            bgcolor: alpha(currentConversionType.color, 0.2),
+                            borderColor: currentConversionType.color,
+                            color: currentConversionType.color,
+                            '&:hover': {
+                              bgcolor: alpha(currentConversionType.color, 0.3),
+                            },
+                          },
+                          '&:hover': {
+                            bgcolor: 'rgba(255, 255, 255, 0.05)',
+                          },
+                        },
+                      }}
                     >
-                      <ToggleButton value="low">Low</ToggleButton>
-                      <ToggleButton value="medium">Medium</ToggleButton>
-                      <ToggleButton value="high">High</ToggleButton>
+                      <ToggleButton value="low" aria-label="low quality">
+                        Low
+                      </ToggleButton>
+                      <ToggleButton value="medium" aria-label="medium quality">
+                        Medium
+                      </ToggleButton>
+                      <ToggleButton value="high" aria-label="high quality">
+                        High
+                      </ToggleButton>
                     </ToggleButtonGroup>
-                  </>
-                )}
-                
-                <Box 
-                  sx={{ 
-                    bgcolor: alpha(currentConversionType.color, 0.1), 
-                    p: 2, 
-                    borderRadius: 2,
-                    display: 'flex',
-                    alignItems: 'center',
-                  }}
-                >
-                  <ZapIcon size={18} color={currentConversionType.color} style={{ marginRight: 12 }} />
-                  <Typography variant="body2">
-                    {currentConversionType.description}
-                  </Typography>
-                </Box>
-              </CardContent>
-            </Card>
-            
-            <Card 
-              sx={{ 
-                borderRadius: 4, 
-                p: 2.5, 
-                border: `1px dashed ${alpha(theme.palette.primary.main, 0.3)}`,
-                bgcolor: alpha(theme.palette.primary.main, 0.03),
-              }}
-            >
-              <Typography variant="subtitle2" fontWeight={600} gutterBottom>
-                Need to do more?
-              </Typography>
-              <Typography variant="body2" color="text.secondary" paragraph>
-                Check out our Pro version for advanced features, larger file sizes and batch processing.
-              </Typography>
-              <Button 
-                variant="outlined" 
-                color="primary"
-                size="small"
-                fullWidth
-              >
-                Upgrade to Pro
-              </Button>
-            </Card>
+                    
+                    <Typography 
+                      variant="caption" 
+                      sx={{ 
+                        color: 'rgba(255, 255, 255, 0.5)', 
+                        mt: 1,
+                        display: 'block',
+                        textAlign: 'center'
+                      }}
+                    >
+                      {quality === 'low' && 'Smaller file size, lower quality'}
+                      {quality === 'medium' && 'Balanced size and quality'}
+                      {quality === 'high' && 'Best quality, larger file size'}
+                    </Typography>
+                  </Box>
+                  
+                  {/* Conversion Summary */}
+                  <Box
+                    sx={{
+                      p: 2,
+                      borderRadius: '12px',
+                      background: alpha(currentConversionType.color, 0.1),
+                      border: `1px solid ${alpha(currentConversionType.color, 0.2)}`,
+                    }}
+                  >
+                    <Typography 
+                      variant="caption" 
+                      sx={{ 
+                        color: 'rgba(255, 255, 255, 0.7)',
+                        display: 'block',
+                        mb: 1
+                      }}
+                    >
+                      Current Settings:
+                    </Typography>
+                    <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                      <Chip 
+                        label={currentConversionType.title}
+                        size="small"
+                        sx={{ 
+                          bgcolor: alpha(currentConversionType.color, 0.2),
+                          color: currentConversionType.color,
+                          fontWeight: 500,
+                        }}
+                      />
+                      <Chip 
+                        label={outputFormat}
+                        size="small"
+                        sx={{ 
+                          bgcolor: 'rgba(255, 255, 255, 0.1)',
+                          color: 'white',
+                        }}
+                      />
+                      <Chip 
+                        label={`${quality.charAt(0).toUpperCase() + quality.slice(1)} Quality`}
+                        size="small"
+                        sx={{ 
+                          bgcolor: 'rgba(255, 255, 255, 0.1)',
+                          color: 'white',
+                        }}
+                      />
+                    </Stack>
+                  </Box>
+                </CardContent>
+              </Card>
+            </motion.div>
           </Grid>
           
-          <Grid item xs={12} md={9}>
-            {processedFiles.length === 0 ? (
-              <motion.div
-                variants={containerVariants}
-                initial="hidden"
-                animate="visible"
+          {/* Main Content Area */}
+          <Grid item xs={12} lg={8} xl={9}>
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8, duration: 0.8 }}
+            >
+              {/* Upload Area */}
+              <Card
+                sx={{
+                  borderRadius: '24px',
+                  mb: { xs: 3, md: 4 },
+                  background: 'rgba(255, 255, 255, 0.03)',
+                  backdropFilter: 'blur(20px)',
+                  border: isDragActive 
+                    ? `2px dashed ${currentConversionType.color}` 
+                    : '2px dashed rgba(255, 255, 255, 0.1)',
+                  boxShadow: isDragActive
+                    ? `0 20px 40px ${alpha(currentConversionType.color, 0.2)}`
+                    : '0 15px 35px rgba(0, 0, 0, 0.2)',
+                  transition: 'all 0.3s ease',
+                  cursor: 'pointer',
+                  '&:hover': {
+                    borderColor: alpha(currentConversionType.color, 0.5),
+                    background: `${alpha(currentConversionType.color, 0.02)}`,
+                    boxShadow: `0 25px 50px ${alpha(currentConversionType.color, 0.15)}`,
+                  },
+                }}
+                {...getRootProps()}
               >
-                <Paper
-                  {...getRootProps()}
-                  elevation={0}
-                  variant="outlined"
-                  sx={{
-                    borderRadius: 4,
-                    borderStyle: 'dashed',
-                    borderWidth: 2,
-                    borderColor: isDragActive ? currentConversionType.color : 'divider',
-                    bgcolor: isDragActive 
-                      ? alpha(currentConversionType.color, 0.05)
-                      : 'background.paper',
-                    p: 4,
-                    textAlign: 'center',
-                    transition: 'all 0.2s ease',
-                    cursor: 'pointer',
-                    mb: 3,
-                  }}
-                >
-                  <input {...getInputProps()} />
-                  
+                <input {...getInputProps()} />
+                
+                <CardContent sx={{ p: { xs: 4, md: 6 }, textAlign: 'center' }}>
                   <Box
                     component={motion.div}
-                    variants={itemVariants}
+                    animate={{
+                      y: isDragActive ? -10 : [0, -5, 0],
+                      scale: isDragActive ? 1.1 : [1, 1.05, 1],
+                    }}
+                    transition={{
+                      duration: isDragActive ? 0.3 : 2,
+                      repeat: isDragActive ? 0 : Infinity,
+                      ease: 'easeInOut',
+                    }}
                     sx={{
-                      width: 80,
-                      height: 80,
+                      width: { xs: 80, md: 100 },
+                      height: { xs: 80, md: 100 },
                       borderRadius: '50%',
-                      backgroundColor: alpha(currentConversionType.color, 0.1),
-                      color: currentConversionType.color,
+                      background: currentConversionType.gradient,
+                      color: 'white',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      mb: 2,
+                      mb: { xs: 3, md: 4 },
                       mx: 'auto',
+                      boxShadow: `0 15px 35px ${alpha(currentConversionType.color, 0.4)}`,
                     }}
                   >
-                    <UploadIcon size={36} />
+                    <UploadIcon sx={{ fontSize: { xs: 32, md: 40 } }} />
                   </Box>
                   
                   <Typography 
-                    variant="h6" 
-                    component={motion.div}
-                    variants={itemVariants} 
-                    gutterBottom
+                    variant="h4" 
+                    sx={{ 
+                      mb: { xs: 2, md: 3 },
+                      color: 'white',
+                      fontWeight: 700,
+                      fontSize: { xs: '1.5rem', sm: '1.8rem', md: '2rem' },
+                    }}
                   >
                     {isDragActive
-                      ? `Drop ${conversionType === 'image-to-pdf' ? 'images' : 'PDFs'} here`
-                      : `Drag & drop ${conversionType === 'image-to-pdf' ? 'images' : 'PDF files'} here`
+                      ? `Drop ${conversionType === 'image-to-pdf' ? 'images' : 'PDF files'} here`
+                      : `Upload ${conversionType === 'image-to-pdf' ? 'Images' : 'PDF Files'}`
                     }
                   </Typography>
                   
                   <Typography 
-                    variant="body2" 
-                    color="text.secondary"
-                    component={motion.div}
-                    variants={itemVariants}
-                  >
-                    or <Box component="span" sx={{ color: 'primary.main', fontWeight: 600 }}>browse files</Box> from your computer
-                  </Typography>
-                  
-                  <Box component={motion.div} variants={itemVariants} sx={{ mt: 2 }}>
-                    <Chip 
-                      label={`Supported formats: ${Object.values(currentConversionType.acceptedFiles)
-                        .flat()
-                        .join(', ')
-                        .replace(/\./g, '')
-                        .toUpperCase()}`} 
-                      size="small" 
-                      variant="outlined" 
-                    />
-                  </Box>
-                </Paper>
-                
-                {files.length > 0 && (
-                  <Card sx={{ borderRadius: 4, mb: 4 }}>
-                    <CardContent sx={{ p: 0 }}>
-                      <Box sx={{ p: 3, borderBottom: '1px solid', borderColor: 'divider' }}>
-                        <Stack direction="row" alignItems="center" justifyContent="space-between">
-                          <Typography variant="h6">
-                            {files.length} {files.length === 1 ? 'File' : 'Files'} Selected
-                          </Typography>
-                          <Button
-                            variant="outlined"
-                            size="small"
-                            startIcon={<CloseIcon size={16} />}
-                            onClick={handleReset}
-                          >
-                            Clear All
-                          </Button>
-                        </Stack>
-                      </Box>
-                      
-                      <List sx={{ py: 0 }}>
-                        {files.map((fileObj, index) => (
-                          <ListItem 
-                            key={fileObj.id}
-                            divider={index < files.length - 1}
-                            sx={{ px: 3, py: 1.5 }}
-                          >
-                            <ListItemIcon>
-                              <Box
-                                sx={{
-                                  bgcolor: alpha(
-                                    conversionType === 'image-to-pdf' 
-                                      ? theme.palette.success.main 
-                                      : theme.palette.error.main,
-                                    0.1
-                                  ),
-                                  width: 40,
-                                  height: 40,
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  borderRadius: 2,
-                                }}
-                              >
-                                {conversionType === 'image-to-pdf' 
-                                  ? <ImageIcon size={20} color={theme.palette.success.main} />
-                                  : <FilePdfIcon size={20} color={theme.palette.error.main} />
-                                }
-                              </Box>
-                            </ListItemIcon>
-                            
-                            <ListItemText
-                              primary={fileObj.file.name}
-                              secondary={`${(fileObj.file.size / (1024 * 1024)).toFixed(2)} MB`}
-                              primaryTypographyProps={{ fontWeight: 500 }}
-                            />
-                            
-                            <ListItemSecondaryAction>
-                              <IconButton
-                                edge="end"
-                                size="small"
-                                onClick={() => handleRemoveFile(fileObj.id)}
-                                sx={{ color: 'error.main' }}
-                              >
-                                <CloseIcon size={18} />
-                              </IconButton>
-                            </ListItemSecondaryAction>
-                          </ListItem>
-                        ))}
-                      </List>
-                      
-                      <Box sx={{ p: 3, textAlign: 'right', borderTop: '1px solid', borderColor: 'divider' }}>
-                        <Button
-                          variant="contained"
-                          size="large"
-                          startIcon={isProcessing ? <RefreshIcon className="rotating" /> : <SettingsIcon size={16} />}
-                          onClick={handleConvert}
-                          disabled={files.length === 0 || isProcessing}
-                          sx={{
-                            px: 4,
-                            borderRadius: '50px',
-                            bgcolor: currentConversionType.color,
-                            '&:hover': {
-                              bgcolor: alpha(currentConversionType.color, 0.9),
-                            },
-                            '& .rotating': {
-                              animation: 'spin 2s linear infinite',
-                            },
-                            '@keyframes spin': {
-                              '0%': { transform: 'rotate(0deg)' },
-                              '100%': { transform: 'rotate(360deg)' },
-                            },
-                          }}
-                        >
-                          {isProcessing ? 'Converting...' : `Convert to ${outputFormat}`}
-                        </Button>
-                      </Box>
-                    </CardContent>
-                  </Card>
-                )}
-                
-                {isProcessing && (
-                  <Box sx={{ mt: 2 }}>
-                    <Typography variant="body2" color="text.secondary" gutterBottom>
-                      Converting your files...
-                    </Typography>
-                    <LinearProgress sx={{ height: 6, borderRadius: 3 }} />
-                  </Box>
-                )}
-                
-                {error && (
-                  <Alert 
-                    severity="error" 
-                    sx={{ mt: 3, borderRadius: 2 }}
-                  >
-                    {error}
-                  </Alert>
-                )}
-              </motion.div>
-            ) : (
-              <Card sx={{ borderRadius: 4, mb: 4 }}>
-                <CardContent sx={{ p: 0 }}>
-                  <Box
+                    variant="body1" 
                     sx={{
-                      p: 3,
-                      display: 'flex',
-                      alignItems: 'center',
-                      borderBottom: '1px solid',
-                      borderColor: 'divider',
-                      bgcolor: 'success.lighter',
+                      color: 'rgba(255, 255, 255, 0.7)',
+                      mb: { xs: 3, md: 4 },
+                      fontSize: { xs: '1rem', md: '1.1rem' },
+                      maxWidth: '500px',
+                      mx: 'auto',
+                      lineHeight: 1.6,
                     }}
                   >
-                    <Box
-                      sx={{
-                        width: 48,
-                        height: 48,
-                        borderRadius: '50%',
-                        bgcolor: 'success.main',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: 'white',
-                        mr: 2,
-                      }}
-                    >
-                      <CheckIcon size={24} />
-                    </Box>
-                    
-                    <Box>
-                      <Typography variant="h6">
-                        Conversion Completed!
-                      </Typography>
-                      <Typography variant="body2">
-                        {processedFiles.length} {processedFiles.length === 1 ? 'file' : 'files'} converted to {outputFormat}
-                      </Typography>
-                    </Box>
-                  </Box>
+                    Drag & drop your files here or{' '}
+                    <Box component="span" sx={{ 
+                      color: currentConversionType.color, 
+                      fontWeight: 600,
+                      textDecoration: 'underline',
+                      textDecorationColor: alpha(currentConversionType.color, 0.5),
+                    }}>
+                      browse files
+                    </Box>{' '}
+                    from your device
+                  </Typography>
                   
-                  <Box sx={{ p: 3 }}>
-                    <Typography variant="subtitle1" gutterBottom fontWeight={600}>
-                      Download Converted Files
-                    </Typography>
+                  <Chip 
+                    label={`Supported: ${Object.values(currentConversionType.acceptedFiles)
+                      .flat()
+                      .join(', ')
+                      .replace(/\./g, '')
+                      .toUpperCase()}`} 
+                    size="small" 
+                    sx={{
+                      bgcolor: 'rgba(255, 255, 255, 0.1)',
+                      color: 'rgba(255, 255, 255, 0.8)',
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      borderRadius: '20px',
+                      px: 1,
+                      fontSize: { xs: '0.75rem', md: '0.8rem' },
+                    }}
+                  />
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Files List */}
+            {files.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1, duration: 0.8 }}
+              >
+                <Card
+                  sx={{
+                    borderRadius: '20px',
+                    mb: { xs: 3, md: 4 },
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    backdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)',
+                  }}
+                >
+                  <CardContent sx={{ p: { xs: 3, md: 4 } }}>
+                    <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
+                      <Typography variant="h6" sx={{ 
+                        fontWeight: 700, 
+                        color: 'white',
+                        fontSize: { xs: '1.1rem', md: '1.2rem' }
+                      }}>
+                        Files to Convert ({files.length})
+                      </Typography>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={handleReset}
+                        startIcon={<RefreshIcon />}
+                        sx={{
+                          borderColor: 'rgba(255, 255, 255, 0.2)',
+                          color: 'rgba(255, 255, 255, 0.7)',
+                          borderRadius: '12px',
+                          '&:hover': {
+                            borderColor: '#7df9ff',
+                            color: '#7df9ff',
+                          },
+                        }}
+                      >
+                        Clear All
+                      </Button>
+                    </Stack>
                     
-                    <List sx={{ py: 0 }}>
-                      {processedFiles.map((file, index) => (
-                        <ListItem 
-                          key={index}
-                          divider={index < processedFiles.length - 1}
-                          sx={{ 
-                            px: 3, 
-                            py: 2,
-                            transition: 'all 0.2s ease',
+                    <List sx={{ p: 0 }}>
+                      {files.map((fileObj, index) => (
+                        <ListItem
+                          key={fileObj.id}
+                          sx={{
+                            borderRadius: '12px',
+                            mb: 1,
+                            bgcolor: 'rgba(255, 255, 255, 0.03)',
+                            border: '1px solid rgba(255, 255, 255, 0.1)',
                             '&:hover': {
-                              bgcolor: 'action.hover',
-                            }
+                              bgcolor: 'rgba(255, 255, 255, 0.08)',
+                            },
                           }}
                         >
                           <ListItemIcon>
-                            <Box
+                            <Avatar sx={{ 
+                              bgcolor: currentConversionType.color,
+                              width: 36,
+                              height: 36,
+                            }}>
+                              {conversionType === 'image-to-pdf' ? (
+                                <ImageIcon sx={{ color: 'white', fontSize: 20 }} />
+                              ) : (
+                                <FilePdfIcon sx={{ color: 'white', fontSize: 20 }} />
+                              )}
+                            </Avatar>
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={
+                              <Typography variant="body1" sx={{ 
+                                color: 'white', 
+                                fontWeight: 500,
+                                fontSize: { xs: '0.9rem', md: '1rem' }
+                              }}>
+                                {fileObj.file.name}
+                              </Typography>
+                            }
+                            secondary={
+                              <Typography variant="caption" sx={{ 
+                                color: 'rgba(255, 255, 255, 0.6)',
+                                fontSize: { xs: '0.75rem', md: '0.8rem' }
+                              }}>
+                                {(fileObj.file.size / 1024 / 1024).toFixed(2)} MB
+                              </Typography>
+                            }
+                          />
+                          <ListItemSecondaryAction>
+                            <IconButton 
+                              edge="end" 
+                              onClick={() => handleRemoveFile(fileObj.id)}
                               sx={{
-                                bgcolor: (() => {
-                                  if (outputFormat === 'PDF') 
-                                    return alpha(theme.palette.error.main, 0.1);
-                                  if (outputFormat === 'DOCX' || outputFormat === 'DOC') 
-                                    return alpha(theme.palette.info.main, 0.1);
-                                  return alpha(theme.palette.success.main, 0.1);
-                                })(),
-                                width: 48,
-                                height: 48,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                borderRadius: 2,
+                                color: 'rgba(255, 255, 255, 0.5)',
+                                '&:hover': {
+                                  color: '#ff4444',
+                                  bgcolor: 'rgba(255, 68, 68, 0.1)',
+                                },
                               }}
                             >
-                              {outputFormat === 'PDF' ? (
-                                <FilePdfIcon size={24} color={theme.palette.error.main} />
-                              ) : outputFormat === 'DOCX' || outputFormat === 'DOC' ? (
-                                <WordIcon size={24} color={theme.palette.info.main} />
-                              ) : (
-                                <ImageIcon size={24} color={theme.palette.success.main} />
-                              )}
-                            </Box>
-                          </ListItemIcon>
-                          
-                          <ListItemText
-                            primary={file.convertedName}
-                            secondary={`Original: ${file.originalName} • ${(file.size / (1024 * 1024)).toFixed(2)} MB`}
-                            primaryTypographyProps={{ fontWeight: 500 }}
-                          />
-                          
-                          <Button
-                            variant="contained"
-                            startIcon={<DownloadIcon size={16} />}
-                            onClick={() => handleDownloadFile(file)}
-                            sx={{ 
-                              borderRadius: '50px',
-                              px: 3,
-                              bgcolor: currentConversionType.color,
-                              '&:hover': {
-                                bgcolor: alpha(currentConversionType.color, 0.9),
-                              },
-                            }}
-                          >
-                            Download
-                          </Button>
+                              <CloseIcon />
+                            </IconButton>
+                          </ListItemSecondaryAction>
                         </ListItem>
                       ))}
                     </List>
-                  </Box>
-                  
-                  <Box sx={{ p: 3, display: 'flex', justifyContent: 'space-between', borderTop: '1px solid', borderColor: 'divider' }}>
-                    <Button
-                      variant="outlined"
-                      startIcon={<RefreshIcon size={16} />}
-                      onClick={handleReset}
-                    >
-                      Convert More Files
-                    </Button>
-                    
-                    {processedFiles.length > 1 && (
-                      <Button
-                        variant="contained"
-                        startIcon={<DownloadIcon size={16} />}
-                        onClick={handleDownloadAll}
-                      >
-                        Download All Files
-                      </Button>
-                    )}
-                  </Box>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </motion.div>
             )}
-            
-            {/* Help Section */}
-            <Box sx={{ mt: 8 }}>
-              <Divider sx={{ mb: 4 }} />
-              
-              <Grid container spacing={4}>
-                <Grid item xs={12} md={6}>
-                  <Typography variant="h5" gutterBottom fontWeight={700}>
-                    How to Convert {currentConversionType.title}
-                  </Typography>
-                  
-                  <Box sx={{ mt: 3 }}>
-                    {[
-                      {
-                        title: 'Upload your files',
-                        description: `Drag and drop ${conversionType === 'image-to-pdf' ? 'images' : 'PDF files'} into the upload area or click to browse.`,
-                      },
-                      {
-                        title: 'Select output format',
-                        description: `Choose your desired output format (${currentConversionType.targetFormats.join(', ')}).`,
-                      },
-                      {
-                        title: 'Adjust settings',
-                        description: 'Configure any additional options like quality to fine-tune your results.',
-                      },
-                      {
-                        title: 'Convert and download',
-                        description: 'Click the convert button and download your transformed files.',
-                      },
-                    ].map((step, index) => (
-                      <Box
-                        key={index}
-                        sx={{
-                          display: 'flex',
-                          mb: 3,
-                        }}
-                      >
-                        <Box
-                          sx={{
-                            width: 28,
-                            height: 28,
-                            borderRadius: '50%',
-                            bgcolor: currentConversionType.color,
-                            color: 'white',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontWeight: 'bold',
-                            fontSize: '14px',
-                            mr: 2,
-                            mt: 0.5,
-                            flexShrink: 0,
-                          }}
-                        >
-                          {index + 1}
-                        </Box>
-                        <Box>
-                          <Typography variant="subtitle1" fontWeight={600} gutterBottom>
-                            {step.title}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            {step.description}
-                          </Typography>
-                        </Box>
-                      </Box>
-                    ))}
-                  </Box>
-                </Grid>
-                
-                <Grid item xs={12} md={6}>
-                  <Card
-                    sx={{
-                      borderRadius: 4,
-                      overflow: 'hidden',
-                      height: '100%',
-                      display: 'flex',
-                      flexDirection: 'column',
-                    }}
-                  >
+
+            {/* Processing Progress */}
+            {isProcessing && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Card
+                  sx={{
+                    borderRadius: '20px',
+                    mb: { xs: 3, md: 4 },
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    backdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)',
+                  }}
+                >
+                  <CardContent sx={{ p: { xs: 3, md: 4 }, textAlign: 'center' }}>
                     <Box
+                      component={motion.div}
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
                       sx={{
-                        bgcolor: alpha(currentConversionType.color, 0.1),
-                        p: 3,
-                        borderBottom: '1px solid',
-                        borderColor: 'divider',
+                        width: 60,
+                        height: 60,
+                        borderRadius: '50%',
+                        background: currentConversionType.gradient,
+                        color: 'white',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        mb: 3,
+                        mx: 'auto',
+                        boxShadow: `0 15px 35px ${alpha(currentConversionType.color, 0.4)}`,
                       }}
                     >
-                      <Typography variant="h6" fontWeight={600} gutterBottom>
-                        Tips for Better Conversions
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        Follow these recommendations for the best results:
-                      </Typography>
+                      <SettingsIcon sx={{ fontSize: 28 }} />
                     </Box>
                     
-                    <CardContent sx={{ flexGrow: 1 }}>
-                      <List dense sx={{ p: 0 }}>
-                        {[
-                          'Ensure your source files have good quality before converting',
-                          'For image to PDF conversions, use high-resolution images',
-                          'Select the appropriate quality setting based on your needs',
-                          'For text extraction, make sure your PDF contains actual text, not just images',
-                          'Use our "Pro" version for batch processing of large files',
-                        ].map((tip, index) => (
-                          <ListItem key={index} sx={{ px: 0, py: 1 }}>
-                            <ListItemIcon sx={{ minWidth: 32 }}>
-                              <CheckIcon size={16} color={currentConversionType.color} />
-                            </ListItemIcon>
-                            <ListItemText 
-                              primary={tip} 
-                              primaryTypographyProps={{ variant: 'body2' }} 
-                            />
-                          </ListItem>
-                        ))}
-                      </List>
-                      
-                      <Box
+                    <Typography variant="h6" sx={{ 
+                      color: 'white', 
+                      fontWeight: 600, 
+                      mb: 2,
+                      fontSize: { xs: '1rem', md: '1.1rem' }
+                    }}>
+                      Converting Files...
+                    </Typography>
+                    
+                    <LinearProgress
+                      sx={{
+                        height: 8,
+                        borderRadius: 4,
+                        bgcolor: 'rgba(255, 255, 255, 0.1)',
+                        '& .MuiLinearProgress-bar': {
+                          background: currentConversionType.gradient,
+                          borderRadius: 4,
+                        },
+                      }}
+                    />
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
+
+            {/* Conversion Results */}
+            {processedFiles.length > 0 && !isProcessing && (
+              <motion.div
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+              >
+                <Card
+                  sx={{
+                    borderRadius: '20px',
+                    mb: { xs: 3, md: 4 },
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    backdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)',
+                  }}
+                >
+                  <CardContent sx={{ p: { xs: 3, md: 4 } }}>
+                    <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
+                      <Typography variant="h6" sx={{ 
+                        fontWeight: 700, 
+                        color: 'white',
+                        fontSize: { xs: '1.1rem', md: '1.2rem' }
+                      }}>
+                        <CheckIcon sx={{ mr: 1, color: '#4ade80' }} />
+                        Conversion Complete!
+                      </Typography>
+                      <Button
+                        variant="contained"
+                        size="medium"
+                        onClick={handleDownloadAll}
+                        startIcon={<DownloadIcon />}
                         sx={{
-                          mt: 3,
-                          p: 2,
-                          bgcolor: alpha(theme.palette.info.main, 0.1),
-                          borderRadius: 2,
-                          display: 'flex',
-                          alignItems: 'flex-start',
+                          background: currentConversionType.gradient,
+                          borderRadius: '12px',
+                          fontWeight: 600,
+                          px: 3,
+                          textTransform: 'none',
+                          boxShadow: `0 8px 25px ${alpha(currentConversionType.color, 0.3)}`,
+                          '&:hover': {
+                            boxShadow: `0 12px 30px ${alpha(currentConversionType.color, 0.4)}`,
+                          },
                         }}
                       >
-                        <AlertIcon 
-                          size={18} 
-                          color={theme.palette.info.main} 
-                          style={{ marginRight: 12, marginTop: 2 }}
-                        />
-                        <Typography variant="body2">
-                          Files are processed securely and deleted from our servers after conversion. We don't store your content.
-                        </Typography>
-                      </Box>
-                    </CardContent>
+                        Download All
+                      </Button>
+                    </Stack>
+                    
+                    <List sx={{ p: 0 }}>
+                      {processedFiles.map((file, index) => (
+                        <ListItem
+                          key={index}
+                          sx={{
+                            borderRadius: '12px',
+                            mb: 1,
+                            bgcolor: 'rgba(255, 255, 255, 0.03)',
+                            border: '1px solid rgba(255, 255, 255, 0.1)',
+                            '&:hover': {
+                              bgcolor: 'rgba(255, 255, 255, 0.08)',
+                            },
+                          }}
+                        >
+                          <ListItemIcon>
+                            <Avatar sx={{ 
+                              bgcolor: '#4ade80',
+                              width: 36,
+                              height: 36,
+                            }}>
+                              <CheckIcon sx={{ color: 'white', fontSize: 20 }} />
+                            </Avatar>
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={
+                              <Typography variant="body1" sx={{ 
+                                color: 'white', 
+                                fontWeight: 500,
+                                fontSize: { xs: '0.9rem', md: '1rem' }
+                              }}>
+                                {file.convertedName}
+                              </Typography>
+                            }
+                            secondary={
+                              <Typography variant="caption" sx={{ 
+                                color: 'rgba(255, 255, 255, 0.6)',
+                                fontSize: { xs: '0.75rem', md: '0.8rem' }
+                              }}>
+                                {(file.size / 1024 / 1024).toFixed(2)} MB
+                              </Typography>
+                            }
+                          />
+                          <ListItemSecondaryAction>
+                            <IconButton 
+                              edge="end" 
+                              onClick={() => handleDownloadFile(file)}
+                              sx={{
+                                color: currentConversionType.color,
+                                '&:hover': {
+                                  bgcolor: alpha(currentConversionType.color, 0.1),
+                                },
+                              }}
+                            >
+                              <DownloadIcon />
+                            </IconButton>
+                          </ListItemSecondaryAction>
+                        </ListItem>
+                      ))}
+                    </List>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
+
+            {/* Action Buttons */}
+            {files.length > 0 && !isProcessing && processedFiles.length === 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1.2, duration: 0.8 }}
+              >
+                <Stack 
+                  direction={{ xs: 'column', sm: 'row' }} 
+                  spacing={2} 
+                  justifyContent="center"
+                  sx={{ mb: 4 }}
+                >
+                  <Button
+                    variant="contained"
+                    size="large"
+                    onClick={handleConvert}
+                    startIcon={<ZapIcon />}
+                    sx={{
+                      background: currentConversionType.gradient,
+                      borderRadius: '16px',
+                      fontWeight: 700,
+                      fontSize: { xs: '1rem', md: '1.1rem' },
+                      px: { xs: 4, md: 6 },
+                      py: { xs: 1.5, md: 2 },
+                      textTransform: 'none',
+                      boxShadow: `0 12px 30px ${alpha(currentConversionType.color, 0.3)}`,
+                      minWidth: { xs: '100%', sm: '200px' },
+                      '&:hover': {
+                        boxShadow: `0 20px 40px ${alpha(currentConversionType.color, 0.4)}`,
+                        transform: 'translateY(-2px)',
+                      },
+                    }}
+                  >
+                    Convert to {outputFormat}
+                  </Button>
+                  
+                  <Button
+                    variant="outlined"
+                    size="large"
+                    onClick={handleReset}
+                    startIcon={<RefreshIcon />}
+                    sx={{
+                      borderColor: 'rgba(255, 255, 255, 0.2)',
+                      color: 'rgba(255, 255, 255, 0.7)',
+                      borderRadius: '16px',
+                      fontWeight: 600,
+                      fontSize: { xs: '1rem', md: '1.1rem' },
+                      px: { xs: 4, md: 6 },
+                      py: { xs: 1.5, md: 2 },
+                      textTransform: 'none',
+                      minWidth: { xs: '100%', sm: '140px' },
+                      '&:hover': {
+                        borderColor: '#7df9ff',
+                        color: '#7df9ff',
+                        bgcolor: 'rgba(125, 249, 255, 0.05)',
+                      },
+                    }}
+                  >
+                    Clear All
+                  </Button>
+                </Stack>
+              </motion.div>
+            )}
+
+            {/* Error Display */}
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Alert 
+                  severity="error" 
+                  sx={{
+                    borderRadius: '12px',
+                    bgcolor: 'rgba(255, 68, 68, 0.1)',
+                    border: '1px solid rgba(255, 68, 68, 0.2)',
+                    color: '#ff6b6b',
+                    mb: 4,
+                    '& .MuiAlert-icon': {
+                      color: '#ff6b6b',
+                    },
+                  }}
+                >
+                  {error}
+                </Alert>
+              </motion.div>
+            )}
+
+            {/* Features Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.4, duration: 0.8 }}
+            >
+              <Grid container spacing={{ xs: 2, md: 3 }} sx={{ mt: { xs: 2, md: 4 } }}>
+                <Grid item xs={12} sm={6} md={4}>
+                  <Card
+                    sx={{
+                      borderRadius: '16px',
+                      background: 'rgba(255, 255, 255, 0.03)',
+                      backdropFilter: 'blur(20px)',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      p: 3,
+                      textAlign: 'center',
+                      '&:hover': {
+                        bgcolor: 'rgba(255, 255, 255, 0.05)',
+                      },
+                    }}
+                  >
+                    <Avatar
+                      sx={{
+                        width: 56,
+                        height: 56,
+                        background: 'linear-gradient(135deg, #7df9ff 0%, #60a5fa 100%)',
+                        mb: 2,
+                        mx: 'auto',
+                      }}
+                    >
+                      <ZapIcon sx={{ fontSize: 28, color: 'white' }} />
+                    </Avatar>
+                    <Typography variant="h6" sx={{ color: 'white', fontWeight: 600, mb: 1 }}>
+                      Lightning Fast
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                      Convert multiple files simultaneously with optimized processing
+                    </Typography>
+                  </Card>
+                </Grid>
+                
+                <Grid item xs={12} sm={6} md={4}>
+                  <Card
+                    sx={{
+                      borderRadius: '16px',
+                      background: 'rgba(255, 255, 255, 0.03)',
+                      backdropFilter: 'blur(20px)',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      p: 3,
+                      textAlign: 'center',
+                      '&:hover': {
+                        bgcolor: 'rgba(255, 255, 255, 0.05)',
+                      },
+                    }}
+                  >
+                    <Avatar
+                      sx={{
+                        width: 56,
+                        height: 56,
+                        background: 'linear-gradient(135deg, #6836e6 0%, #8c5eff 100%)',
+                        mb: 2,
+                        mx: 'auto',
+                      }}
+                    >
+                      <SecurityIcon sx={{ fontSize: 28, color: 'white' }} />
+                    </Avatar>
+                    <Typography variant="h6" sx={{ color: 'white', fontWeight: 600, mb: 1 }}>
+                      Secure Processing
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                      Your files are processed locally with enterprise-grade security
+                    </Typography>
+                  </Card>
+                </Grid>
+                
+                <Grid item xs={12} sm={12} md={4}>
+                  <Card
+                    sx={{
+                      borderRadius: '16px',
+                      background: 'rgba(255, 255, 255, 0.03)',
+                      backdropFilter: 'blur(20px)',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      p: 3,
+                      textAlign: 'center',
+                      '&:hover': {
+                        bgcolor: 'rgba(255, 255, 255, 0.05)',
+                      },
+                    }}
+                  >
+                    <Avatar
+                      sx={{
+                        width: 56,
+                        height: 56,
+                        background: 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)',
+                        mb: 2,
+                        mx: 'auto',
+                      }}
+                    >
+                      <StarIcon sx={{ fontSize: 28, color: 'white' }} />
+                    </Avatar>
+                    <Typography variant="h6" sx={{ color: 'white', fontWeight: 600, mb: 1 }}>
+                      Premium Quality
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                      Maintain original quality with advanced conversion algorithms
+                    </Typography>
                   </Card>
                 </Grid>
               </Grid>
-            </Box>
+            </motion.div>
           </Grid>
         </Grid>
-      </Box>
-    </motion.div>
+      </Container>
+    </Box>
   );
 };
 

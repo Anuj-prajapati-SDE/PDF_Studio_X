@@ -1,6 +1,5 @@
 const User = require('../../models/User');
-const { createOTPSession } = require('../../utils/otpService');
-const { sendEmail, generateLoginOTPTemplate } = require('../../utils/emailService');
+const { generateToken, setTokenCookies } = require('../../utils/authUtils');
 
 // Login controller
 exports.login = async (req, res) => {
@@ -35,32 +34,17 @@ exports.login = async (req, res) => {
       });
     }
     
-    // Create OTP session for login verification
-    const otpData = await createOTPSession(email, 'login', user._id);
+    // Generate JWT token
+    const token = generateToken(user);
     
-    // Send OTP via email
-    const emailTemplate = generateLoginOTPTemplate(otpData.otp, user.firstName);
-    const emailSent = await sendEmail(
-      email,
-      'Login Verification - PDF Studio X',
-      emailTemplate
-    );
-    
-    if (!emailSent) {
-      return res.status(500).json({
-        success: false,
-        message: 'Failed to send verification email'
-      });
-    }
+    // Set token in HTTP-only cookie and prepare response data
+    const authData = setTokenCookies(res, token, user);
     
     res.status(200).json({
       success: true,
-      message: 'Please verify your login with the OTP sent to your email',
-      data: {
-        requiresOTP: true,
-        sessionId: otpData.sessionId,
-        email: otpData.email
-      }
+      message: 'Login successful',
+      token: authData.token,
+      user: authData.user
     });
   } catch (error) {
     console.error('Login error:', error);

@@ -31,7 +31,6 @@ import {
 } from '@mui/icons-material';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import OTPVerification from './OTPVerification';
 import toast from 'react-hot-toast';
 import { getApiUrl } from '../../utils/api';
 
@@ -106,8 +105,6 @@ const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [currentStep, setCurrentStep] = useState('login'); // 'login' or 'otp'
-  const [otpData, setOtpData] = useState(null);
   
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -136,21 +133,11 @@ const LoginPage = () => {
       const data = await response.json();
 
       if (data.success) {
-        if (data.data?.requiresOTP) {
-          // OTP verification required
-          toast.success(data.message);
-          setOtpData({
-            sessionId: data.data.sessionId,
-            email: data.data.email
-          });
-          setCurrentStep('otp');
-        } else {
-          // Direct login without OTP
-          localStorage.setItem('token', data.token);
-          login(data.user);
-          toast.success('Welcome back!');
-          navigate('/');
-        }
+        // Direct login without OTP
+        localStorage.setItem('token', data.token);
+        login(data.user);
+        toast.success('Welcome back!');
+        navigate('/');
       } else {
         toast.error(data.message || 'Login failed');
       }
@@ -162,44 +149,7 @@ const LoginPage = () => {
     }
   };
 
-  // Handle OTP verification success
-  const handleOTPSuccess = (data) => {
-    // Store token and user data
-    localStorage.setItem('token', data.token);
-    login(data.user);
-    
-    // Navigate to dashboard or home
-    navigate('/');
-  };
-
-  // Handle back to login form
-  const handleBackToLogin = () => {
-    setCurrentStep('login');
-    setOtpData(null);
-  };
-
-  // Handle OTP resend
-  const handleResendOTP = (newSessionId) => {
-    setOtpData(prev => ({
-      ...prev,
-      sessionId: newSessionId
-    }));
-  };
-
-  // If we're in OTP verification step, show OTP component
-  if (currentStep === 'otp' && otpData) {
-    return (
-      <OTPVerification
-        email={otpData.email}
-        sessionId={otpData.sessionId}
-        purpose="login"
-        onSuccess={handleOTPSuccess}
-        onBack={handleBackToLogin}
-        onResendOTP={handleResendOTP}
-        isLoading={isLoading}
-      />
-    );
-  }
+  // No OTP verification is needed for login anymore
 
   return (
     <Box

@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { Box, Container } from '@mui/material';
 import { motion } from 'framer-motion';
-import Header from '../Components/common/Header';
-import Footer from '../Components/common/Footer';
-import FloatingActionButton from '../Components/common/FloatingActionButton';
+import Header from '../../../Components/common/Header';
+import Footer from '../../../Components/common/Footer';
+import FloatingActionButton from '../../../Components/common/FloatingActionButton';
 // import ParticlesBackground from '../Components/common/ParticlesBackground';
 
 const MainLayout = () => {

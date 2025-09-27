@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import {
   Box,
@@ -9,6 +9,7 @@ import {
   Card,
   CardContent,
   Grid,
+  Container,
   Divider,
   LinearProgress,
   Alert,
@@ -27,24 +28,81 @@ import {
   Slider,
   useTheme,
   alpha,
+  Avatar,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  ListItemSecondaryAction,
+  Tooltip,
 } from '@mui/material';
 import {
-//   FilePdf as FilePdfIcon,
-  FileText as FileTextIcon,
+  PictureAsPdf as FilePdfIcon,
   Upload as UploadIcon,
   Download as DownloadIcon,
-  RefreshCw as RefreshIcon,
-  Trash2 as TrashIcon,
+  Refresh as RefreshIcon,
+  Close as CloseIcon,
   Check as CheckIcon,
-  AlertCircle as AlertCircleIcon,
-  Info as InfoIcon,
-  Zap as ZapIcon,
-} from 'react-feather';
-import { motion } from 'framer-motion';
+  Warning as AlertCircleIcon,
+  Info as InfoIcon, 
+  Bolt as ZapIcon,
+  Description as FileTextIcon,
+  Tune as TuneIcon,
+  Settings as SettingsIcon,
+  AutoAwesome as AutoAwesomeIcon,
+  Star as StarIcon,
+  Security as SecurityIcon,
+} from '@mui/icons-material';
+import { motion, useAnimation } from 'framer-motion';
+import { useInView } from 'react-intersection-observer';
 import toast from 'react-hot-toast';
+import axios from 'axios';
+import { getApiUrl } from '../../../utils/api';
+
+// Mock implementation - replace with actual API call in production
+const convertWordToPDF = async (file, settings) => {
+  // This is a placeholder for the actual API call
+  const formData = new FormData();
+  formData.append('document', file);
+  formData.append('quality', settings.quality);
+  formData.append('preserveHyperlinks', settings.preserveHyperlinks);
+  formData.append('preserveFormFields', settings.preserveFormFields);
+  formData.append('fontEmbedding', settings.fontEmbedding);
+  formData.append('pdfVersion', settings.pdfVersion);
+  formData.append('optimizeSize', settings.optimizeSize);
+  formData.append('compressionLevel', settings.compressionLevel);
+
+  try {
+    // Replace with your actual API endpoint
+    const response = await axios.post(getApiUrl('/pdf/word-to-pdf'), formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      },
+      responseType: 'blob'
+    });
+    
+    return {
+      success: true,
+      data: response.data,
+      message: 'Word document converted to PDF successfully!'
+    };
+  } catch (error) {
+    console.error('Error converting Word to PDF:', error);
+    return {
+      success: false,
+      message: 'Failed to convert document. Please try again.'
+    };
+  }
+};
 
 const WordToPDFPage = () => {
   const theme = useTheme();
+  
+  // Theme colors for consistent styling
+  const WORD_BLUE = theme.palette.primary.main;
+  const WORD_LIGHT_BLUE = theme.palette.primary.light;
+  const PDF_RED = theme.palette.error.main;
+  
   const [file, setFile] = useState(null);
   const [conversionOptions, setConversionOptions] = useState({
     quality: 'high',
@@ -59,9 +117,18 @@ const WordToPDFPage = () => {
   const [processedFile, setProcessedFile] = useState(null);
   const [error, setError] = useState(null);
 
-  // Current date and time
-  const currentDateTime = "2025-05-03 19:10:37";
-  const username = "Anuj-prajapati-SDE";
+  // Animation hooks
+  const controls = useAnimation();
+  const [ref, inView] = useInView({
+    threshold: 0.3,
+    triggerOnce: false,
+  });
+
+  useEffect(() => {
+    if (inView) {
+      controls.start('visible');
+    }
+  }, [controls, inView]);
 
   const onDrop = useCallback(acceptedFiles => {
     if (acceptedFiles.length > 0) {
@@ -79,7 +146,11 @@ const WordToPDFPage = () => {
         return;
       }
       
-      setFile(wordFile);
+      setFile({
+        file: wordFile,
+        preview: URL.createObjectURL(wordFile),
+        id: `file-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      });
       toast.success('Word document uploaded successfully');
       setProcessedFile(null);
       setError(null);
@@ -138,11 +209,14 @@ const WordToPDFPage = () => {
         sizeMultiplier *= (1 - (conversionOptions.compressionLevel / 200)); // Reduce size based on compression
       }
       
-      const estimatedSize = Math.floor(file.size * sizeMultiplier);
+      const originalSize = file.file.size;
+      const estimatedSize = Math.floor(originalSize * sizeMultiplier);
       
       setProcessedFile({
-        name: file.name.replace(/\.docx?$/, '.pdf'),
-        size: estimatedSize,
+        originalSize,
+        convertedSize: estimatedSize,
+        name: file.file.name.replace(/\.docx?$/, '.pdf'),
+        originalName: file.file.name,
         url: '#', // Mock URL
       });
       
@@ -209,120 +283,437 @@ const WordToPDFPage = () => {
     }
   };
 
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.6 }}
-    >
-      <Box sx={{ position: 'relative', minHeight: '100vh' }}>
-        {/* Page Header with Current User and DateTime */}
-        <Paper
-          elevation={0}
-          sx={{
-            p: 3,
-            mb: 4,
-            borderRadius: 4,
-            background: 'linear-gradient(135deg, #fafbff 0%, #f5f7ff 100%)',
-            border: '1px solid',
-            borderColor: alpha(theme.palette.primary.main, 0.1),
-          }}
-        >
-          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'flex-start', md: 'center' }, gap: 2 }}>
-            <Box>
-              <Typography variant="h4" component="h1" fontWeight={700} gutterBottom>
-                Word to PDF
-              </Typography>
-              <Typography variant="body1" color="text.secondary">
-                Convert Word documents to PDF format with high fidelity
-              </Typography>
-            </Box>
-            <Box sx={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-              <Box>
-                <Typography variant="caption" color="text.secondary">Current User</Typography>
-                <Typography variant="body2" fontWeight={500}>{username}</Typography>
-              </Box>
-              <Box>
-                <Typography variant="caption" color="text.secondary">Date & Time (UTC)</Typography>
-                <Typography variant="body2" fontWeight={500}>{currentDateTime}</Typography>
-              </Box>
-            </Box>
-          </Box>
-        </Paper>
+  const qualityOptions = [
+    { 
+      value: 'low', 
+      label: 'Low (Smaller Size)', 
+      description: 'Reduced quality, smaller file size',
+      color: '#22c55e',
+      gradient: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)'
+    },
+    { 
+      value: 'medium', 
+      label: 'Medium (Balanced)', 
+      description: 'Good balance between quality and size',
+      color: '#3b82f6',
+      gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)'
+    },
+    { 
+      value: 'high', 
+      label: 'High (Best Quality)', 
+      description: 'Best quality, larger file size',
+      color: '#6836e6',
+      gradient: 'linear-gradient(135deg, #6836e6 0%, #8c5eff 100%)'
+    },
+  ];
 
-        {!processedFile ? (
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            {!file ? (
-              <Paper
-                {...getRootProps()}
-                elevation={0}
-                variant="outlined"
+  const getCurrentQuality = () => {
+    return qualityOptions.find(option => option.value === conversionOptions.quality) || qualityOptions[2];
+  };
+
+  return (
+    <Box sx={{ 
+      position: 'relative', 
+      overflow: 'hidden',
+      bgcolor: '#030018', // Deep dark theme background
+      color: 'white',
+      minHeight: '100vh',
+    }}>
+      {/* Premium animated background */}
+      <Box
+        sx={{
+          position: 'absolute',
+          top: '-20%',
+          left: '-10%',
+          right: '-10%',
+          bottom: '-20%',
+          zIndex: 0,
+          overflow: 'hidden',
+        }}
+      >
+        {/* Animated particles */}
+        {[...Array(8)].map((_, i) => (
+          <Box
+            key={`particle-${i}`}
+            component={motion.div}
+            initial={{
+              x: Math.random() * 400 - 200,
+              y: Math.random() * 400 - 200,
+              opacity: Math.random() * 0.3 + 0.1,
+              scale: Math.random() * 0.5 + 0.3,
+            }}
+            animate={{
+              x: Math.random() * 600 - 300,
+              y: Math.random() * 600 - 300,
+              opacity: Math.random() * 0.3 + 0.1,
+              scale: Math.random() * 0.5 + 0.3,
+              rotate: 360,
+            }}
+            transition={{
+              repeat: Infinity,
+              repeatType: 'reverse',
+              duration: 20 + i * 5,
+              ease: 'linear',
+            }}
+            sx={{
+              position: 'absolute',
+              top: `${20 + i * 10}%`,
+              left: `${10 + i * 12}%`,
+              width: 60,
+              height: 60,
+              background: i % 3 === 0 
+                ? 'linear-gradient(135deg, rgba(125, 249, 255, 0.1) 0%, rgba(104, 54, 230, 0.1) 100%)'
+                : i % 3 === 1
+                ? 'linear-gradient(135deg, rgba(104, 54, 230, 0.1) 0%, rgba(230, 54, 189, 0.1) 100%)'
+                : 'linear-gradient(135deg, rgba(230, 54, 189, 0.1) 0%, rgba(255, 214, 10, 0.1) 100%)',
+              borderRadius: '50%',
+              filter: 'blur(20px)',
+            }}
+          />
+        ))}
+      </Box>
+
+      {/* Lens flare effect */}
+      <Box
+        component={motion.div}
+        animate={{
+          opacity: [0.2, 0.5, 0.2],
+          scale: [1, 1.3, 1],
+        }}
+        transition={{
+          duration: 8,
+          repeat: Infinity,
+          ease: 'easeInOut'
+        }}
+        sx={{
+          position: 'absolute',
+          top: '20%',
+          right: '10%',
+          width: '25rem',
+          height: '25rem',
+          background: `radial-gradient(circle, ${alpha(theme.palette.primary.main, 0.3)} 0%, ${alpha(theme.palette.primary.main, 0)} 70%)`,
+          filter: 'blur(80px)',
+          borderRadius: '50%',
+          mixBlendMode: 'screen',
+          zIndex: 0,
+        }}
+      />
+
+      <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 2, pt: { xs: 4, md: 6 }, pb: { xs: 6, md: 10 } }}>
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+        >
+          {/* Hero Header with theme styling */}
+          <Box sx={{ 
+            mb: { xs: 4, md: 6 }, 
+            textAlign: { xs: 'center', md: 'left' },
+            maxWidth: { xs: '100%', md: '800px' } 
+          }}>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.6 }}
+            >
+              <Typography 
+                variant="h2" 
+                component="h1" 
                 sx={{
-                  borderRadius: 4,
-                  borderStyle: 'dashed',
-                  borderWidth: 2,
-                  borderColor: isDragActive ? 'primary.main' : 'divider',
-                  bgcolor: isDragActive ? alpha(theme.palette.primary.main, 0.05) : 'background.paper',
-                  p: 6,
-                  textAlign: 'center',
-                  cursor: 'pointer',
-                  mb: 4,
+                  fontWeight: 900,
+                  fontSize: { xs: '2.5rem', sm: '3rem', md: '3.5rem' },
+                  lineHeight: { xs: 1.2, md: 1.1 },
+                  mb: { xs: 2, md: 3 },
+                  background: 'linear-gradient(90deg, #ffffff, #aac7ff)',
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  textShadow: '0 5px 30px rgba(43, 87, 151, 0.3)',
+                  position: 'relative',
                 }}
               >
+                Convert Word to
+                <Box component="span" sx={{
+                  display: { xs: 'block', sm: 'inline' },
+                  background: 'linear-gradient(90deg, #aac7ff, #2b5797)',
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  ml: { xs: 0, sm: 2 }
+                }}>
+                  PDF Files
+                </Box>
+              </Typography>
+            </motion.div>
+            
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4, duration: 0.6 }}
+            >
+              <Typography 
+                variant="h6" 
+                sx={{
+                  mb: { xs: 3, md: 4 },
+                  color: 'rgba(255, 255, 255, 0.8)',
+                  fontSize: { xs: '1.1rem', md: '1.3rem' },
+                  lineHeight: 1.6,
+                  maxWidth: '600px',
+                  mx: { xs: 'auto', md: 0 }
+                }}
+              >
+                Transform Word documents into professional 
+                <Box component="span" sx={{
+                  fontWeight: 600,
+                  background: 'linear-gradient(90deg, #ffffff, #aac7ff)',
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  mx: 0.5
+                }}>
+                  high-quality PDF files
+                </Box> 
+                while preserving all formatting and fonts.
+              </Typography>
+            </motion.div>
+          </Box>
+        </motion.div>
+
+        <Grid container spacing={{ xs: 3, md: 4 }}>
+          {/* Sidebar - Conversion Info */}
+          <Grid item xs={12} lg={4} xl={3}>
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.6, duration: 0.8 }}
+            >
+              <Card sx={{ 
+                borderRadius: '20px', 
+                mb: { xs: 3, lg: 4 }, 
+                position: { lg: 'sticky' }, 
+                top: '100px',
+                background: 'rgba(255, 255, 255, 0.05)',
+                backdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)',
+              }}>
+                <CardContent sx={{ p: { xs: 3, md: 4 } }}>
+                  <Stack direction="row" alignItems="center" sx={{ mb: 3 }}>
+                    <Avatar sx={{ 
+                      bgcolor: 'linear-gradient(135deg, #2b5797 0%, #4285f4 100%)',
+                      background: 'linear-gradient(135deg, #2b5797 0%, #4285f4 100%)',
+                      width: 48, 
+                      height: 48,
+                      mr: 2,
+                      boxShadow: '0 8px 25px rgba(43, 87, 151, 0.3)',
+                    }}>
+                      <FileTextIcon sx={{ fontSize: 24, color: 'white' }} />
+                    </Avatar>
+                    <Box>
+                      <Typography variant="h6" sx={{ 
+                        fontWeight: 700, 
+                        color: 'white',
+                        fontSize: { xs: '1.1rem', md: '1.2rem' }
+                      }}>
+                        Word to PDF Tool
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.6)' }}>
+                        Convert with precision
+                      </Typography>
+                    </Box>
+                  </Stack>
+                  
+                  <Box sx={{ mb: 3 }}>
+                    <Typography variant="subtitle2" sx={{ 
+                      color: 'rgba(255, 255, 255, 0.7)', 
+                      mb: 2,
+                      fontWeight: 600 
+                    }}>
+                      How it works:
+                    </Typography>
+                    <Stack spacing={2}>
+                      <Stack direction="row" spacing={2} alignItems="center">
+                        <Box sx={{
+                          width: 24,
+                          height: 24,
+                          borderRadius: '50%',
+                          background: 'linear-gradient(135deg, #aac7ff 0%, #4285f4 100%)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0,
+                        }}>
+                          <Typography variant="caption" sx={{ color: 'white', fontWeight: 'bold' }}>1</Typography>
+                        </Box>
+                        <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                          Upload Word document
+                        </Typography>
+                      </Stack>
+                      <Stack direction="row" spacing={2} alignItems="center">
+                        <Box sx={{
+                          width: 24,
+                          height: 24,
+                          borderRadius: '50%',
+                          background: 'linear-gradient(135deg, #2b5797 0%, #4285f4 100%)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0,
+                        }}>
+                          <Typography variant="caption" sx={{ color: 'white', fontWeight: 'bold' }}>2</Typography>
+                        </Box>
+                        <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                          Configure settings
+                        </Typography>
+                      </Stack>
+                      <Stack direction="row" spacing={2} alignItems="center">
+                        <Box sx={{
+                          width: 24,
+                          height: 24,
+                          borderRadius: '50%',
+                          background: 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0,
+                        }}>
+                          <Typography variant="caption" sx={{ color: 'white', fontWeight: 'bold' }}>3</Typography>
+                        </Box>
+                        <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                          Download PDF file
+                        </Typography>
+                      </Stack>
+                    </Stack>
+                  </Box>
+                  
+                  <Box
+                    sx={{
+                      p: 2,
+                      borderRadius: '12px',
+                      background: 'rgba(43, 87, 151, 0.1)', // Word blue
+                      border: '1px solid rgba(43, 87, 151, 0.2)',
+                    }}
+                  >
+                    <Typography variant="caption" sx={{ 
+                      color: 'rgba(255, 255, 255, 0.7)',
+                      display: 'block',
+                      mb: 1
+                    }}>
+                      Current Status:
+                    </Typography>
+                    <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                      <Chip 
+                        label={file ? '1 File Ready' : 'No File'}
+                        size="small"
+                        sx={{ 
+                          bgcolor: file ? 'rgba(43, 87, 151, 0.2)' : 'rgba(255, 255, 255, 0.1)',
+                          color: file ? '#aac7ff' : 'white',
+                          fontWeight: 500,
+                        }}
+                      />
+                      <Chip 
+                        label={file ? getCurrentQuality().label : 'Upload Document'}
+                        size="small"
+                        sx={{ 
+                          bgcolor: file ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)',
+                          color: file ? '#22c55e' : '#ef4444',
+                        }}
+                      />
+                    </Stack>
+                  </Box>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </Grid>
+
+          {/* Main Content Area */}
+          <Grid item xs={12} lg={8} xl={9}>
+            {!processedFile ? (
+              <motion.div
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8, duration: 0.8 }}
+              >
+                {!file ? (
+                  <Card
+                    sx={{
+                      borderRadius: '24px',
+                      mb: { xs: 3, md: 4 },
+                      background: 'rgba(255, 255, 255, 0.03)',
+                      backdropFilter: 'blur(20px)',
+                      border: isDragActive 
+                        ? '2px dashed #aac7ff' 
+                        : '2px dashed rgba(255, 255, 255, 0.1)',
+                      boxShadow: isDragActive
+                        ? '0 20px 40px rgba(43, 87, 151, 0.2)'
+                        : '0 15px 35px rgba(0, 0, 0, 0.2)',
+                      transition: 'all 0.3s ease',
+                      cursor: 'pointer',
+                      '&:hover': {
+                        borderColor: 'rgba(43, 87, 151, 0.5)',
+                        background: 'rgba(43, 87, 151, 0.02)',
+                        boxShadow: '0 25px 50px rgba(43, 87, 151, 0.15)',
+                      },
+                    }}
+                    {...getRootProps()}
+                    >
                 <input {...getInputProps()} />
                 
-                <Box
-                  component={motion.div}
-                  variants={itemVariants}
-                  sx={{
-                    width: 80,
-                    height: 80,
-                    borderRadius: '50%',
-                    backgroundColor: alpha(theme.palette.primary.main, 0.1),
-                    color: 'primary.main',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    mb: 2,
-                    mx: 'auto',
-                  }}
-                >
-                  <UploadIcon size={36} />
-                </Box>
-                
-                <Typography 
-                  variant="h6" 
-                  component={motion.div}
-                  variants={itemVariants} 
-                  gutterBottom
-                >
-                  {isDragActive
-                    ? "Drop your Word document here"
-                    : "Drag & drop Word document here"
-                  }
-                </Typography>
-                
-                <Typography 
-                  variant="body2" 
-                  color="text.secondary"
-                  component={motion.div}
-                  variants={itemVariants}
-                >
-                  or <Box component="span" sx={{ color: 'primary.main', fontWeight: 600, cursor: 'pointer' }}>browse files</Box> from your computer
-                </Typography>
-                
-                <Box component={motion.div} variants={itemVariants} sx={{ mt: 2 }}>
-                  <Chip 
-                    label="Supported formats: DOC, DOCX, DOCM" 
-                    size="small" 
-                    variant="outlined" 
-                  />
-                </Box>
-              </Paper>
+                <CardContent sx={{ p: 5, textAlign: 'center' }}>
+                  <Box
+                    component={motion.div}
+                    variants={itemVariants}
+                    sx={{
+                      width: 80,
+                      height: 80,
+                      borderRadius: '50%',
+                      backgroundColor: alpha('#2b5797', 0.1), // Word blue theme color
+                      color: '#2b5797', // Word blue theme color
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      mb: 2,
+                      mx: 'auto',
+                    }}
+                  >
+                    <UploadIcon style={{ fontSize: 36 }} />
+                  </Box>
+                  
+                  <Typography 
+                    variant="h6" 
+                    component={motion.div}
+                    variants={itemVariants} 
+                    gutterBottom
+                    sx={{ color: 'white' }}
+                  >
+                    {isDragActive
+                      ? "Drop your Word document here"
+                      : "Drag & drop Word document here"
+                    }
+                  </Typography>
+                  
+                  <Typography 
+                    variant="body2"
+                    component={motion.div}
+                    variants={itemVariants}
+                    sx={{ color: 'rgba(255, 255, 255, 0.7)', mb: 2 }}
+                  >
+                    or <Box component="span" sx={{ color: '#aac7ff', fontWeight: 600, cursor: 'pointer' }}>browse files</Box> from your computer
+                  </Typography>
+                  
+                  <Box component={motion.div} variants={itemVariants} sx={{ mt: 2 }}>
+                    <Chip 
+                      label="Supported formats: DOC, DOCX, DOCM" 
+                      size="small" 
+                      sx={{
+                        bgcolor: 'rgba(43, 87, 151, 0.1)',
+                        color: '#aac7ff',
+                        border: '1px solid rgba(43, 87, 151, 0.3)',
+                      }}
+                    />
+                  </Box>
+                </CardContent>
+              </Card>
             ) : (
               <Card sx={{ borderRadius: 4, mb: 4 }}>
                 <CardContent sx={{ p: 0 }}>
@@ -339,7 +730,7 @@ const WordToPDFPage = () => {
                           borderRadius: 2,
                         }}
                       >
-                        <FileTextIcon size={24} color="#2b5797" />
+                        <FileTextIcon sx={{ fontSize: 24, color: "#2b5797" }} />
                       </Box>
                       
                       <Box sx={{ flexGrow: 1 }}>
@@ -355,7 +746,7 @@ const WordToPDFPage = () => {
                         variant="outlined"
                         color="error"
                         size="small"
-                        startIcon={<TrashIcon size={16} />}
+                        startIcon={<TrashIcon sx={{ fontSize: 16 }} />}
                         onClick={handleReset}
                       >
                         Change File
@@ -482,7 +873,16 @@ const WordToPDFPage = () => {
                               min={10}
                               max={95}
                               disabled={!conversionOptions.optimizeSize}
-                              sx={{ maxWidth: 500 }}
+                              sx={{ 
+                                maxWidth: 500,
+                                color: WORD_BLUE,
+                                '& .MuiSlider-thumb': {
+                                  bgcolor: WORD_BLUE,
+                                },
+                                '& .MuiSlider-track': {
+                                  bgcolor: WORD_BLUE,
+                                },
+                              }}
                             />
                             <Typography variant="caption" color="text.secondary">
                               Higher compression may affect image quality
@@ -494,7 +894,7 @@ const WordToPDFPage = () => {
                     
                     <Alert 
                       severity="info" 
-                      icon={<InfoIcon size={18} />}
+                      icon={<InfoIcon sx={{ fontSize: 18 }} />}
                       sx={{ mt: 3, borderRadius: 2 }}
                     >
                       <Typography variant="body2">
@@ -507,7 +907,7 @@ const WordToPDFPage = () => {
                     <Button
                       variant="contained"
                       size="large"
-                      startIcon={isProcessing ? <RefreshIcon className="rotating" /> : <ZapIcon size={16} />}
+                      startIcon={isProcessing ? <RefreshIcon className="rotating" /> : <ZapIcon sx={{ fontSize: 16 }} />}
                       onClick={handleConvert}
                       disabled={isProcessing}
                       sx={{
@@ -516,9 +916,9 @@ const WordToPDFPage = () => {
                         borderRadius: '50px',
                         position: 'relative',
                         overflow: 'hidden',
-                        bgcolor: '#2b5797', // Word blue
+                        bgcolor: theme.palette.primary.main,
                         '&:hover': {
-                          bgcolor: '#1e3d6b',
+                          bgcolor: theme.palette.primary.dark,
                         },
                         '& .rotating': {
                           animation: 'spin 2s linear infinite',
@@ -564,7 +964,7 @@ const WordToPDFPage = () => {
               <Box
                 sx={{
                   p: 3,
-                  bgcolor: 'success.lighter',
+                  bgcolor: alpha(theme.palette.success.main, 0.1),
                   borderBottom: '1px solid',
                   borderColor: alpha(theme.palette.success.main, 0.2),
                 }}
@@ -575,21 +975,21 @@ const WordToPDFPage = () => {
                       width: 48,
                       height: 48,
                       borderRadius: '50%',
-                      bgcolor: 'success.main',
+                      bgcolor: theme.palette.success.main,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       color: 'white',
                     }}
                   >
-                    <CheckIcon size={24} />
+                    <CheckIcon sx={{ fontSize: 24 }} />
                   </Box>
                   
                   <Box>
-                    <Typography variant="h6">
+                    <Typography variant="h6" sx={{ color: 'white' }}>
                       Conversion Complete!
                     </Typography>
-                    <Typography variant="body2">
+                    <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
                       Your Word document has been successfully converted to PDF
                     </Typography>
                   </Box>
@@ -615,8 +1015,7 @@ const WordToPDFPage = () => {
                         }}
                       >
                         <FileTextIcon 
-                          size={32} 
-                          color="#2b5797" // Word blue
+                          sx={{ fontSize: 32, color: '#2b5797' }} // Word blue
                         />
                       </Box>
                       
@@ -626,7 +1025,7 @@ const WordToPDFPage = () => {
                     </Box>
                     
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      <ZapIcon size={24} color={theme.palette.primary.main} />
+                      <ZapIcon sx={{ fontSize: 24, color: theme.palette.primary.main }} />
                     </Box>
                     
                     <Box sx={{ textAlign: 'center' }}>
@@ -644,10 +1043,12 @@ const WordToPDFPage = () => {
                           position: 'relative',
                         }}
                       >
-                        {/* <FilePdfIcon 
-                          size={32} 
-                          color={theme.palette.error.main}
-                        /> */}
+                        <FilePdfIcon 
+                          sx={{ 
+                            fontSize: 32, 
+                            color: theme.palette.error.main 
+                          }}
+                        />
                       </Box>
                       
                       <Typography variant="body2" color="text.secondary">
@@ -661,7 +1062,7 @@ const WordToPDFPage = () => {
                   </Typography>
                   
                   <Typography variant="body2" color="text.secondary">
-                    {formatFileSize(processedFile.size)}
+                    {formatFileSize(processedFile.convertedSize)}
                   </Typography>
                 </Box>
                 
@@ -715,7 +1116,7 @@ const WordToPDFPage = () => {
               >
                 <Button
                   variant="outlined"
-                  startIcon={<RefreshIcon size={16} />}
+                  startIcon={<RefreshIcon sx={{ fontSize: 16 }} />}
                   onClick={handleReset}
                 >
                   Convert Another Document
@@ -733,7 +1134,7 @@ const WordToPDFPage = () => {
             
             <Alert 
               severity="info" 
-              icon={<InfoIcon size={20} />} 
+              icon={<InfoIcon sx={{ fontSize: 20 }} />} 
               sx={{ mb: 4, borderRadius: 3 }}
             >
               <AlertTitle>PDF Ready</AlertTitle>
@@ -750,7 +1151,7 @@ const WordToPDFPage = () => {
           
           <Grid container spacing={4}>
             <Grid item xs={12} md={6}>
-              <Typography variant="h5" gutterBottom fontWeight={700}>
+              <Typography variant="h5" gutterBottom fontWeight={700} sx={{ color: 'white' }}>
                 How to Convert Word to PDF
               </Typography>
               
@@ -800,10 +1201,10 @@ const WordToPDFPage = () => {
                       {index + 1}
                     </Box>
                     <Box>
-                      <Typography variant="subtitle1" fontWeight={600} gutterBottom>
+                      <Typography variant="subtitle1" fontWeight={600} gutterBottom sx={{ color: 'white' }}>
                         {step.title}
                       </Typography>
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
                         {step.description}
                       </Typography>
                     </Box>
@@ -813,7 +1214,7 @@ const WordToPDFPage = () => {
             </Grid>
             
             <Grid item xs={12} md={6}>
-              <Typography variant="h6" gutterBottom fontWeight={700}>
+              <Typography variant="h6" gutterBottom fontWeight={700} sx={{ color: 'white' }}>
                 When to Convert Word to PDF
               </Typography>
               
@@ -843,17 +1244,20 @@ const WordToPDFPage = () => {
                         borderRadius: 3,
                         height: '100%',
                         transition: 'all 0.2s ease',
+                        bgcolor: 'rgba(255, 255, 255, 0.05)', 
+                        backdropFilter: 'blur(10px)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
                         '&:hover': {
-                          borderColor: '#2b5797',
-                          boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+                          borderColor: '#aac7ff',
+                          boxShadow: '0 4px 20px rgba(43, 87, 151, 0.25)',
                         },
                       }}
                     >
                       <CardContent>
-                        <Typography variant="subtitle1" fontWeight={600} gutterBottom>
+                        <Typography variant="subtitle1" fontWeight={600} gutterBottom sx={{ color: 'white' }}>
                           {item.title}
                         </Typography>
-                        <Typography variant="body2" color="text.secondary">
+                        <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
                           {item.description}
                         </Typography>
                       </CardContent>
@@ -866,16 +1270,16 @@ const WordToPDFPage = () => {
                 sx={{ 
                   mt: 3,
                   borderRadius: 3,
-                  bgcolor: alpha(theme.palette.warning.main, 0.05),
+                  bgcolor: alpha(theme.palette.warning.main, 0.1),
                   border: `1px solid ${alpha(theme.palette.warning.main, 0.2)}`
                 }}
               >
                 <CardContent>
-                  <Typography variant="subtitle1" fontWeight={600} gutterBottom color="warning.dark">
-                    <AlertCircleIcon size={16} style={{ verticalAlign: 'middle', marginRight: 8 }} />
+                  <Typography variant="subtitle1" fontWeight={600} gutterBottom sx={{ color: theme.palette.warning.light }}>
+                    <AlertCircleIcon sx={{ fontSize: 16, verticalAlign: 'middle', mr: 1 }} />
                     Important Note
                   </Typography>
-                  <Typography variant="body2" paragraph>
+                  <Typography variant="body2" paragraph sx={{ color: 'rgba(255, 255, 255, 0.8)' }}>
                     Converting to PDF makes your document fixed and non-editable. If you need to make further text edits, keep a copy of the original Word document.
                   </Typography>
                 </CardContent>
@@ -883,8 +1287,10 @@ const WordToPDFPage = () => {
             </Grid>
           </Grid>
         </Box>
-      </Box>
-    </motion.div>
+      </Grid>
+    </Grid>
+    </Container>
+    </Box>
   );
 };
 

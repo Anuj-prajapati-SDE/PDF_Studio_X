@@ -137,7 +137,7 @@ const LoginPage = () => {
         localStorage.setItem('token', data.token);
         login(data.user);
         toast.success('Welcome back!');
-        navigate('/');
+        navigate('/tools/dashboard');
       } else {
         toast.error(data.message || 'Login failed');
       }

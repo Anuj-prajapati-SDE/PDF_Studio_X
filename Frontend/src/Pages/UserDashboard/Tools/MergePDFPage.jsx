@@ -45,7 +45,7 @@ import { motion, useAnimation } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import toast from 'react-hot-toast';
 import axios from 'axios';
-import { getApiUrl } from '../../utils/api';
+import { getApiUrl } from '../../../utils/api';
 // import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 // Mock implementation - replace with actual API call in production

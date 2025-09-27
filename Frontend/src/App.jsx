@@ -13,41 +13,43 @@ import theme from './theme';
 import { AuthProvider } from './context/AuthContext';
 
 // Layouts
-import MainLayout from './Layouts/MainLayout';
+import MainLayout from './Pages/UserDashboard/Layouts/MainLayout.jsx';
 
 // Pages
 import HomePage from './Pages/Home/HomePage';
-import MergePDFPage from './Pages/UserDashboard/MergePDFPage';
-import SplitPDFPage from './Pages/UserDashboard/SplitPDFPage';
-import ConvertPDFPage from './Pages/UserDashboard/ConvertPDFPage';
-import CreatePDFPage from './Pages/UserDashboard/CreatePDFPage';
-import ProtectPDFPage from './Pages/UserDashboard/ProtectedPDFPage';
-import AboutPage from './Pages/AboutPage';
-import ContactPage from './Pages/ContactPage.jsx';
-import PricingPage from './Pages/PricingPage';
-import NotFoundPage from './Pages/NotFoundPage';
-import CompressPDFPage from './Pages/UserDashboard/CompressPDFpage';
-import PDFToWordPage from './Pages/UserDashboard/PDFToWordPage';
-import PDFToPowerPointPage from './Pages/UserDashboard/PDFToPowerPointPage';
-import PDFToExcelPage from './Pages/UserDashboard/PDFToExcelPage';
-import WordToPDFPage from './Pages/UserDashboard/WordToPDFPage';
-import PowerPointToPDFPage from './Pages/UserDashboard/PowerPointToPDFPage';
-import ExcelToPDFPage from './Pages/UserDashboard/ExcelToPDFPage';
-import ImageCompressionPage from './Pages/UserDashboard/ImageCompressionPage';
-import PDFToJPGPage from './Pages/UserDashboard/PDFToJPGPage';
-import WatermarkPDFPage from './Pages/UserDashboard/WaterMarkPDFPage';
-import UnlockPDFPage from './Pages/UserDashboard/UnlockPDFPage';
-import CropPDFPage from './Pages/UserDashboard/CropPDFPage';
-import EditPDFPage from './Pages/UserDashboard/EditPDFPage';
+// import AboutPage from './Pages/Home/AboutPage.jsx';
+// import PricingPage from './Pages/Home/PricingPage.jsx';
+// import ContactPage from './Pages/Home/ContactPage.jsx';
 import SignupPage from './Pages/Auth/SignupPage';
 import LoginPage from './Pages/Auth/LoginPage';
 import OTPVerification from './Pages/Auth/OTPVerification';
 import ForgotPasswordPage from './Pages/Auth/ForgotPasswordPage';
 import ResetPasswordPage from './Pages/Auth/ResetPasswordPage';
-import DashboardPage from './Pages/UserDashboard/DashboardPage';
 
-import DashBoardLayout from './Layouts/DashBoardLayout.jsx';
+import DashBoardLayout from './Pages/UserDashboard/Layouts/DashBoardLayout.jsx';
+import DashboardPage from './Pages/UserDashboard/DashboardPage.jsx';
+import CreatePDFPage from './Pages/UserDashboard/Tools/CreatePDFPage.jsx';
+import CompressPDFPage from './Pages/UserDashboard/Tools/CompressPDFpage';
+import WordToPDFPage from './Pages/UserDashboard/Tools/WordToPDFPage.jsx';
+import ExcelToPDFPage from './Pages/UserDashboard/Tools/ExcelToPDFPage.jsx';
+import ProtectPDFPage from './Pages/UserDashboard/Tools/ProtectedPDFPage.jsx';
+// import ImageCompressionPage from './Pages/UserDashboard/ImageCompressionPage';
+// import MergePDFPage from './Pages/UserDashboard/MergePDFPage';
+// import SplitPDFPage from './Pages/UserDashboard/SplitPDFPage';
+// import PDFToWordPage from './Pages/UserDashboard/PDFToWordPage';
+// import PDFToPowerPointPage from './Pages/UserDashboard/PDFToPowerPointPage';
+// import PDFToExcelPage from './Pages/UserDashboard/PDFToExcelPage';
+// import PowerPointToPDFPage from './Pages/UserDashboard/PowerPointToPDFPage';
+// import PDFToJPGPage from './Pages/UserDashboard/PDFToJPGPage';
+// import WatermarkPDFPage from './Pages/UserDashboard/WaterMarkPDFPage';
+// import UnlockPDFPage from './Pages/UserDashboard/UnlockPDFPage';
+// import CropPDFPage from './Pages/UserDashboard/CropPDFPage';
 
+import ConvertPDFPage from './Pages/UserDashboard/Tools/ConvertPDFPage.jsx';
+import EditPDFPage from './Pages/UserDashboard/Tools/EditPDFPage.jsx';
+
+import NotFoundPage from './Pages/Error/NotFoundPage.jsx';
+import WordToPDFPageDynamic from './Pages/UserDashboard/Tools/WordToPDFPageDynamic.jsx';
 // Global styles
 const globalStyles = {
   '*::-webkit-scrollbar': {
@@ -141,39 +143,41 @@ function App() {
           <Routes>
             <Route path="/" element={<MainLayout />}>
               <Route index element={<HomePage />} />
-              <Route path="about" element={<AboutPage />} />
-              <Route path="contact" element={<ContactPage />} />
-              <Route path="pricing" element={<PricingPage />} />
+
+              {/* <Route path="about" element={<AboutPage />} /> */}
+              {/* <Route path="contact" element={<ContactPage />} /> */}
+              {/* <Route path="pricing" element={<PricingPage />} /> */}
+
+
               <Route path="signup" element={<SignupPage />} />
               <Route path="login" element={<LoginPage />} />
               <Route path="forgot-password" element={<ForgotPasswordPage />} />
               <Route path="reset-password" element={<ResetPasswordPage />} />
-              <Route path="otp-verification" element={<OTPVerification />} />  
+              <Route path="otp-verification" element={<OTPVerification />} /> 
+
             </Route>
 
             <Route path="/tools" element={<DashBoardLayout/>}>
               <Route index path="dashboard" element={<DashboardPage/>} />
-              <Route path="merge-pdf" element={<MergePDFPage />} />
-              <Route path="split-pdf" element={<SplitPDFPage />} />
-              <Route path="convert-pdf" element={<ConvertPDFPage />} />
               <Route path="create-pdf" element={<CreatePDFPage />} />
-              <Route path="protect-pdf" element={<ProtectPDFPage />} />
               <Route path="compress-pdf" element={<CompressPDFPage />} />
-              <Route path="pdf-to-word" element={<PDFToWordPage />} />
-              <Route path="pdf-to-power-point" element={<PDFToPowerPointPage />} />
-              <Route path="pdf-to-excel" element={<PDFToExcelPage/>} />
-              <Route path="word-to-pdf" element={<WordToPDFPage/>} />
-              <Route path="power-point-to-pdf" element={<PowerPointToPDFPage/>} />
+              <Route path="word-to-pdf" element={<WordToPDFPageDynamic/>} />
               <Route path="excel-to-pdf" element={<ExcelToPDFPage/>} />
-              <Route path="image-compression" element={<ImageCompressionPage/>} />
-              <Route path="pdf-to-jpg" element={<PDFToJPGPage/>} />
-            
-              <Route path="add-sign" element={<SignupPage/>} />
-              <Route path="watermark-pdf" element={<WatermarkPDFPage/>} />
-              <Route path="unlock-pdf" element={<UnlockPDFPage/>} />
-              <Route path="crop-pdf" element={<CropPDFPage/>} />  
+              <Route path="protect-pdf" element={<ProtectPDFPage />} />
+              {/* <Route path="merge-pdf" element={<MergePDFPage />} /> */}
+              {/* <Route path="split-pdf" element={<SplitPDFPage />} /> */}
+              {/* <Route path="pdf-to-word" element={<PDFToWordPage />} /> */}
+              {/* <Route path="pdf-to-power-point" element={<PDFToPowerPointPage />} /> */}
+              {/* <Route path="pdf-to-excel" element={<PDFToExcelPage/>} /> */}
+              {/* <Route path="power-point-to-pdf" element={<PowerPointToPDFPage/>} /> */}
+              {/* <Route path="image-compression" element={<ImageCompressionPage/>} /> */}
+              {/* <Route path="pdf-to-jpg" element={<PDFToJPGPage/>} /> */} 
+              {/* <Route path="add-sign" element={<SignupPage/>} /> */}
+              {/* <Route path="watermark-pdf" element={<WatermarkPDFPage/>} /> */}
+              {/* <Route path="unlock-pdf" element={<UnlockPDFPage/>} /> */}
+              {/* <Route path="crop-pdf" element={<CropPDFPage/>} />   */}
               <Route path="edit-pdf" element={<EditPDFPage/>} />
-            
+              <Route path="convert-pdf" element={<ConvertPDFPage />} />
             </Route>
             <Route path="*" element={<NotFoundPage />} />
           </Routes>

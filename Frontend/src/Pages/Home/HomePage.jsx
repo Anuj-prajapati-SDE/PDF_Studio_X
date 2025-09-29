@@ -78,6 +78,13 @@ const HomePage = () => {
 
    const tools = [
     {
+      title: 'Create PDF',
+      description: 'Generate new PDF documents from scratch',
+      icon: <TextSnippetIcon sx={{ fontSize: 40, color: 'white' }} />,
+      path: '/tools/create-pdf',
+      color: theme.palette.secondary.main,
+    },
+    {
       title: 'Merge PDF',
       description: 'Combine multiple PDFs into a single document',
       icon: <MergeTypeIcon sx={{ fontSize: 40, color: 'white' }} />,
@@ -92,26 +99,19 @@ const HomePage = () => {
       color: theme.palette.warning.main,
     },
     {
-      title: 'Convert PDF',
-      description: 'Transform PDFs to other formats and back',
-      icon: <CompareArrowsIcon sx={{ fontSize: 40, color: 'white' }} />,
-      path: '/tools/convert-pdf',
-      color: theme.palette.success.main,
-    },
-    {
-      title: 'Create PDF',
-      description: 'Generate new PDF documents from scratch',
-      icon: <TextSnippetIcon sx={{ fontSize: 40, color: 'white' }} />,
-      path: '/tools/create-pdf',
-      color: theme.palette.secondary.main,
-    },
-    {
       title: 'Protect PDF',
       description: 'Add password protection to your documents',
       icon: <LockIcon sx={{ fontSize: 40, color: 'white' }} />,
       path: '/tools/protect-pdf',
       color: theme.palette.error.main,
     },
+    {
+      title: 'Convert PDF',
+      description: 'Transform PDFs to other formats and back',
+      icon: <CompareArrowsIcon sx={{ fontSize: 40, color: 'white' }} />,
+      path: '/tools/convert-pdf',
+      color: theme.palette.success.main,
+    },  
     {
       title: 'Advanced Editing',
       description: 'Edit content, add watermarks, and more',
@@ -143,8 +143,8 @@ const HomePage = () => {
           overflow: 'visible', // Allow elements to extend beyond container
           bgcolor: '#030018', // Deeper, richer background
           color: 'white',
-          pt: { xs: 10, sm: 14, md: 18 },
-          pb: { xs: 16, sm: 20, md: 24 },
+          pt: { xs: 10, sm: 14, md: 16 },
+          pb: { xs: 16, sm: 20, md:  16 },
         }}
       >
         {/* Extreme premium animated background */}
@@ -737,8 +737,7 @@ const HomePage = () => {
               '&::before': {
                   content: '""',
                   position: 'absolute',
-                  top: 10,
-                
+                  top: 10,  
                   minWidth: '100%',
                   borderRadius: '20px',
                   left: 0,
@@ -767,8 +766,7 @@ const HomePage = () => {
                       content: '""',
                       position: 'absolute',
                       right: 0,
-                      top: '20%',
-                     
+                      top: '20%', 
                       height: '60%',
                       width: '1px',
                       bgcolor: 'rgba(255, 255, 255, 0.15)',
@@ -853,7 +851,7 @@ const HomePage = () => {
        {/* How It Works Section */}
         <HowItWorksSection />
         {/* Testimonials Section */}
-        <TestimonialSection testimonials={testimonials}></TestimonialSection>
+        {/* <TestimonialSection testimonials={testimonials}></TestimonialSection> */}
 
         {/* CTA Section */}
         <CTASection />

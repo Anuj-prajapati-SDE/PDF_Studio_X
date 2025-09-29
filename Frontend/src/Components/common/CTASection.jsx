@@ -21,7 +21,7 @@ const CTASection = () => {
     <Box 
       ref={sectionRef}
       sx={{ 
-        py: { xs: 8, md: 12 },
+        py: { xs: 8, md: 6 },
         position: 'relative',
       }}
     >

@@ -12,7 +12,7 @@ import {
   ListItemIcon,
   Avatar,
   Tooltip,
-  Badge,
+ 
   Drawer,
   List,
   ListItem,
@@ -34,8 +34,6 @@ import {
   Image as ImageIcon,
   Layers as LayersIcon,
   Security as SecurityIcon,
-  DateRange as DateIcon,
-  AccessTime as TimeIcon,
   Person as PersonIcon,
   NotificationsNone as NotificationsIcon,
   Logout as LogoutIcon,
@@ -78,14 +76,14 @@ const PdfLogo = ({ size = 40, light = false }) => (
 
 const Header = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [dateTime, setDateTime] = useState(new Date());
+  // const [dateTime, setDateTime] = useState(new Date());
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  // const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout, isAuthenticated } = useAuth();
-  
+  console.log('User in Header:', user);
   // Tools menu
   const [toolsAnchorEl, setToolsAnchorEl] = useState(null);
   const isToolsMenuOpen = Boolean(toolsAnchorEl);
@@ -95,18 +93,6 @@ const Header = () => {
   const [userMenuAnchor, setUserMenuAnchor] = useState(null);
   const isUserMenuOpen = Boolean(userMenuAnchor);
   
-  // Update the date/time every second
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setDateTime(new Date());
-    }, 1000);
-    
-    return () => clearInterval(timer);
-  }, []);
-  
-  // Format date and time (UTC)
-  const formattedDateTime = dateTime.toISOString().replace('T', ' ').slice(0, 19);
-
   const toolsMenuItems = [
     { 
       name: 'Merge PDF', 
@@ -172,15 +158,15 @@ const Header = () => {
   // Desktop navigation links
   const navLinks = [
     { title: 'Home', path: '/' },
-    { title: 'About', path: '/about' },
-    { title: 'Pricing', path: '/pricing' },
+    // { title: 'About', path: '/about' },
+    // { title: 'Pricing', path: '/pricing' },
     { title: 'Contact', path: '/contact' },
   ];
   
   // Get current user's initials for avatar
-  const getUserInitials = (name) => {
-    if (!name) return 'U';
-    return name.split('-')
+  const getUserInitials = (name, lastName) => {
+    if (!name && !lastName) return 'U';
+    return (name + ' ' + lastName).split('-')
       .map(part => part[0])
       .join('')
       .substring(0, 2)
@@ -370,8 +356,6 @@ const Header = () => {
               </Box>
             ))}
           </Box>
-
-          {/* Right side information: time, user */}
           <Box 
             sx={{ 
               ml: { xs: 0, md: 2 },
@@ -386,7 +370,7 @@ const Header = () => {
                 <Box
                   component={motion.div}
                   whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.97 }}
+                  whileTap={{ scale: 0.97 }} 
                 >
                   <Button
                     onClick={handleUserMenuOpen}
@@ -416,37 +400,8 @@ const Header = () => {
                         fontWeight: 600,
                       }}
                     >
-                      {getUserInitials(user?.name)}
-                    </Avatar>
-                    
-                    <Box sx={{ 
-                      ml: 1.5, 
-                      display: { xs: 'none', sm: 'block' },
-                      textAlign: 'left',
-                    }}>
-                      <Typography 
-                        component="span" 
-                        sx={{ 
-                          fontSize: '0.85rem',
-                          fontWeight: 600,
-                          display: 'block',
-                          lineHeight: 1.2,
-                        }}
-                      >
-                        {isSmall ? user?.name?.split('-')[0] : user?.name}
-                      </Typography>
-                      <Typography 
-                        component="span" 
-                        sx={{ 
-                          fontSize: '0.7rem',
-                          opacity: 0.8,
-                          display: 'block',
-                          lineHeight: 1.2,
-                        }}
-                      >
-                        {user?.role || 'User'}
-                      </Typography>
-                    </Box>
+                      {getUserInitials(user?.firstName + ' ' + user?.lastName)}
+                    </Avatar>   
                   </Button>
                 </Box>
               </Tooltip>
@@ -702,7 +657,7 @@ const Header = () => {
         >
           <Box sx={{ px: 2, py: 1 }}>
             <Typography variant="subtitle2" fontWeight={600}>
-              {user?.name?.split('-').join(' ') || 'User'}
+              {user?.firstName?.split('-').join(' ') || 'User'} {user?.lastName?.split('-').join(' ') || 'User'}      
             </Typography>
             <Typography variant="caption" color="text.secondary">
               {user?.email}
@@ -838,15 +793,15 @@ const Header = () => {
             <Avatar
               sx={{
                 width: 48,
-                height: 48,
+                height: 48, 
                 backgroundColor: 'white',
-                color: '#6366f1',
+                color: '#2934b5',
                 fontWeight: 600,
                 fontSize: '1rem',
                 boxShadow: '0 0 0 2px rgba(255, 255, 255, 0.3)',
               }}
             >
-              {getUserInitials(user?.name)}
+              {getUserInitials(user?.name) + '' + getUserInitials(user?.lastName)}
             </Avatar>
             <Box>
               <Typography variant="subtitle2" fontWeight={600}>

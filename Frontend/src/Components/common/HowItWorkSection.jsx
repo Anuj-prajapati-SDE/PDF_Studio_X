@@ -28,16 +28,16 @@ import {
 const GlassCard = styled(Box)(({ theme, gradientStyle = 'primary' }) => {
   // Define gradient styles using theme colors
   const gradients = {
-    primary: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.08)} 0%, ${alpha(theme.palette.primary.dark, 0.12)} 100%)`,
-    secondary: `linear-gradient(135deg, ${alpha(theme.palette.secondary.main, 0.08)} 0%, ${alpha(theme.palette.secondary.dark, 0.12)} 100%)`,
-    info: `linear-gradient(135deg, ${alpha(theme.palette.info.main, 0.08)} 0%, ${alpha(theme.palette.info.dark, 0.12)} 100%)`,
+    primary: `linear-gradient(135deg, ${alpha(theme.palette.primary.dark, 0.08)} 0%, ${alpha(theme.palette.primary.dark, 0.12)} 100%)`,
+    secondary: `linear-gradient(135deg, ${alpha(theme.palette.secondary.dark, 0.08)} 0%, ${alpha(theme.palette.secondary.dark, 0.12)} 100%)`,
+    info: `linear-gradient(135deg, ${alpha(theme.palette.info.dark, 0.08)} 0%, ${alpha(theme.palette.info.dark, 0.12)} 100%)`,
   };
   
   // Define border colors using theme colors
   const borders = {
-    primary: alpha(theme.palette.primary.main, 0.2),
-    secondary: alpha(theme.palette.secondary.main, 0.2),
-    info: alpha(theme.palette.info.main, 0.2),
+    primary: alpha(theme.palette.primary.dark, 0.2),
+    secondary: alpha(theme.palette.secondary.dark, 0.2),
+    info: alpha(theme.palette.info.dark, 0.2),
   };
 
   return {
@@ -70,16 +70,16 @@ const GlassCard = styled(Box)(({ theme, gradientStyle = 'primary' }) => {
 const GradientDisplay = styled(Box)(({ theme, gradient = 'primary' }) => {
   // Define gradient styles using theme colors
   const gradients = {
-    primary: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
-    secondary: `linear-gradient(135deg, ${theme.palette.secondary.main} 0%, ${theme.palette.secondary.dark} 100%)`,
-    info: `linear-gradient(135deg, ${theme.palette.info.main} 0%, ${theme.palette.info.dark} 100%)`,
+    primary: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.dark} 100%)`,
+    secondary: `linear-gradient(135deg, ${theme.palette.secondary.dark} 0%, ${theme.palette.secondary.dark} 100%)`,
+    info: `linear-gradient(135deg, ${theme.palette.info.dark} 0%, ${theme.palette.info.dark} 100%)`,
   };
   
   // Define shadow colors using theme colors
   const shadows = {
-    primary: `0 8px 16px -4px ${alpha(theme.palette.primary.main, 0.5)}`,
-    secondary: `0 8px 16px -4px ${alpha(theme.palette.secondary.main, 0.5)}`,
-    info: `0 8px 16px -4px ${alpha(theme.palette.info.main, 0.5)}`,
+    primary: `0 8px 16px -4px ${alpha(theme.palette.primary.dark, 0.5)}`,
+    secondary: `0 8px 16px -4px ${alpha(theme.palette.secondary.dark, 0.5)}`,
+    info: `0 8px 16px -4px ${alpha(theme.palette.info.dark, 0.5)}`,
   };
 
   return {
@@ -220,46 +220,45 @@ const StepCard = ({ step, index }) => {
   const getGradient = (gradientType) => {
     switch(gradientType) {
       case 'primary':
-        return `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`;
+        return `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.dark} 100%)`;
       case 'secondary':
-        return `linear-gradient(135deg, ${theme.palette.secondary.main} 0%, ${theme.palette.secondary.dark} 100%)`;
+        return `linear-gradient(135deg, ${theme.palette.secondary.dark} 0%, ${theme.palette.secondary.dark} 100%)`;
       case 'info':
-        return `linear-gradient(135deg, ${theme.palette.info.main} 0%, ${theme.palette.info.dark} 100%)`;
+        return `linear-gradient(135deg, ${theme.palette.info.dark} 0%, ${theme.palette.info.dark} 100%)`;
       default:
-        return `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`;
+        return `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.dark} 100%)`;
     }
   };
 
   const getShadow = (gradientType) => {
     switch(gradientType) {
       case 'primary':
-        return `0 8px 16px -3px ${alpha(theme.palette.primary.main, 0.4)}`;
+        return `0 8px 16px -3px ${alpha(theme.palette.primary.dark, 0.4)}`;
       case 'secondary':
-        return `0 8px 16px -3px ${alpha(theme.palette.secondary.main, 0.4)}`;
+        return `0 8px 16px -3px ${alpha(theme.palette.secondary.dark, 0.4)}`;
       case 'info':
-        return `0 8px 16px -3px ${alpha(theme.palette.info.main, 0.4)}`;
+        return `0 8px 16px -3px ${alpha(theme.palette.info.dark, 0.4)}`;
       default:
-        return `0 8px 16px -3px ${alpha(theme.palette.primary.main, 0.4)}`;
+        return `0 8px 16px -3px ${alpha(theme.palette.primary.dark, 0.4)}`;
     }
   };
 
   const getColor = (gradientType) => {
     switch(gradientType) {
       case 'primary':
-        return theme.palette.primary.main;
+        return theme.palette.primary.dark;
       case 'secondary':
-        return theme.palette.secondary.main;
+        return theme.palette.secondary.dark;
       case 'info':
-        return theme.palette.info.main;
+        return theme.palette.info.dark;
       default:
-        return theme.palette.primary.main;
+        return theme.palette.primary.dark;
     }
   };
 
 
   return (
-    <Box
-     
+    <Box     
       sx={{
         position: 'relative',
        
@@ -273,8 +272,6 @@ const StepCard = ({ step, index }) => {
           overflow: 'hidden',
         }}
       >
-        {/* Shimmer effect */}
-        <Shimmer />
         
         <Box sx={{ position: 'relative', zIndex: 10 }}>
           {/* Step number badge */}
@@ -364,7 +361,7 @@ const StepCard = ({ step, index }) => {
   );
 };
 
-// Main How It Works Section Component
+// dark How It Works Section Component
 const HowItWorksSection = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -423,10 +420,10 @@ const HowItWorksSection = () => {
               width: { xs: '30rem', md: '40rem' },
               height: { xs: '30rem', md: '40rem' },
               background: i === 0 
-                ? `radial-gradient(circle, ${alpha(theme.palette.primary.main, 0.08)} 0%, ${alpha(theme.palette.primary.main, 0)} 70%)`
+                ? `radial-gradient(circle, ${alpha(theme.palette.primary.dark, 0.08)} 0%, ${alpha(theme.palette.primary.dark, 0)} 70%)`
                 : i === 1 
-                  ? `radial-gradient(circle, ${alpha(theme.palette.secondary.main, 0.08)} 0%, ${alpha(theme.palette.secondary.main, 0)} 70%)`
-                  : `radial-gradient(circle, ${alpha(theme.palette.info.main, 0.08)} 0%, ${alpha(theme.palette.info.main, 0)} 70%)`,
+                  ? `radial-gradient(circle, ${alpha(theme.palette.secondary.dark, 0.08)} 0%, ${alpha(theme.palette.secondary.dark, 0)} 70%)`
+                  : `radial-gradient(circle, ${alpha(theme.palette.info.dark, 0.08)} 0%, ${alpha(theme.palette.info.dark, 0)} 70%)`,
               borderRadius: '50%',
               filter: 'blur(80px)',
               transform: 'translate(-50%, -50%)',
@@ -446,9 +443,9 @@ const HowItWorksSection = () => {
               px: 2.5,
               py: 3,
               borderRadius: '30px',
-              backgroundColor: alpha(theme.palette.primary.main, 0.1),
-              color: theme.palette.primary.main,
-              border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+              backgroundColor: alpha(theme.palette.primary.dark, 0.1),
+              color: theme.palette.primary.dark,
+              border: `1px solid ${alpha(theme.palette.primary.dark, 0.2)}`,
               mb: 3,
               backdropFilter: 'blur(8px)',
               fontSize: '0.75rem',
@@ -462,7 +459,7 @@ const HowItWorksSection = () => {
             sx={{
               fontWeight: 800,
               mb: 2,
-              background: `linear-gradient(to right, ${theme.palette.primary.main}, ${theme.palette.primary.light}, ${theme.palette.primary.dark})`,
+              background: `linear-gradient(to right, ${theme.palette.primary.dark}, ${theme.palette.primary.light}, ${theme.palette.primary.dark})`,
               backgroundClip: 'text',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
@@ -495,7 +492,7 @@ const HowItWorksSection = () => {
                 width: { xs: 30, md: 50 },
                 height: { xs: 30, md: 50 },
                 borderRadius: '50%',
-                border: `2px dashed ${alpha(theme.palette.primary.main, 0.3)}`,
+                border: `2px dashed ${alpha(theme.palette.primary.dark, 0.3)}`,
                 zIndex: -1,
               }}
             />
@@ -582,11 +579,11 @@ const HowItWorksSection = () => {
                         width: 28,
                         height: 28,
                         borderRadius: '50%',
-                        backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                        backgroundColor: alpha(theme.palette.primary.dark, 0.1),
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: theme.palette.primary.main,
+                        color: theme.palette.primary.dark,
                       }}
                     >
                       <CheckIcon fontSize="small" />

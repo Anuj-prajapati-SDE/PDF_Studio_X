@@ -6,4 +6,4 @@ const ConvertPDFPageDynamic = () => {
   return <DynamicPDFToolPage config={convertConfig} />;
 };
 
-export default ConvertPDFPageDynamic;
+export default ConvertPDFPageDynamic; 

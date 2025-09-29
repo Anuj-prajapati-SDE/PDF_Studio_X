@@ -1,41 +1,27 @@
-import React, { useState, useEffect } from 'react';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box, 
   Typography, 
   useTheme,
-  Link as MuiLink,
   Avatar,
    alpha,
   Paper,
   Card,
   Grid,
-  
+
 } from '@mui/material';
-import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+
 import {
-  Menu as MenuIcon,
-  Home as HomeIcon,
-  ArrowForward as ArrowIcon,
-  Notifications as NotificationIcon,
-  Settings as SettingsIcon,
-  ExitToApp as LogoutIcon,
-  Help as HelpIcon,
-  Person as PersonIcon,
-  Search as SearchIcon,
+  
   GridView
 } from '@mui/icons-material';
 import {
-  Calendar as CalendarIcon, 
-  Clock as ClockIcon,
-  User as UserIcon,
-  Bell as BellIcon,
   FileText as FileTextIcon,
   Scissors as ScissorsIcon,
-  RefreshCw as RefreshCwIcon,
+
   Shield as ShieldIcon,
-  FilePlus as FilePlusIcon,
+
   Layers as LayersIcon,
   ZapOff,
   FilePlus

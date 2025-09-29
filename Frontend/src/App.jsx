@@ -31,8 +31,10 @@ import DashboardPage from './Pages/UserDashboard/DashboardPage.jsx';
 import CreatePDFPage from './Pages/UserDashboard/Tools/CreatePDFPage.jsx';
 import CompressPDFPage from './Pages/UserDashboard/Tools/CompressPDFpage';
 import WordToPDFPage from './Pages/UserDashboard/Tools/WordToPDFPage.jsx';
+import SplitPDFPage from './Pages/UserDashboard/Tools/SplitPDFPage.jsx';
+import MergePDFPage from './Pages/UserDashboard/Tools/MergePDFPage.jsx';
 import ExcelToPDFPage from './Pages/UserDashboard/Tools/ExcelToPDFPage.jsx';
-import ProtectPDFPage from './Pages/UserDashboard/Tools/ProtectedPDFPage.jsx';
+import ProtectPDFPage from './Pages/UserDashboard/Tools/ProtectPDFPage.jsx';
 // import ImageCompressionPage from './Pages/UserDashboard/ImageCompressionPage';
 // import MergePDFPage from './Pages/UserDashboard/MergePDFPage';
 // import SplitPDFPage from './Pages/UserDashboard/SplitPDFPage';
@@ -49,7 +51,7 @@ import ConvertPDFPage from './Pages/UserDashboard/Tools/ConvertPDFPage.jsx';
 import EditPDFPage from './Pages/UserDashboard/Tools/EditPDFPage.jsx';
 
 import NotFoundPage from './Pages/Error/NotFoundPage.jsx';
-import WordToPDFPageDynamic from './Pages/UserDashboard/Tools/WordToPDFPageDynamic.jsx';
+
 // Global styles
 const globalStyles = {
   '*::-webkit-scrollbar': {
@@ -160,12 +162,13 @@ function App() {
             <Route path="/tools" element={<DashBoardLayout/>}>
               <Route index path="dashboard" element={<DashboardPage/>} />
               <Route path="create-pdf" element={<CreatePDFPage />} />
+              {/* <Route path="create" element={<CreatePDFDynamicPage/>} /> */}
               <Route path="compress-pdf" element={<CompressPDFPage />} />
-              <Route path="word-to-pdf" element={<WordToPDFPageDynamic/>} />
+              <Route path="word-to-pdf" element={<WordToPDFPage/>} />
               <Route path="excel-to-pdf" element={<ExcelToPDFPage/>} />
               <Route path="protect-pdf" element={<ProtectPDFPage />} />
-              {/* <Route path="merge-pdf" element={<MergePDFPage />} /> */}
-              {/* <Route path="split-pdf" element={<SplitPDFPage />} /> */}
+              <Route path="merge-pdf" element={<MergePDFPage/>} />
+              <Route path="split-pdf" element={<SplitPDFPage />} />
               {/* <Route path="pdf-to-word" element={<PDFToWordPage />} /> */}
               {/* <Route path="pdf-to-power-point" element={<PDFToPowerPointPage />} /> */}
               {/* <Route path="pdf-to-excel" element={<PDFToExcelPage/>} /> */}

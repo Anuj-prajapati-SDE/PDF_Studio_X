@@ -51,11 +51,13 @@ import {
   AutoAwesome as AutoAwesomeIcon,
   Tune as TuneIcon,
   Description as FileTextIcon,
+  DragIndicator as DragIndicatorIcon,
+  Delete as DeleteIcon,
 } from '@mui/icons-material';
 import { motion, useAnimation } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import toast from 'react-hot-toast';
-import axios from 'axios';
+import axios from 'axios';  
 import { getApiUrl } from '../../../utils/api';
 
 // Configuration-driven dynamic component for PDF tools
@@ -64,10 +66,14 @@ const DynamicPDFToolPage = ({ config }) => {
   
   // Core state management
   const [file, setFile] = useState(null);
+  const [files, setFiles] = useState([]);
   const [settings, setSettings] = useState(config.defaultSettings || {});
   const [isProcessing, setIsProcessing] = useState(false);
   const [processedFile, setProcessedFile] = useState(null);
   const [error, setError] = useState(null);
+
+  // Determine if we're in multi-file mode based on config
+  const isMultiFileMode = config.allowMultipleFiles || false;
 
   // Animation hooks
   const controls = useAnimation();
@@ -85,37 +91,62 @@ const DynamicPDFToolPage = ({ config }) => {
   // File upload handler
   const onDrop = useCallback(acceptedFiles => {
     if (acceptedFiles.length > 0) {
-      const uploadedFile = acceptedFiles[0];
-      
       // Check file type based on configuration
       const acceptedTypes = config.acceptedFileTypes || { 'application/pdf': ['.pdf'] };
-      const fileTypeValid = Object.keys(acceptedTypes).some(type => 
-        uploadedFile.type === type || uploadedFile.type.startsWith(type)
-      );
       
-      if (!fileTypeValid) {
+      const validFiles = acceptedFiles.filter(uploadedFile => {
+        return Object.keys(acceptedTypes).some(type => 
+          uploadedFile.type === type || uploadedFile.type.startsWith(type)
+        );
+      });
+      
+      if (validFiles.length !== acceptedFiles.length) {
         const expectedFormats = Object.values(acceptedTypes).flat().join(', ');
-        toast.error(`Please upload a valid file format: ${expectedFormats}`);
+        toast.error(`Please upload valid file formats: ${expectedFormats}`);
         return;
       }
       
-      setFile({
-        file: uploadedFile,
-        preview: URL.createObjectURL(uploadedFile),
-        id: `file-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      });
-      toast.success(config.messages?.uploadSuccess || 'File uploaded successfully');
+      if (isMultiFileMode) {
+        // Handle multiple file mode (for merge operations)
+        const newFiles = validFiles.map(uploadedFile => ({
+          file: uploadedFile,
+          preview: URL.createObjectURL(uploadedFile),
+          id: `file-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        }));
+        
+        setFiles(prev => {
+          const combined = [...prev, ...newFiles];
+          const maxFiles = config.maxFiles || 20;
+          if (combined.length > maxFiles) {
+            toast.error(`Maximum ${maxFiles} files allowed`);
+            return prev;
+          }
+          return combined;
+        });
+        
+        toast.success(`${validFiles.length} file${validFiles.length > 1 ? 's' : ''} added successfully`);
+      } else {
+        // Handle single file mode (for other operations)
+        const uploadedFile = validFiles[0];
+        setFile({
+          file: uploadedFile,
+          preview: URL.createObjectURL(uploadedFile),
+          id: `file-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        });
+        toast.success(config.messages?.uploadSuccess || 'File uploaded successfully');
+      }
+      
       setProcessedFile(null);
       setError(null);
     }
-  }, [config.messages, config.acceptedFileTypes]);
+  }, [config.messages, config.acceptedFileTypes, isMultiFileMode, config.maxFiles]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: config.acceptedFileTypes || {
       'application/pdf': ['.pdf']
     },
-    maxFiles: 1,
+    maxFiles: isMultiFileMode ? (config.maxFiles || 20) : 1,
     maxSize: config.maxFileSize || 50 * 1024 * 1024, // Default 50MB
   });
 
@@ -127,13 +158,40 @@ const DynamicPDFToolPage = ({ config }) => {
     }));
   };
 
+  // Multi-file specific handlers
+  const handleRemoveFile = (fileId) => {
+    const fileToRemove = files.find(f => f.id === fileId);
+    if (fileToRemove?.preview) {
+      URL.revokeObjectURL(fileToRemove.preview);
+    }
+    
+    setFiles(prev => prev.filter(f => f.id !== fileId));
+    toast.success('File removed');
+  };
+
+  const handleReorderFiles = (startIndex, endIndex) => {
+    setFiles(prev => {
+      const result = Array.from(prev);
+      const [removed] = result.splice(startIndex, 1);
+      result.splice(endIndex, 0, removed);
+      return result;
+    });
+  };
+
   // Main processing function
   const handleProcess = async () => {
-    if (!file) {
+    const filesToProcess = isMultiFileMode ? files : [file].filter(Boolean);
+    
+    if (filesToProcess.length === 0) {
       const fileType = config.acceptedFileTypes ? 
         (Object.keys(config.acceptedFileTypes)[0].includes('word') ? 'document' : 'file') : 
         'PDF file';
       toast.error(`Please upload a ${fileType} to ${config.actionName?.toLowerCase()}`);
+      return;
+    }
+
+    if (isMultiFileMode && config.minRequiredFiles && filesToProcess.length < config.minRequiredFiles) {
+      toast.error(config.messages?.minFilesRequired || `Please upload at least ${config.minRequiredFiles} files`);
       return;
     }
 
@@ -142,7 +200,8 @@ const DynamicPDFToolPage = ({ config }) => {
     
     try {
       // Call the configured processing function
-      const result = await config.processFunction(file.file, settings);
+      const filesData = isMultiFileMode ? filesToProcess.map(f => f.file) : filesToProcess[0].file;
+      const result = await config.processFunction(filesData, settings);
       
       if (result.success) {
         setProcessedFile(result.data);
@@ -152,7 +211,7 @@ const DynamicPDFToolPage = ({ config }) => {
         toast.error(result.message || config.messages?.processError);
       }
     } catch (err) {
-      console.error(`Error processing PDF:`, err);
+      console.error(`Error processing files:`, err);
       const errorMessage = config.messages?.processError || 'An unexpected error occurred. Please try again.';
       setError(errorMessage);
       toast.error(errorMessage);
@@ -170,10 +229,20 @@ const DynamicPDFToolPage = ({ config }) => {
   };
 
   const handleReset = () => {
+    // Clean up single file
     if (file?.preview) {
       URL.revokeObjectURL(file.preview);
     }
+    
+    // Clean up multiple files
+    files.forEach(fileObj => {
+      if (fileObj.preview) {
+        URL.revokeObjectURL(fileObj.preview);
+      }
+    });
+    
     setFile(null);
+    setFiles([]);
     setProcessedFile(null);
     setError(null);
     setSettings(config.defaultSettings || {});
@@ -575,20 +644,36 @@ const DynamicPDFToolPage = ({ config }) => {
                     </Typography>
                     <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
                       <Chip 
-                        label={file ? '1 File Ready' : 'No File'}
+                        label={
+                          isMultiFileMode 
+                            ? `${files.length} File${files.length !== 1 ? 's' : ''} ${files.length > 0 ? 'Ready' : 'Needed'}`
+                            : file ? '1 File Ready' : 'No File'
+                        }
                         size="small"
                         sx={{ 
-                          bgcolor: file ? 'rgba(125, 249, 255, 0.2)' : 'rgba(255, 255, 255, 0.1)',
-                          color: file ? '#7df9ff' : 'white',
+                          bgcolor: (isMultiFileMode ? files.length > 0 : file) ? 'rgba(125, 249, 255, 0.2)' : 'rgba(255, 255, 255, 0.1)',
+                          color: (isMultiFileMode ? files.length > 0 : file) ? '#7df9ff' : 'white',
                           fontWeight: 500,
                         }}
                       />
                       <Chip 
-                        label={file ? 'Ready to Process' : 'Upload PDF'}
+                        label={
+                          isMultiFileMode 
+                            ? (files.length >= (config.minRequiredFiles || 1) ? 'Ready to Process' : `Need ${(config.minRequiredFiles || 2) - files.length} More`)
+                            : file ? 'Ready to Process' : 'Upload File'
+                        }
                         size="small"
                         sx={{ 
-                          bgcolor: file ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)',
-                          color: file ? '#22c55e' : '#ef4444',
+                          bgcolor: (
+                            isMultiFileMode 
+                              ? (files.length >= (config.minRequiredFiles || 1) ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)')
+                              : (file ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)')
+                          ),
+                          color: (
+                            isMultiFileMode 
+                              ? (files.length >= (config.minRequiredFiles || 1) ? '#22c55e' : '#ef4444')
+                              : (file ? '#22c55e' : '#ef4444')
+                          ),
                         }}
                       />
                     </Stack>
@@ -608,7 +693,7 @@ const DynamicPDFToolPage = ({ config }) => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.8, duration: 0.8 }}
                 >
-                  {!file ? (
+                  {(isMultiFileMode ? files.length === 0 : !file) ? (
                     <Card
                       sx={{
                         borderRadius: '24px',
@@ -706,8 +791,212 @@ const DynamicPDFToolPage = ({ config }) => {
                       </CardContent>
                     </Card>
                   ) : (
-                    /* File Uploaded - Settings Panel */
-                    <Card
+                    <>
+                      {/* Multi-File Display for Merge Operations */}
+                      {isMultiFileMode && files.length > 0 && (
+                        <Card
+                          sx={{
+                            borderRadius: '20px',
+                            mb: { xs: 3, md: 4 },
+                            background: 'rgba(255, 255, 255, 0.05)',
+                            backdropFilter: 'blur(20px)',
+                            border: '1px solid rgba(255, 255, 255, 0.1)',
+                            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)',
+                          }}
+                        >
+                          <CardContent sx={{ p: { xs: 3, md: 4 } }}>
+                            <Box sx={{ mb: 3, borderBottom: '1px solid rgba(255, 255, 255, 0.1)', pb: 3 }}>
+                              <Stack direction="row" alignItems="center" justifyContent="space-between">
+                                <Typography variant="h6" sx={{ 
+                                  color: 'white', 
+                                  fontWeight: 600,
+                                  fontSize: { xs: '1rem', md: '1.1rem' }
+                                }}>
+                                  Files to Merge ({files.length})
+                                </Typography>
+                                
+                                <Button
+                                  variant="outlined"
+                                  size="small"
+                                  onClick={handleReset}
+                                  startIcon={<RefreshIcon />}
+                                  sx={{
+                                    borderColor: 'rgba(255, 255, 255, 0.2)',
+                                    color: 'rgba(255, 255, 255, 0.7)',
+                                    borderRadius: '12px',
+                                    '&:hover': {
+                                      borderColor: config.theme?.primary || '#7df9ff',
+                                      color: config.theme?.primary || '#7df9ff',
+                                    },
+                                  }}
+                                >
+                                  Clear All
+                                </Button>
+                              </Stack>
+                            </Box>
+
+                            {/* File List */}
+                            <Box sx={{ mb: 4, maxHeight: '300px', overflowY: 'auto' }}>
+                              {files.map((fileObj, index) => (
+                                <Card
+                                  key={fileObj.id}
+                                  variant="outlined"
+                                  sx={{
+                                    mb: 2,
+                                    background: 'rgba(255, 255, 255, 0.03)',
+                                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                                    borderRadius: '12px',
+                                    '&:hover': {
+                                      background: 'rgba(255, 255, 255, 0.05)',
+                                    },
+                                  }}
+                                >
+                                  <CardContent sx={{ p: 2 }}>
+                                    <Stack direction="row" alignItems="center" spacing={2}>
+                                      {config.supportFileReordering && (
+                                        <Box sx={{ cursor: 'grab', color: 'rgba(255, 255, 255, 0.5)' }}>
+                                          <DragIndicatorIcon sx={{ fontSize: 20 }} />
+                                        </Box>
+                                      )}
+                                      
+                                      <Box
+                                        sx={{
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          justifyContent: 'center',
+                                          width: 24,
+                                          height: 24,
+                                          borderRadius: '50%',
+                                          background: config.theme?.primary || '#7df9ff',
+                                          color: 'white',
+                                          fontSize: '12px',
+                                          fontWeight: 'bold',
+                                        }}
+                                      >
+                                        {index + 1}
+                                      </Box>
+                                      
+                                      <Avatar sx={{ 
+                                        bgcolor: config.theme?.primary || '#7df9ff',
+                                        width: 32,
+                                        height: 32,
+                                      }}>
+                                        {getFileIcon()}
+                                      </Avatar>
+                                      
+                                      <Box sx={{ flexGrow: 1 }}>
+                                        <Typography variant="body2" sx={{ 
+                                          color: 'white', 
+                                          fontWeight: 500,
+                                          fontSize: '0.9rem',
+                                        }} noWrap>
+                                          {fileObj.file.name}
+                                        </Typography>
+                                        <Typography variant="caption" sx={{ 
+                                          color: 'rgba(255, 255, 255, 0.6)',
+                                          fontSize: '0.75rem'
+                                        }}>
+                                          {formatFileSize(fileObj.file.size)}
+                                        </Typography>
+                                      </Box>
+                                      
+                                      <IconButton
+                                        size="small"
+                                        onClick={() => handleRemoveFile(fileObj.id)}
+                                        sx={{
+                                          color: 'rgba(255, 68, 68, 0.8)',
+                                          '&:hover': {
+                                            bgcolor: 'rgba(255, 68, 68, 0.1)',
+                                            color: '#ff4444',
+                                          },
+                                        }}
+                                      >
+                                        <DeleteIcon sx={{ fontSize: 16 }} />
+                                      </IconButton>
+                                    </Stack>
+                                  </CardContent>
+                                </Card>
+                              ))}
+                            </Box>
+
+                            {/* Add More Files Button */}
+                            <Box sx={{ mb: 4, textAlign: 'center' }}>
+                              <Card
+                                sx={{
+                                  borderRadius: '12px',
+                                  background: 'rgba(255, 255, 255, 0.02)',
+                                  backdropFilter: 'blur(10px)',
+                                  border: '2px dashed rgba(255, 255, 255, 0.1)',
+                                  cursor: 'pointer',
+                                  transition: 'all 0.3s ease',
+                                  '&:hover': {
+                                    borderColor: config.theme?.primary || 'rgba(125, 249, 255, 0.5)',
+                                    background: 'rgba(125, 249, 255, 0.02)',
+                                  },
+                                }}
+                                {...getRootProps()}
+                              >
+                                <input {...getInputProps()} />
+                                <CardContent sx={{ p: 2, textAlign: 'center' }}>
+                                  <UploadIcon sx={{ 
+                                    fontSize: 24, 
+                                    color: config.theme?.primary || '#7df9ff', 
+                                    mb: 1 
+                                  }} />
+                                  <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                                    {isDragActive ? 'Drop files here' : 'Add more PDF files'}
+                                  </Typography>
+                                </CardContent>
+                              </Card>
+                            </Box>
+
+                            {/* Settings Section for Multi-File */}
+                            {config.settings && config.settings.length > 0 && (
+                              <>
+                                <Typography variant="h6" sx={{ 
+                                  color: 'white', 
+                                  fontWeight: 600, 
+                                  mb: 3,
+                                  fontSize: { xs: '1.1rem', md: '1.2rem' }
+                                }}>
+                                  {config.settingsTitle || 'Settings'}
+                                </Typography>
+                                
+                                {renderSettings()}
+                              </>
+                            )}
+
+                            {config.alerts && config.alerts.length > 0 && (
+                              <Stack spacing={2} sx={{ mt: 3 }}>
+                                {config.alerts.map((alert, index) => (
+                                  <Alert 
+                                    key={index}
+                                    severity={alert.type || "info"} 
+                                    icon={<InfoIcon />}
+                                    sx={{ 
+                                      borderRadius: '12px',
+                                      bgcolor: `rgba(59, 130, 246, 0.1)`,
+                                      border: `1px solid rgba(59, 130, 246, 0.2)`,
+                                      color: config.theme?.primary || '#7df9ff',
+                                      '& .MuiAlert-icon': {
+                                        color: config.theme?.primary || '#7df9ff',
+                                      },
+                                    }}
+                                  >
+                                    <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.8)' }}>
+                                      {alert.message}
+                                    </Typography>
+                                  </Alert>
+                                ))}
+                              </Stack>
+                            )}
+                          </CardContent>
+                        </Card>
+                      )}
+
+                      {/* Single File Display - Settings Panel */}
+                      {!isMultiFileMode && file && (
+                      <Card
                       sx={{
                         borderRadius: '20px',
                         mb: { xs: 3, md: 4 },
@@ -807,7 +1096,8 @@ const DynamicPDFToolPage = ({ config }) => {
                           </Stack>
                         )}
                       </CardContent>
-                    </Card>
+                      </Card>)}
+                   </>
                   )}
                 </motion.div>
 
@@ -883,7 +1173,7 @@ const DynamicPDFToolPage = ({ config }) => {
                 )}
 
                 {/* Action Button */}
-                {file && !isProcessing && !processedFile && (
+                {((isMultiFileMode ? files.length > 0 : file) && !isProcessing && !processedFile) && (
                   <motion.div
                     initial={{ opacity: 0, y: 50 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -971,10 +1261,8 @@ const DynamicPDFToolPage = ({ config }) => {
                     </Alert>
                   </motion.div>
                 )}
-              </>
-            ) : (
-              /* Success Result */
-              config.renderResult ? config.renderResult(processedFile, handleDownload, handleReset) : (
+             </>)
+             : (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -1068,8 +1356,7 @@ const DynamicPDFToolPage = ({ config }) => {
                     </CardContent>
                   </Card>
                 </motion.div>
-              )
-            )}
+              )}
 
             {/* Features Section */}
             {config.features && (

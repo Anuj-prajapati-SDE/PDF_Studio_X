@@ -12,14 +12,17 @@ import {
   Bolt as ZapIcon,
   Tune as TuneIcon,
   Star as StarIcon,
-    Description as FileTextIcon,
+  Description as FileTextIcon,
   Speed as SpeedIcon,
   Security as SecurityIcon,
-  AutoAwesome as AutoAwesomeIcon, 
+  AutoAwesome as AutoAwesomeIcon,
+  SwapVert as SwapVertIcon,
+  Layers as LayersIcon,
 } from '@mui/icons-material';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { getApiUrl } from '../../../utils/api';
+import { pdfService } from '../../../services';
 
 // Mock API functions - replace with actual implementations
 const mockProcessPDF = async (file, settings, type = 'compress') => {
@@ -34,7 +37,7 @@ const mockProcessPDF = async (file, settings, type = 'compress') => {
       compressionPercent: settings.compressionLevel || 50,
       name: file.name,
       url: '#'
-    },
+    }, 
     split: {
       originalPages: Math.floor(Math.random() * 50) + 10,
       splitPages: settings.pageRange ? settings.pageRange.split('-').length : 2,
@@ -47,13 +50,6 @@ const mockProcessPDF = async (file, settings, type = 'compress') => {
       totalPages: Math.floor(Math.random() * 100) + 20,
       mergedSize: file.size * 1.2, // Slightly larger
       name: 'merged-document.pdf',
-      url: '#'
-    },
-    convert: {
-      originalFormat: 'PDF',
-      targetFormat: settings.outputFormat || 'JPG',
-      pages: Math.floor(Math.random() * 20) + 5,
-      name: file.name.replace('.pdf', `.${(settings.outputFormat || 'jpg').toLowerCase()}`),
       url: '#'
     },
     protect: {
@@ -72,7 +68,7 @@ const mockProcessPDF = async (file, settings, type = 'compress') => {
   };
 };
 
-// Base configuration object
+// Base configuration object 
 export const createPDFToolConfig = (toolType) => {
   const baseConfig = {
     maxFileSize: 50 * 1024 * 1024, // 50MB
@@ -322,8 +318,17 @@ export const createPDFToolConfig = (toolType) => {
       actionIcon: <MergeIcon />,
       icon: <MergeIcon sx={{ fontSize: 24, color: 'white' }} />,
       uploadTitle: 'Upload PDF Files to Merge',
+      uploadDescription: 'Drag & drop multiple PDF files here or browse files from your device',
       processingMessage: 'Merging PDF Files...',
+      processingDescription: 'Combining your PDF files in the selected order',
       successTitle: 'Merge Complete!',
+      successMessage: 'Your PDF files have been successfully merged into one document',
+      
+      // Special properties for merge operation
+      allowMultipleFiles: true,
+      minRequiredFiles: 2,
+      maxFiles: 20,
+      supportFileReordering: true,
       
       theme: {
         ...baseConfig.theme,
@@ -334,10 +339,19 @@ export const createPDFToolConfig = (toolType) => {
         titleGradient: 'linear-gradient(90deg, #ffffff, #22c55e)',
       },
       
+      messages: {
+        uploadSuccess: 'PDF files uploaded successfully',
+        processSuccess: 'PDF files merged successfully!',
+        processError: 'Failed to merge PDF files. Please try again.',
+        downloadSuccess: 'Downloading your merged PDF',
+        minFilesRequired: 'Please upload at least 2 PDF files to merge',
+      },
+      
       defaultSettings: {
-        mergeOrder: 'filename',
+        mergeOrder: 'custom',
         addBookmarks: true,
         optimizeSize: true,
+        includeOutlines: true,
       },
       
       settings: [
@@ -345,29 +359,133 @@ export const createPDFToolConfig = (toolType) => {
           type: 'select',
           key: 'mergeOrder',
           label: 'Merge Order',
-          defaultValue: 'filename',
+          defaultValue: 'custom',
           options: [
-            { value: 'filename', label: 'By Filename' },
+            { value: 'custom', label: 'Custom Order (Drag to Reorder)' },
+            { value: 'filename', label: 'By Filename (A-Z)' },
             { value: 'date', label: 'By Creation Date' },
-            { value: 'size', label: 'By File Size' },
-            { value: 'custom', label: 'Custom Order' }
-          ]
+            { value: 'size', label: 'By File Size' }
+          ],
+          description: 'Choose how to order the files in the merged document'
         },
         {
           type: 'switch',
           key: 'addBookmarks',
           label: 'Add bookmarks for each merged file',
-          defaultValue: true
+          defaultValue: true,
+          description: 'Create bookmarks to navigate between original files'
+        },
+        {
+          type: 'switch',
+          key: 'includeOutlines',
+          label: 'Preserve original document outlines',
+          defaultValue: true,
+          description: 'Keep the table of contents from original PDFs'
         },
         {
           type: 'switch',
           key: 'optimizeSize',
           label: 'Optimize merged file size',
-          defaultValue: true
+          defaultValue: true,
+          description: 'Apply compression to reduce final file size'
         }
       ],
       
-      processFunction: (file, settings) => mockProcessPDF(file, settings, 'merge')
+      alerts: [
+        {
+          type: 'info',
+          message: 'You can drag and drop files to reorder them before merging. The final PDF will follow this exact order.'
+        }
+      ],
+      
+      steps: [
+        { text: 'Upload multiple PDF files', color: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)' },
+        { text: 'Reorder files if needed', color: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' },
+        { text: 'Configure merge settings', color: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)' },
+        { text: 'Download merged PDF', color: 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)' }
+      ],
+      
+      features: [
+        {
+          icon: <MergeIcon sx={{ fontSize: 28, color: 'white' }} />,
+          iconBackground: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+          title: 'Smart Merging',
+          description: 'Combine unlimited PDFs while preserving quality and formatting'
+        },
+        {
+          icon: <SwapVertIcon sx={{ fontSize: 28, color: 'white' }} />,
+          iconBackground: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+          title: 'Custom Ordering',
+          description: 'Drag and drop to arrange files in your preferred order'
+        },
+        {
+          icon: <LayersIcon sx={{ fontSize: 28, color: 'white' }} />,
+          iconBackground: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+          title: 'Bookmark Creation',
+          description: 'Automatically generate bookmarks for easy navigation'
+        }
+      ],
+      
+      howItWorks: {
+        title: 'How to Merge PDF Files',
+        steps: [
+          {
+            description: 'Upload multiple PDF files by dragging them into the upload area',
+            background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)'
+          },
+          {
+            description: 'Drag and drop files to reorder them in your preferred sequence',
+            background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)'
+          },
+          {
+            description: 'Configure merge settings like bookmarks and optimization',
+            background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)'
+          },
+          {
+            description: 'Download your merged PDF with all files combined',
+            background: 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)'
+          }
+        ]
+      },
+      
+      // Custom processing function for merge
+      processFunction: async (files, settings) => {
+        // Simulate processing time based on number of files
+        const processingTime = 2000 + (files.length * 500);
+        await new Promise(resolve => setTimeout(resolve, processingTime));
+        
+        // Calculate merged file properties
+        const totalSize = Array.isArray(files) ? 
+          files.reduce((total, file) => total + file.size, 0) : 
+          files.size;
+        
+        let mergedSize = totalSize * 0.95; // Slight optimization
+        if (settings.optimizeSize) {
+          mergedSize = totalSize * 0.85; // Better compression
+        }
+        
+        const fileCount = Array.isArray(files) ? files.length : 1;
+        const totalPages = fileCount * (Math.floor(Math.random() * 10) + 5); // Mock page count
+        
+        return {
+          success: true,
+          data: {
+            totalFiles: fileCount,
+            totalPages: totalPages,
+            originalSize: totalSize,
+            mergedSize: Math.floor(mergedSize),
+            name: 'merged-document.pdf',
+            settings: settings,
+            url: '#'
+          },
+          message: `Successfully merged ${fileCount} PDF files into one document!`
+        };
+      },
+      
+      downloadFunction: (processedFile) => {
+        toast.success('Downloading your merged PDF');
+        // Implement actual download logic here
+      }
     },
 
     convert: {
@@ -737,6 +855,280 @@ export const createPDFToolConfig = (toolType) => {
         toast.success('Downloading your PDF file');
         // Implement actual download logic here
       }
+    },
+
+    createPDF: {
+      ...baseConfig,
+      title: 'Create PDF from Images',
+      description: 'Transform your images into professional PDF documents with customizable layouts, watermarks, and formatting options.',
+      toolName: 'PDF Creation Tool',
+      toolDescription: 'Convert images to PDF',
+      actionName: 'Create PDF',
+      actionIcon: <FileTextIcon />,
+      icon: <FileTextIcon sx={{ fontSize: 24, color: 'white' }} />,
+      uploadTitle: 'Upload Images to Create PDF',
+      uploadDescription: 'Drag & drop your images here or browse files from your device',
+      processingMessage: 'Creating PDF from Images...',
+      processingDescription: 'Processing your images with selected layout and customization settings',
+      successTitle: 'PDF Created Successfully!',
+      successMessage: 'Your PDF document has been created successfully from the uploaded images',
+      settingsTitle: 'PDF Creation Settings',
+      
+      // Image-specific file acceptance
+      maxFileSize: 10 * 1024 * 1024, // 10MB per image
+      acceptedFileTypes: {
+        'image/jpeg': ['.jpg', '.jpeg'],
+        'image/png': ['.png'],
+        'image/gif': ['.gif'],
+        'image/webp': ['.webp']
+      },
+      
+      // Special properties for create PDF (multi-file support)
+      allowMultipleFiles: true,
+      minRequiredFiles: 1,
+      maxFiles: 50,
+      supportFileReordering: true,
+      
+      theme: {
+        ...baseConfig.theme,
+        primary: '#e65100', // Orange for create
+        secondary: '#ff9800',
+        iconBackground: 'linear-gradient(135deg, #e65100 0%, #ff9800 100%)',
+        buttonBackground: 'linear-gradient(135deg, #e65100 0%, #ff9800 100%)',
+        titleGradient: 'linear-gradient(90deg, #ffffff, #ffab40)',
+      },
+      
+      messages: {
+        uploadSuccess: 'Images uploaded successfully',
+        processSuccess: 'PDF created from images successfully!',
+        processError: 'Failed to create PDF. Please try again.',
+        downloadSuccess: 'Downloading your created PDF',
+        minFilesRequired: 'Please upload at least 1 image to create PDF',
+      },
+      
+      defaultSettings: {
+        pageSize: 'A4',
+        pageOrientation: 'portrait',
+        imagesPerPage: 1,
+        pageMargins: 20,
+        preserveAspectRatio: true,
+        addWatermark: false,
+        watermarkText: 'CONFIDENTIAL',
+        watermarkOpacity: 0.3,
+        watermarkColor: '#FF0000',
+        addHeader: false,
+        headerText: '',
+        addFooter: false,
+        footerText: '',
+        addPageNumbers: false,
+        pageNumberPosition: 'bottom-center'
+      },
+      
+      settings: [
+        {
+          type: 'select',
+          key: 'pageSize',
+          label: 'Page Size',
+          defaultValue: 'A4',
+          options: [
+            { value: 'A4', label: 'A4 (210 × 297 mm)' },
+            { value: 'A5', label: 'A5 (148 × 210 mm)' },
+            { value: 'Letter', label: 'Letter (8.5 × 11 in)' },
+            { value: 'Legal', label: 'Legal (8.5 × 14 in)' }
+          ],
+          description: 'Choose the page size for your PDF document'
+        },
+        {
+          type: 'select',
+          key: 'pageOrientation',
+          label: 'Page Orientation',
+          defaultValue: 'portrait',
+          options: [
+            { value: 'portrait', label: 'Portrait' },
+            { value: 'landscape', label: 'Landscape' }
+          ]
+        },
+        {
+          type: 'select',
+          key: 'imagesPerPage',
+          label: 'Images Per Page',
+          defaultValue: 1,
+          options: [
+            { value: 1, label: '1 image per page' },
+            { value: 2, label: '2 images per page' },
+            { value: 4, label: '4 images per page' },
+            { value: 6, label: '6 images per page' }
+          ],
+          description: 'How many images to place on each page'
+        },
+        {
+          type: 'slider',
+          key: 'pageMargins',
+          label: 'Page Margins',
+          defaultValue: 20,
+          min: 0,
+          max: 50,
+          step: 5,
+          showValue: true,
+          unit: 'mm',
+          description: 'Margin size around the page content'
+        },
+        {
+          type: 'switch',
+          key: 'preserveAspectRatio',
+          label: 'Preserve image aspect ratio',
+          defaultValue: true,
+          description: 'Maintain original image proportions'
+        },
+        {
+          type: 'switch',
+          key: 'addWatermark',
+          label: 'Add watermark to pages',
+          defaultValue: false,
+          description: 'Add a watermark overlay to each page'
+        },
+        {
+          type: 'select',
+          key: 'watermarkColor',
+          label: 'Watermark Color',
+          defaultValue: '#FF0000',
+          options: [
+            { value: '#FF0000', label: 'Red' },
+            { value: '#000000', label: 'Black' },
+            { value: '#0000FF', label: 'Blue' },
+            { value: '#808080', label: 'Gray' }
+          ],
+          conditionalDisplay: (settings) => settings.addWatermark,
+          description: 'Choose watermark text color'
+        },
+        {
+          type: 'slider',
+          key: 'watermarkOpacity',
+          label: 'Watermark Opacity',
+          defaultValue: 0.3,
+          min: 0.1,
+          max: 1.0,
+          step: 0.1,
+          showValue: true,
+          unit: '',
+          conditionalDisplay: (settings) => settings.addWatermark,
+          description: 'Transparency level of the watermark'
+        },
+        {
+          type: 'switch',
+          key: 'addPageNumbers',
+          label: 'Add page numbers',
+          defaultValue: false,
+          description: 'Include page numbers on each page'
+        },
+        {
+          type: 'select',
+          key: 'pageNumberPosition',
+          label: 'Page Number Position',
+          defaultValue: 'bottom-center',
+          options: [
+            { value: 'bottom-center', label: 'Bottom Center' },
+            { value: 'bottom-right', label: 'Bottom Right' },
+            { value: 'bottom-left', label: 'Bottom Left' }
+          ],
+          conditionalDisplay: (settings) => settings.addPageNumbers,
+          description: 'Where to place page numbers'
+        }
+      ],
+      
+      alerts: [
+        {
+          type: 'info',
+          message: 'You can drag and drop images to reorder them before creating the PDF. Large images will be optimized for better file size.'
+        }
+      ],
+      
+      steps: [
+        { text: 'Upload image files', color: 'linear-gradient(135deg, #e65100 0%, #ff9800 100%)' },
+        { text: 'Configure page layout', color: 'linear-gradient(135deg, #6836e6 0%, #8c5eff 100%)' },
+        { text: 'Add customizations', color: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)' },
+        { text: 'Download PDF', color: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)' }
+      ],
+      
+      features: [
+        {
+          icon: <FileTextIcon sx={{ fontSize: 28, color: 'white' }} />,
+          iconBackground: 'linear-gradient(135deg, #e65100 0%, #ff9800 100%)',
+          title: 'Professional PDFs',
+          description: 'Create high-quality PDF documents from your images'
+        },
+        {
+          icon: <TuneIcon sx={{ fontSize: 28, color: 'white' }} />,
+          iconBackground: 'linear-gradient(135deg, #6836e6 0%, #8c5eff 100%)',
+          title: 'Flexible Layout',
+          description: 'Customize page sizes, orientation, and image arrangement'
+        },
+        {
+          icon: <AutoAwesomeIcon sx={{ fontSize: 28, color: 'white' }} />,
+          iconBackground: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+          title: 'Advanced Features',
+          description: 'Add watermarks, headers, footers, and page numbers'
+        }
+      ],
+      
+      howItWorks: {
+        title: 'How to Create PDF from Images',
+        steps: [
+          {
+            description: 'Upload your images by dragging them into the upload area',
+            background: 'linear-gradient(135deg, #e65100 0%, #ff9800 100%)'
+          },
+          {
+            description: 'Choose page size, orientation, and how many images per page',
+            background: 'linear-gradient(135deg, #6836e6 0%, #8c5eff 100%)'
+          },
+          {
+            description: 'Add watermarks, page numbers, and other customizations',
+            background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)'
+          },
+          {
+            description: 'Download your professionally formatted PDF document',
+            background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)'
+          }
+        ]
+      },
+      
+      // Custom processing function for create PDF from images
+      processFunction: async (files, settings) => {
+        try {
+          // Call the actual PDF service
+          const response = await pdfService.createPDFFromImages(files, settings);
+          
+          if (response.success) {
+            return {
+              success: true,
+              data: {
+                ...response.data,
+                url: pdfService.getPDFDownloadUrl(response.data.filename)
+              },
+              message: response.message || `Successfully created PDF with ${Array.isArray(files) ? files.length : 1} images!`
+            };
+          } else {
+            throw new Error(response.message || 'Failed to create PDF');
+          }
+        } catch (error) {
+          console.error('Error creating PDF:', error);
+          return {
+            success: false,
+            message: error.message || 'Failed to create PDF. Please try again.'
+          };
+        }
+      },
+      
+      downloadFunction: (processedFile) => {
+        if (processedFile && processedFile.url) {
+          // Open the download URL in a new tab
+          window.open(processedFile.url, '_blank');
+          toast.success('Downloading your created PDF');
+        } else {
+          toast.error('No file available for download');
+        }
+      }
     }
 
   };
@@ -751,6 +1143,7 @@ export const mergeConfig = createPDFToolConfig('merge');
 export const convertConfig = createPDFToolConfig('convert');
 export const protectConfig = createPDFToolConfig('protect');
 export const wordToPDFConfig = createPDFToolConfig('wordToPDF');
+export const createPDFConfig = createPDFToolConfig('createPDF');
 
 // Default export
 export default createPDFToolConfig;

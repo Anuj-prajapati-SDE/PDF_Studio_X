@@ -37,40 +37,40 @@ import CTASection from '../../Components/common/CTASection';
 
 
 // Sample testimonials
-const testimonials = [
-  {
-    name: 'Sarah Johnson',
-    role: 'Marketing Manager',
-    company: 'Acme Inc.',
-    avatar: 'https://randomuser.me/api/portraits/women/44.jpg',
-    quote: 'PDF Utility has transformed how our team handles documents. The merge feature alone saves us hours each week!',
-    rating: 5,
-  },
-  {
-    name: 'Michael Chen',
-    role: 'Financial Analyst',
-    company: 'Global Finance',
-    avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
-    quote: 'Secure, fast, and reliable. I use PDF Utility daily for converting sensitive financial documents.',
-    rating: 5,
-  },
-  {
-    name: 'Emily Rodriguez',
-    role: 'Graphic Designer',
-    company: 'Creative Studios',
-    avatar: 'https://randomuser.me/api/portraits/women/68.jpg',
-    quote: 'The image to PDF conversion is flawless. Best tool I ve found for maintaining design quality in PDFs.',
-    rating: 4,
-  },
-  {
-    name: 'David Wilson',
-    role: 'Legal Consultant',
-    company: 'Wilson & Partners',
-    avatar: 'https://randomuser.me/api/portraits/men/46.jpg',
-    quote: 'The security features give me peace of mind when handling confidential client documents. Excellent service!',
-    rating: 5,
-  },
-];
+// const testimonials = [
+//   {
+//     name: 'Sarah Johnson',
+//     role: 'Marketing Manager',
+//     company: 'Acme Inc.',
+//     avatar: 'https://randomuser.me/api/portraits/women/44.jpg',
+//     quote: 'PDF Utility has transformed how our team handles documents. The merge feature alone saves us hours each week!',
+//     rating: 5,
+//   },
+//   {
+//     name: 'Michael Chen',
+//     role: 'Financial Analyst',
+//     company: 'Global Finance',
+//     avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
+//     quote: 'Secure, fast, and reliable. I use PDF Utility daily for converting sensitive financial documents.',
+//     rating: 5,
+//   },
+//   {
+//     name: 'Emily Rodriguez',
+//     role: 'Graphic Designer',
+//     company: 'Creative Studios',
+//     avatar: 'https://randomuser.me/api/portraits/women/68.jpg',
+//     quote: 'The image to PDF conversion is flawless. Best tool I ve found for maintaining design quality in PDFs.',
+//     rating: 4,
+//   },
+//   {
+//     name: 'David Wilson',
+//     role: 'Legal Consultant',
+//     company: 'Wilson & Partners',
+//     avatar: 'https://randomuser.me/api/portraits/men/46.jpg',
+//     quote: 'The security features give me peace of mind when handling confidential client documents. Excellent service!',
+//     rating: 5,
+//   },
+// ];
  
 
 const HomePage = () => {

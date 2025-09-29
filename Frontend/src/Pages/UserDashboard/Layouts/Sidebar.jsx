@@ -19,7 +19,8 @@ import {
   Chip,
   IconButton,
   useMediaQuery,
-  SwipeableDrawer
+  SwipeableDrawer,
+  Grid
 } from '@mui/material';
 import { 
   ChevronRight as ChevronRightIcon,
@@ -61,6 +62,11 @@ const Sidebar = ({ onClose }) => {
   const handleSubMenuToggle = (menuId) => {
     setOpenSubMenu(openSubMenu === menuId ? null : menuId);
   };
+  const HandleLogout=()=>{
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    navigate("/login");
+  }
   
   const handleNavigation = (path) => {
     navigate(path);
@@ -196,29 +202,6 @@ const Sidebar = ({ onClose }) => {
       
       <Divider sx={{ mb: 2, borderColor: 'rgba(255, 255, 255, 0.1)' }} />
       
-      {/* Skip to content link - only visible on mobile */}
-      {isMobile && (
-        <Box sx={{ px: 2, mb: 2 }}>
-          <Button
-            fullWidth
-            onClick={onClose}
-            variant="outlined"
-            sx={{
-              borderRadius: 2,
-              py: 1,
-              borderColor: 'rgba(255, 255, 255, 0.2)',
-              color: 'rgba(255, 255, 255, 0.7)',
-              '&:hover': {
-                borderColor: '#7df9ff',
-                bgcolor: 'rgba(125, 249, 255, 0.1)',
-                color: '#7df9ff',
-              }
-            }}
-          >
-            Skip to Content
-          </Button>
-        </Box>
-      )}
       
       {/* Navigation Menu */}
       <Box 
@@ -432,70 +415,32 @@ const Sidebar = ({ onClose }) => {
         </List>
       </Box>
       
-      {/* Storage Usage */}
-      {/* <Box sx={{ p: 3, mt: 'auto' }}>
-        <Box
-          sx={{
-            p: 2.5,
-            borderRadius: 3,
-            bgcolor: 'rgba(104, 54, 230, 0.08)',
-            border: '1px solid',
-            borderColor: 'rgba(104, 54, 230, 0.15)',
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-            <DatabaseIcon size={16} color="#7df9ff" style={{ marginRight: 8 }} />
-            <Typography variant="subtitle2" fontWeight={600} sx={{ color: 'white' }}>
-              Storage
-            </Typography>
-          </Box>
-          
-          <Box sx={{ mt: 1.5, mb: 1 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-              <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.6)' }}>
-                65% of 100 MB used
-              </Typography>
-              <Typography variant="caption" fontWeight={600} sx={{ color: 'white' }}>
-                65 MB
-              </Typography>
-            </Box>
-            <LinearProgress 
-              variant="determinate" 
-              value={65} 
-              sx={{ 
-                height: 6, 
-                borderRadius: 3,
-                bgcolor: 'rgba(104, 54, 230, 0.2)',
-                '& .MuiLinearProgress-bar': {
-                  borderRadius: 3,
-                  background: 'linear-gradient(90deg, #7df9ff, #4361ee)',
-                }
-              }} 
-            />
-          </Box>
-          
-          <Button
-            size="small"
-            fullWidth
-            startIcon={<ZapIcon size={14} />}
-            variant="outlined"
-            sx={{ 
-              mt: 1.5, 
-              borderRadius: 2,
-              textTransform: 'none',
-              fontWeight: 600,
-              color: '#7df9ff',
-              borderColor: 'rgba(125, 249, 255, 0.4)',
-              '&:hover': {
-                borderColor: '#7df9ff',
-                backgroundColor: 'rgba(125, 249, 255, 0.1)',
-              }
-            }}
-          >
-            Upgrade for more space
-          </Button>
-        </Box>
-      </Box> */}
+     
+          <Grid item xs={12}>
+                         <Button
+                           fullWidth
+                           variant="contained"
+                           to="/signup"
+                           onClick={HandleLogout}
+                           sx={{
+                            width: '90%',
+                             backgroundColor: 'white',
+                             color: 'white',
+                             borderRadius: '10px',
+                             py: 1.2,
+                             margin: "10px",
+                             textTransform: 'none',
+                             fontWeight: 600,
+                             boxShadow: '0 10px 20px -5px rgba(0, 0, 0, 0.1)',
+                             '&:hover': {
+                               backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                               boxShadow: '0 15px 25px -5px rgba(0, 0, 0, 0.2)',
+                             },
+                           }}
+                         >
+                          Sign Out
+                         </Button>
+                       </Grid>
     </Box>
   );
 };

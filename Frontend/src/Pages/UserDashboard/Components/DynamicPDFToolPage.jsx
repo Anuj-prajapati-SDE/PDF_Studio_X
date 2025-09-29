@@ -27,11 +27,7 @@ import {
   alpha,
   AlertTitle,
   Avatar,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  ListItemSecondaryAction,
+ 
 } from '@mui/material';
 import {
   PictureAsPdf as FilePdfIcon,
@@ -548,9 +544,9 @@ const DynamicPDFToolPage = ({ config }) => {
           </Box>
         </motion.div>
 
-        <Grid container spacing={{ xs: 3, md: 4 }}>
+        <Grid container spacing={{ xs: 3, md: 4 }} >
           {/* Sidebar - Tool Info */}
-          <Grid item xs={12} lg={4} xl={3}>
+          <Grid item xs={12} lg={4} xl={3} minWidth={'100%'}>
             <motion.div
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}

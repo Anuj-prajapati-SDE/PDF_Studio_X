@@ -360,7 +360,7 @@ const DashBoardLayout = () => {
               {location.pathname.includes('/tools') && (
                 <MuiLink
                   component={Link}
-                  to="/tools"
+                  to="/tools/dashboard"
                   color="inherit"
                   sx={{ 
                     fontWeight: 500,

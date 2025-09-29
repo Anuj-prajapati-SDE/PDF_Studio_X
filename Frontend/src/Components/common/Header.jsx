@@ -12,7 +12,7 @@ import {
   ListItemIcon,
   Avatar,
   Tooltip,
- 
+  Chip,
   Drawer,
   List,
   ListItem,
@@ -38,11 +38,14 @@ import {
   NotificationsNone as NotificationsIcon,
   Logout as LogoutIcon,
   Login as LoginIcon,
+  Info as InfoIcon,
+  Dashboard,
 } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Grid } from 'react-feather';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
+import VersionModal from './VersionModal';
 
 // Logo component
 const PdfLogo = ({ size = 40, light = false }) => (
@@ -76,14 +79,13 @@ const PdfLogo = ({ size = 40, light = false }) => (
 
 const Header = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
-  // const [dateTime, setDateTime] = useState(new Date());
+  const [versionModalOpen, setVersionModalOpen] = useState(false);
   const theme = useTheme();
-  // const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
   const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout, isAuthenticated } = useAuth();
-  console.log('User in Header:', user);
   // Tools menu
   const [toolsAnchorEl, setToolsAnchorEl] = useState(null);
   const isToolsMenuOpen = Boolean(toolsAnchorEl);
@@ -141,7 +143,7 @@ const Header = () => {
   };
   
   const handleUserMenuClose = () => {
-    setUserMenuAnchor(null);
+    navigate('/tools/dashboard');
   };
 
   const handleLogout = () => {
@@ -153,6 +155,14 @@ const Header = () => {
 
   const handleLoginClick = () => {
     navigate('/login');
+  };
+
+  const handleVersionModalOpen = () => {
+    setVersionModalOpen(true);
+  };
+
+  const handleVersionModalClose = () => {
+    setVersionModalOpen(false);
   };
 
   // Desktop navigation links
@@ -221,8 +231,49 @@ const Header = () => {
                 }}
               >
                 StudioX
-              
               </Typography>
+              
+              {/* Version Badge */}
+              <Tooltip title="View version info and release notes">
+                <Box
+                  component={motion.div}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={handleVersionModalOpen}
+                  sx={{
+                    ml: 2,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 0.5,
+                  }}
+                >
+                  <Chip
+                    icon={<InfoIcon sx={{ fontSize: '0.875rem !important' }} />}
+                    label="v1.0.0"
+                    size="small"
+                    clickable
+                    sx={{
+                      height: 28,
+                      backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                      borderColor: 'rgba(99, 102, 241, 0.3)',
+                      color: '#6366f1',
+                      fontWeight: 600,
+                      fontSize: '0.75rem',
+                      border: '1px solid',
+                      transition: 'all 0.3s ease',
+                      '&:hover': {
+                        backgroundColor: 'rgba(99, 102, 241, 0.15)',
+                        borderColor: '#6366f1',
+                        boxShadow: '0 2px 8px rgba(99, 102, 241, 0.2)',
+                      },
+                      '& .MuiChip-icon': {
+                        color: '#6366f1',
+                      },
+                    }}
+                  />
+                </Box>
+              </Tooltip>
             </Box>
           </RouterLink>
 
@@ -691,6 +742,18 @@ const Header = () => {
             </ListItemIcon>
             <ListItemText>Notifications</ListItemText>
           </MenuItem>
+          <MenuItem 
+            onClick={handleUserMenuClose}
+            sx={{ 
+              borderRadius: '8px',
+              my: 0.5,
+            }}
+          >
+            <ListItemIcon>
+              <Dashboard fontSize="small" color="primary" />
+            </ListItemIcon>
+            <ListItemText>Go To Dashboard</ListItemText>
+          </MenuItem>
           
           <Divider sx={{ my: 1 }} />
           
@@ -1119,6 +1182,12 @@ const Header = () => {
           </Grid>
         </Box>
       </Drawer>
+      
+      {/* Version Modal */}
+      <VersionModal
+        open={versionModalOpen}
+        onClose={handleVersionModalClose}
+      />
     </AppBar>
   );
 };

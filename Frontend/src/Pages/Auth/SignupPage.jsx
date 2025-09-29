@@ -74,7 +74,7 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
     backdropFilter: 'blur(10px)',
     border: '1px solid rgba(255, 255, 255, 0.1)',
-    color: theme.palette.mode === 'dark' ? '#fff' : '#333',
+    color: '#fff',
     transition: 'all 0.3s ease',
     '&:hover': {
       backgroundColor: 'rgba(255, 255, 255, 0.07)',
@@ -87,10 +87,10 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
     },
   },
   '& .MuiInputLabel-root': {
-    color: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)',
+    color: 'rgba(255, 255, 255, 0.88)',
   },
   '& .MuiInputLabel-root.Mui-focused': {
-    color: '#6836e6',
+    color: 'rgba(255, 255, 255, 0.88)',
   },
   '& .MuiOutlinedInput-notchedOutline': {
     border: 'none',
@@ -256,8 +256,7 @@ const SignupPage = () => {
           boxShadow: '0 25px 60px rgba(0,0,0,0.2), 0 0 30px rgba(104, 54, 230, 0.1)',
           border: '1px solid rgba(255,255,255,0.05)',
         }}>      
-          
-          {/* Right panel - Signup Form */}
+
           <Grid 
             item 
             xs={12} 
@@ -303,7 +302,7 @@ const SignupPage = () => {
             </div>
 
             <div>
-              <Box component="form" onSubmit={handleSignup} sx={{ mb: 3 }}>
+              <Box component="form" onSubmit={handleSignup} sx={{ mb: 3 }} >
               
                     <StyledTextField
                       fullWidth
@@ -473,29 +472,29 @@ const SignupPage = () => {
                 <Divider sx={{ flex: 1, borderColor: 'rgba(255,255,255,0.1)' }} />
               </Box>
 
-              <Grid container spacing={2} justifyContent="center">
-                <Grid item xs={12} sm={4}>
-                  <div>
-                    <SocialButton fullWidth startIcon={<Google />}>
-                      Google
-                    </SocialButton>
-                  </div>
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <div>
-                    <SocialButton fullWidth startIcon={<Facebook />}>
-                      Facebook
-                    </SocialButton>
-                  </div>
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <div>
-                    <SocialButton fullWidth startIcon={<Apple />}>
-                      Apple
-                    </SocialButton>
-                  </div>
-                </Grid>
-              </Grid>
+               <Grid container spacing={2} justifyContent={'center'}>
+                            <Grid item xs={4}>
+                              <div>
+                                <SocialButton fullWidth>
+                                  <Google sx={{ color: '#DB4437' }} />
+                                </SocialButton>
+                              </div>
+                            </Grid>
+                            <Grid item xs={4}>
+                              <div>
+                                <SocialButton fullWidth>
+                                  <Facebook sx={{ color: '#4267B2' }} />
+                                </SocialButton>
+                              </div>
+                            </Grid>
+                            <Grid item xs={4}>
+                              <div>
+                                <SocialButton fullWidth>
+                                  <Apple sx={{ color: '#A2AAAD' }} />
+                                </SocialButton>
+                              </div>
+                            </Grid>
+                          </Grid>
             </div>
 
             {/* "Already have an account" for mobile */}

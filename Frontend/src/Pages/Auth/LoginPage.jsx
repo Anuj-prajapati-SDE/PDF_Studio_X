@@ -75,23 +75,23 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
     backdropFilter: 'blur(10px)',
     border: '1px solid rgba(255, 255, 255, 0.1)',
-    color: theme.palette.mode === 'dark' ? '#fff' : '#333',
+    color: '#fff',
     transition: 'all 0.3s ease',
     '&:hover': {
       backgroundColor: 'rgba(255, 255, 255, 0.07)',
       borderColor: 'rgba(255, 255, 255, 0.2)',
     },
     '&.Mui-focused': {
-      backgroundColor: 'rgba(255, 255, 255, 0.07)',
+      backgroundColor: '#6836e6',
       borderColor: '#6836e6',
       boxShadow: '0 0 0 2px rgba(104, 54, 230, 0.2)',
     },
   },
   '& .MuiInputLabel-root': {
-    color: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)',
+    color: 'rgba(255, 255, 255, 0.88)',
   },
   '& .MuiInputLabel-root.Mui-focused': {
-    color: '#6836e6',
+    color: 'rgba(255, 255, 255, 0.88)',
   },
   '& .MuiOutlinedInput-notchedOutline': {
     border: 'none',
@@ -249,6 +249,7 @@ const LoginPage = () => {
                 <StyledTextField
                   fullWidth
                   label="Email Address"
+                  
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   variant="outlined"

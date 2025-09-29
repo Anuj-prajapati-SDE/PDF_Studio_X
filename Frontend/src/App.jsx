@@ -19,7 +19,7 @@ import MainLayout from './Pages/UserDashboard/Layouts/MainLayout.jsx';
 import HomePage from './Pages/Home/HomePage';
 // import AboutPage from './Pages/Home/AboutPage.jsx';
 // import PricingPage from './Pages/Home/PricingPage.jsx';
-// import ContactPage from './Pages/Home/ContactPage.jsx';
+import ContactPage from './Pages/Home/ContactPage.jsx';
 import SignupPage from './Pages/Auth/SignupPage';
 import LoginPage from './Pages/Auth/LoginPage';
 import OTPVerification from './Pages/Auth/OTPVerification';
@@ -145,9 +145,9 @@ function App() {
           <Routes>
             <Route path="/" element={<MainLayout />}>
               <Route index element={<HomePage />} />
+              <Route path="contact" element={<ContactPage />} />
 
               {/* <Route path="about" element={<AboutPage />} /> */}
-              {/* <Route path="contact" element={<ContactPage />} /> */}
               {/* <Route path="pricing" element={<PricingPage />} /> */}
 
 

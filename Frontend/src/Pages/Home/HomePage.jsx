@@ -29,7 +29,7 @@ import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import {  Devices,  InfoOutlined, PictureAsPdf,  Security, Speed, } from '@mui/icons-material';
 import HowItWorksSection from '../../Components/common/HowItWorkSection';
 import FeatureSection from '../../Components/common/FeatureSection';
-import TestimonialSection from '../../Components/common/TestimonialSection';
+// import TestimonialSection from '../../Components/common/TestimonialSection';
 import CTASection from '../../Components/common/CTASection';
 // import WaveSeparator from '../Components/common/WaveSeparator';
 
